@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 
-const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
+const EMAILJS_SERVICE_ID = "service_zcfpyep";
+const EMAILJS_TEMPLATE_ID = "template_18vkz3q";
+const EMAILJS_PUBLIC_KEY = "BGbyIb-UT_3yGOjVY";
+const SUPABASE_URL = "https://spowxgwxglvljpatdtzi.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNwb3d4Z3d4Z2x2bGpwYXRkdHppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0MDY3MjMsImV4cCI6MjA5NDk4MjcyM30.-J4VichpUy_jdfmSJYJ0PqYA54mMzW1eOBBj08ZZ88c";
 
 // Load EmailJS script dynamically
 const loadEmailJS = () => new Promise((resolve) => {
@@ -309,6 +309,33 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
   const [inviteSending, setInviteSending] = useState(false);
   const [inviteSent, setInviteSent] = useState({}); // { raterId: true }
   const [inviteTokens, setInviteTokens] = useState({}); // { raterId: token }
+  const [stakeholderData, setStakeholderData] = useState({}); // { raterId: { ratings, comments, strengths, development } }
+  const [loadingStakeholders, setLoadingStakeholders] = useState(false);
+
+  const loadStakeholderResponses = async () => {
+    if (!currentUser?.email) return;
+    setLoadingStakeholders(true);
+    try {
+      const data = await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(currentUser.email)}&completed=eq.true&select=*`);
+      if (data && data.length > 0) {
+        const newData = {};
+        data.forEach((inv) => {
+          const roleKey = inv.rater_role.toLowerCase().replace(/\s+/g, '_');
+          newData[roleKey] = {
+            role: inv.rater_role,
+            ratings: inv.ratings || {},
+            comments: inv.comments || {},
+            strengths: inv.strengths || "",
+            development: inv.development || "",
+          };
+        });
+        setStakeholderData(newData);
+      }
+    } catch (e) {
+      console.error("Failed to load stakeholder responses:", e);
+    }
+    setLoadingStakeholders(false);
+  };
   const [showInviteScreen, setShowInviteScreen] = useState(false);
   const [report, setReport] = useState(null);
 
@@ -351,40 +378,56 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
     setReportLoading(true);
     try {
       const selfRatings = ratings["self"] || {};
-      const otherRatersData = selectedRaters
-        .filter((r) => r !== "self")
-        .map((r) => {
-          const raterInfo = RATER_TYPES.find((rt) => rt.id === r);
-          const raterRatings = ratings[r] || {};
-          return { name: raterInfo?.label, ratings: raterRatings };
-        });
 
+      // Combine local ratings with loaded stakeholder data from Supabase
+      const allRaterData = [
+        { name: "Self", ratings: selfRatings, comments: comments["self"] || {}, strengths: strengths["self"] || "", development: development["self"] || "" },
+        // Local raters (if rated on same device)
+        ...selectedRaters.filter(r => r !== "self").map(r => {
+          const raterInfo = RATER_TYPES.find(rt => rt.id === r);
+          return { name: raterInfo?.label || r, ratings: ratings[r] || {}, comments: comments[r] || {}, strengths: strengths[r] || "", development: development[r] || "" };
+        }).filter(r => Object.keys(r.ratings).length > 0),
+        // Stakeholders who completed via email link
+        ...Object.values(stakeholderData),
+      ];
+
+      const otherRaters = allRaterData.filter(r => r.name !== "Self");
+
+      // Detailed competency lines including each stakeholder group
       const competencyLines = COMPETENCIES.map((c) => {
         const selfScore = selfRatings[c.id] || 0;
-        const otherScores = otherRatersData.map((r) => r.ratings[c.id] || 0).filter((s) => s > 0);
-        const avgOthers = otherScores.length > 0 ? (otherScores.reduce((a, b) => a + b, 0) / otherScores.length).toFixed(1) : "N/A";
+        const otherScores = otherRaters.map(r => ({ name: r.name, score: r.ratings[c.id] || 0, comment: r.comments?.[c.id] || "" })).filter(r => r.score > 0);
+        const avgOthers = otherScores.length > 0 ? (otherScores.reduce((a, b) => a + b.score, 0) / otherScores.length).toFixed(1) : "N/A";
+        const gap = avgOthers !== "N/A" ? (parseFloat(avgOthers) - selfScore).toFixed(1) : "N/A";
+        const scoreBreakdown = otherScores.map(r => `${r.name}=${r.score}`).join(", ");
+        const allComments = otherScores.filter(r => r.comment).map(r => `${r.name}: "${r.comment}"`).join("; ");
         const selfComment = comments["self"]?.[c.id] || "";
-        return `- ${c.name}: Self=${selfScore}/5, Others avg=${avgOthers}/5${selfComment ? `, Comment: "${selfComment}"` : ""}`;
+        return `- ${c.name}: Self=${selfScore}/5${scoreBreakdown ? `, [${scoreBreakdown}]` : ""}, Others avg=${avgOthers}/5, Gap=${gap}${selfComment ? `\n  Self comment: "${selfComment}"` : ""}${allComments ? `\n  Stakeholder comments: ${allComments}` : ""}`;
       }).join("\n");
 
-      // Scores by pillar
+      // Pillar scores with stakeholder breakdown
       const pillarLines = PILLARS.map((p) => {
         const selfAvg = (p.competencies.reduce((sum, c) => sum + (selfRatings[c.id] || 0), 0) / p.competencies.length).toFixed(1);
-        return `- ${p.name}: Self avg=${selfAvg}/5`;
+        const stakeholderBreakdown = otherRaters.map(r => {
+          const scores = p.competencies.map(c => r.ratings[c.id] || 0).filter(s => s > 0);
+          if (scores.length === 0) return null;
+          return `${r.name}=${(scores.reduce((a,b) => a+b, 0)/scores.length).toFixed(1)}`;
+        }).filter(Boolean).join(", ");
+        return `- ${p.name}: Self=${selfAvg}/5${stakeholderBreakdown ? ` [${stakeholderBreakdown}]` : ""}`;
       }).join("\n");
 
-      // Strengths & development feedback
-      const strengthsFeedback = Object.entries(strengths).map(([r, s]) => `${r}: ${s}`).join("\n");
-      const developmentFeedback = Object.entries(development).map(([r, d]) => `${r}: ${d}`).join("\n");
+      // All strengths and development feedback from all raters
+      const strengthsFeedback = allRaterData.filter(r => r.strengths?.trim()).map(r => `${r.name}: ${r.strengths}`).join("\n");
+      const developmentFeedback = allRaterData.filter(r => r.development?.trim()).map(r => `${r.name}: ${r.development}`).join("\n");
 
       const valuesContext = coreValues.length > 0
         ? `Their core values are: ${coreValues.join(", ")}.`
         : "";
 
-      // Calculate top 3 and bottom 3 behaviours
+      // Calculate top 3 and bottom 3 using ALL rater scores (self + stakeholders)
       const behaviourScores = COMPETENCIES.map((c) => {
         const selfScore = selfRatings[c.id] || 0;
-        const otherScores = otherRatersData.map((r) => r.ratings[c.id] || 0).filter((s) => s > 0);
+        const otherScores = otherRaters.map(r => r.ratings[c.id] || 0).filter(s => s > 0);
         const avgOthers = otherScores.length > 0 ? otherScores.reduce((a, b) => a + b, 0) / otherScores.length : selfScore;
         const combinedAvg = otherScores.length > 0 ? (selfScore + avgOthers) / 2 : selfScore;
         return { name: c.name, selfScore, avgOthers: otherScores.length > 0 ? avgOthers : null, combinedAvg };
@@ -393,22 +436,26 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
       const top3 = behaviourScores.slice(0, 3).map(b => b.name);
       const bottom3 = behaviourScores.slice(-3).map(b => b.name);
 
+      const stakeholderCount = otherRaters.length;
       const prompt = `You are an executive leadership coach analysing a 360-degree leadership assessment using the Parity Coaching Leadership Competency Framework.
 
 Seniority level: ${SENIORITY_LEVELS.find(s => s.id === seniority)?.label}
 ${valuesContext}
+Number of stakeholders who provided feedback: ${stakeholderCount} (${otherRaters.map(r => r.name).join(", ") || "Self only"})
 
-Scores by Pillar:
+Pillar Scores (Self vs each stakeholder group):
 ${pillarLines}
 
-Individual Behaviour Ratings (Self vs Others):
+Individual Behaviour Ratings with Stakeholder Breakdown and Comments:
 ${competencyLines}
 
-Top 3 highest-rated behaviours: ${top3.join(", ")}
-Bottom 3 lowest-rated behaviours: ${bottom3.join(", ")}
+Top 3 highest-rated behaviours (combined Self + Stakeholder avg): ${top3.join(", ")}
+Bottom 3 lowest-rated behaviours (combined Self + Stakeholder avg): ${bottom3.join(", ")}
 
-${strengthsFeedback ? `Stated Strengths:\n${strengthsFeedback}` : ""}
-${developmentFeedback ? `Stated Development Areas:\n${developmentFeedback}` : ""}
+${strengthsFeedback ? `Qualitative Strengths Feedback:\n${strengthsFeedback}` : ""}
+${developmentFeedback ? `Qualitative Development Feedback:\n${developmentFeedback}` : ""}
+
+IMPORTANT: Base your coaching goals primarily on the STAKEHOLDER feedback and comments, not just self-assessment. Note any significant gaps between self-perception and stakeholder scores. Reference specific stakeholder comments in your suggestions where possible.`
 
 Generate a detailed leadership report. Respond ONLY in this exact JSON format with no other text:
 {
@@ -487,7 +534,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
       // Save leadership assessment to Supabase if user is logged in
       if (currentUser?.email && !currentUser?.localOnly) {
         try {
-          const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+          const SUPABASE_URL = "https://spowxgwxglvljpatdtzi.supabase.co";
           const SUPABASE_KEY = "sb_publishable_pMMs0XKnoWNgbRtbdYDL7A_NnEI46Y5";
           const existing = await fetch(`${SUPABASE_URL}/rest/v1/profiles?email=eq.${encodeURIComponent(currentUser.email)}&select=values_data`, {
             headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` },
@@ -583,6 +630,237 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     setInviteTokens(prev => ({ ...prev, ...newTokens }));
     setInviteSent(prev => ({ ...prev, ...newSent }));
     setInviteSending(false);
+  };
+
+  const generatePDFReport = () => {
+    const selfRatings = ratings["self"] || {};
+    const allRaters = [
+      { key: "self", label: "Self", ratings: selfRatings, comments: comments["self"] || {}, strengths: strengths["self"] || "", development: development["self"] || "" },
+      ...Object.values(stakeholderData),
+    ];
+
+    const getRaterAvg = (raterRatings, pillarComps) => {
+      const scores = pillarComps.map(c => raterRatings[c.id] || 0).filter(s => s > 0);
+      return scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : "N/A";
+    };
+
+    const ratingLabel = (score) => {
+      if (!score || score === "N/A") return "";
+      const n = parseFloat(score);
+      if (n >= 4.5) return "Outstanding";
+      if (n >= 3.5) return "Very Strong";
+      if (n >= 2.5) return "Satisfactory";
+      if (n >= 1.5) return "Little evidence";
+      return "No evidence";
+    };
+
+    const pillarColors = { delivery: "#E85D75", capacity: "#F4A261", people: "#2A9D8F" };
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Leadership Brand Assessment Report</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Arial', sans-serif; color: #1a1a2e; background: white; }
+  .page { max-width: 800px; margin: 0 auto; padding: 40px; }
+  @media print { .page { padding: 20px; } .no-print { display: none; } }
+  
+  .header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 40px; margin: -40px -40px 40px; text-align: center; }
+  .header h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+  .header p { font-size: 14px; opacity: 0.7; }
+  .header .user { font-size: 18px; font-weight: 600; margin: 16px 0 4px; opacity: 0.9; }
+  
+  .section { margin-bottom: 32px; }
+  .section-title { font-size: 16px; font-weight: 800; color: #1a1a2e; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+  
+  .headline-box { background: #f8fafc; border-left: 4px solid #2A9D8F; padding: 20px; margin-bottom: 24px; border-radius: 0 8px 8px 0; }
+  .headline-box p { font-size: 16px; font-style: italic; color: #1a1a2e; line-height: 1.6; font-weight: 600; }
+  
+  .pillar-cards { display: flex; gap: 16px; margin-bottom: 24px; }
+  .pillar-card { flex: 1; padding: 16px; border-radius: 8px; text-align: center; }
+  .pillar-card h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .pillar-card .score { font-size: 32px; font-weight: 800; }
+  .pillar-card .label { font-size: 10px; margin-top: 4px; }
+  
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 12px; }
+  th { background: #1a1a2e; color: white; padding: 10px 8px; text-align: left; font-size: 11px; }
+  td { padding: 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .pillar-row td { background: #f1f5f9; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  
+  .score-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-weight: 700; font-size: 11px; }
+  .score-1 { background: #fee2e2; color: #dc2626; }
+  .score-2 { background: #fed7aa; color: #ea580c; }
+  .score-3 { background: #fef9c3; color: #ca8a04; }
+  .score-4 { background: #d1fae5; color: #059669; }
+  .score-5 { background: #d1fae5; color: #047857; }
+  
+  .top-bottom { display: flex; gap: 16px; margin-bottom: 24px; }
+  .top-box { flex: 1; padding: 16px; border-radius: 8px; }
+  .top-box h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; }
+  .top-box .item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .top-box .num { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: white; flex-shrink: 0; }
+  
+  .coaching-goal { padding: 16px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; margin-bottom: 12px; }
+  .coaching-goal h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; color: #92400e; }
+  .coaching-goal .based-on { font-size: 11px; color: #b45309; margin-bottom: 10px; }
+  .coaching-goal ul { padding-left: 16px; }
+  .coaching-goal li { font-size: 12px; color: #1a1a2e; margin-bottom: 4px; line-height: 1.5; }
+  
+  .comments-grid { }
+  .comment-item { padding: 10px 14px; background: #f8fafc; border-left: 3px solid #e2e8f0; margin-bottom: 8px; border-radius: 0 6px 6px 0; }
+  .comment-item .rater { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
+  .comment-item .text { font-size: 12px; color: #1a1a2e; line-height: 1.5; }
+  
+  .footer { text-align: center; padding: 24px; border-top: 1px solid #e2e8f0; margin-top: 32px; color: #94a3b8; font-size: 11px; }
+  
+  .print-btn { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: #2A9D8F; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; z-index: 1000; }
+  .email-btn { position: fixed; top: 20px; right: 160px; padding: 12px 24px; background: #E85D75; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; z-index: 1000; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <p>PARITY COACHING</p>
+    <h1>Leadership Brand Assessment Report</h1>
+    <div class="user">${currentUser?.email || "Assessment Participant"}</div>
+    <p>${SENIORITY_LEVELS.find(s => s.id === seniority)?.label || ""} · ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
+  </div>
+
+  ${report?.headline ? `
+  <div class="section">
+    <div class="section-title">Your Leadership Brand</div>
+    <div class="headline-box"><p>"${report.headline}"</p></div>
+  </div>` : ""}
+
+  <!-- Pillar Summary -->
+  <div class="section">
+    <div class="section-title">Pillar Summary Scores</div>
+    <div class="pillar-cards">
+      ${PILLARS.map(p => {
+        const selfAvg = getRaterAvg(selfRatings, p.competencies);
+        const otherAvgs = allRaters.filter(r => r.key !== "self").map(r => parseFloat(getRaterAvg(r.ratings, p.competencies))).filter(s => !isNaN(s));
+        const othersAvg = otherAvgs.length > 0 ? (otherAvgs.reduce((a,b) => a+b, 0) / otherAvgs.length).toFixed(1) : "N/A";
+        return `<div class="pillar-card" style="background:${pillarColors[p.id]}15; border: 2px solid ${pillarColors[p.id]}40;">
+          <h3 style="color:${pillarColors[p.id]}">${p.name}</h3>
+          <div class="score" style="color:${pillarColors[p.id]}">${selfAvg}</div>
+          <div class="label" style="color:#64748b">Self / 5.0</div>
+          ${othersAvg !== "N/A" ? `<div class="label" style="color:#94a3b8;margin-top:4px">Others: ${othersAvg}</div>` : ""}
+        </div>`;
+      }).join("")}
+    </div>
+
+    <!-- Full scores table -->
+    <table>
+      <tr>
+        <th style="width:35%">Behaviour</th>
+        <th>Self</th>
+        ${allRaters.filter(r => r.key !== "self").map(r => `<th>${r.role || r.key}</th>`).join("")}
+        ${allRaters.length > 1 ? "<th>Others Avg</th>" : ""}
+      </tr>
+      ${PILLARS.map(p => `
+        <tr class="pillar-row">
+          <td colspan="${2 + allRaters.filter(r => r.key !== "self").length + (allRaters.length > 1 ? 1 : 0)}" style="border-left: 4px solid ${pillarColors[p.id]};">${p.name.toUpperCase()} — ${p.fullName.split("—")[1]?.trim() || ""}</td>
+        </tr>
+        ${p.competencies.map(c => {
+          const selfScore = selfRatings[c.id] || 0;
+          const otherScores = allRaters.filter(r => r.key !== "self").map(r => r.ratings[c.id] || 0);
+          const validOthers = otherScores.filter(s => s > 0);
+          const avgOthers = validOthers.length > 0 ? (validOthers.reduce((a,b) => a+b, 0) / validOthers.length).toFixed(1) : "N/A";
+          const scoreClass = (s) => s ? `score-${Math.round(parseFloat(s))}` : "";
+          return `<tr>
+            <td>${c.name}<br><span style="font-size:10px;color:#64748b">${c.description}</span></td>
+            <td><span class="score-badge ${scoreClass(selfScore)}">${selfScore || "-"}</span></td>
+            ${allRaters.filter(r => r.key !== "self").map(r => `<td><span class="score-badge ${scoreClass(r.ratings[c.id])}">${r.ratings[c.id] || "-"}</span></td>`).join("")}
+            ${allRaters.length > 1 ? `<td><strong>${avgOthers}</strong></td>` : ""}
+          </tr>`;
+        }).join("")}
+      `).join("")}
+    </table>
+  </div>
+
+  <!-- Top 3 / Bottom 3 -->
+  <div class="section">
+    <div class="section-title">Key Findings</div>
+    <div class="top-bottom">
+      <div class="top-box" style="background:#f0fdf4; border: 1px solid #bbf7d0;">
+        <h3 style="color:#059669">🏆 Top 3 Behaviours</h3>
+        ${(report?.top3 || []).map((b, i) => `<div class="item"><div class="num" style="background:#059669">${i+1}</div><span style="font-size:12px">${b}</span></div>`).join("")}
+      </div>
+      <div class="top-box" style="background:#fef2f2; border: 1px solid #fecaca;">
+        <h3 style="color:#dc2626">📈 Bottom 3 Behaviours</h3>
+        ${(report?.bottom3 || []).map((b, i) => `<div class="item"><div class="num" style="background:#dc2626">${i+1}</div><span style="font-size:12px">${b}</span></div>`).join("")}
+      </div>
+    </div>
+  </div>
+
+  <!-- Coaching Goals -->
+  ${report?.coaching_goals?.length ? `
+  <div class="section">
+    <div class="section-title">AI-Generated Coaching Goals</div>
+    <p style="font-size:12px;color:#64748b;margin-bottom:16px">Based on bottom 3 behaviours and stakeholder feedback</p>
+    ${report.coaching_goals.map((g, i) => `
+      <div class="coaching-goal">
+        <h4>${i+1}. ${g.goal}</h4>
+        <div class="based-on">Based on: ${g.based_on}</div>
+        <ul>${(g.actions || []).map(a => `<li>${a}</li>`).join("")}</ul>
+      </div>
+    `).join("")}
+  </div>` : ""}
+
+  <!-- Comments Grid -->
+  ${(() => {
+    const allComments = [];
+    COMPETENCIES.forEach(c => {
+      allRaters.forEach(r => {
+        const comment = r.comments?.[c.id];
+        if (comment?.trim()) allComments.push({ behaviour: c.name, rater: r.role || r.key, comment });
+      });
+    });
+    const allStrengths = allRaters.filter(r => r.strengths?.trim()).map(r => ({ rater: r.role || r.key, text: r.strengths }));
+    const allDevelopment = allRaters.filter(r => r.development?.trim()).map(r => ({ rater: r.role || r.key, text: r.development }));
+    
+    if (allComments.length === 0 && allStrengths.length === 0 && allDevelopment.length === 0) return "";
+    return `
+    <div class="section">
+      <div class="section-title">Qualitative Feedback</div>
+      ${allStrengths.length > 0 ? `
+        <p style="font-size:13px;font-weight:700;margin-bottom:8px;color:#059669">Greatest Strengths</p>
+        ${allStrengths.map(s => `<div class="comment-item"><div class="rater">${s.rater}</div><div class="text">${s.text}</div></div>`).join("")}
+      ` : ""}
+      ${allDevelopment.length > 0 ? `
+        <p style="font-size:13px;font-weight:700;margin-bottom:8px;margin-top:16px;color:#dc2626">Areas for Development</p>
+        ${allDevelopment.map(s => `<div class="comment-item"><div class="rater">${s.rater}</div><div class="text">${s.text}</div></div>`).join("")}
+      ` : ""}
+      ${allComments.length > 0 ? `
+        <p style="font-size:13px;font-weight:700;margin-bottom:8px;margin-top:16px;color:#64748b">Behaviour Comments</p>
+        ${allComments.map(c => `<div class="comment-item"><div class="rater">${c.rater} — ${c.behaviour}</div><div class="text">${c.comment}</div></div>`).join("")}
+      ` : ""}
+    </div>`;
+  })()}
+
+  <!-- Values Alignment -->
+  ${report?.values_alignment ? `
+  <div class="section">
+    <div class="section-title">Values Alignment</div>
+    <p style="font-size:13px;line-height:1.6;color:#334155">${report.values_alignment}</p>
+  </div>` : ""}
+
+  <div class="footer">
+    <p><strong>Parity Coaching</strong> · sayhello@paritycoaching.org · www.paritycoaching.org</p>
+    <p style="margin-top:4px">This report was generated using the Parity Coaching Leadership Competency Framework</p>
+  </div>
+</div>
+
+<button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+</body>
+</html>`;
+
+    const win = window.open("", "_blank");
+    win.document.write(html);
+    win.document.close();
   };
 
   const seniorityLevel = SENIORITY_LEVELS.find((s) => s.id === seniority);
@@ -1020,6 +1298,28 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
               Book a Session →
             </a>
           </div>
+
+          {/* Load Stakeholder Responses */}
+          {Object.keys(inviteTokens).length > 0 && (
+            <div style={{ padding: "16px 20px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, marginBottom: 16 }}>
+              <p style={{ color: "#e2e8f0", fontSize: 13, fontWeight: 700, margin: "0 0 8px" }}>📊 Stakeholder Responses</p>
+              <p style={{ color: "#64748b", fontSize: 12, margin: "0 0 12px" }}>
+                {Object.keys(stakeholderData).length > 0
+                  ? `${Object.keys(stakeholderData).length} stakeholder response(s) loaded.`
+                  : "Check if your stakeholders have completed their assessments."}
+              </p>
+              <button onClick={loadStakeholderResponses} disabled={loadingStakeholders}
+                style={{ ...styles.btnSecondary, fontSize: 13, opacity: loadingStakeholders ? 0.7 : 1 }}>
+                {loadingStakeholders ? "Checking..." : "🔄 Load Stakeholder Responses"}
+              </button>
+            </div>
+          )}
+
+          {/* Generate PDF Report */}
+          <button onClick={generatePDFReport}
+            style={{ ...styles.btnPrimary, width: "100%", marginBottom: 12, background: "linear-gradient(135deg, #1a1a2e, #2A9D8F)" }}>
+            📄 Generate PDF Report
+          </button>
 
           <button onClick={onBack} style={{ ...styles.btnSecondary, width: "100%" }}>
             ← Back to Core Values Exercise
