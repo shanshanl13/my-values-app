@@ -101,7 +101,6 @@ const PILLARS = [
     description: "The ability to communicate effectively and build strong, productive relationships to achieve shared goals. Fostering trust, navigating disagreements constructively, and creating an environment where individuals feel valued and motivated.",
     color: "#2A9D8F",
     competencies: [
-      { id: "p1", name: "Effective Delegation", description: "Delegates effectively." },
       { id: "p2", name: "Talent Development", description: "Actively seeks and develops talents." },
       { id: "p3", name: "Peer Collaboration", description: "Collaborates effectively with peers." },
       { id: "p4", name: "Senior Stakeholder Relationships", description: "Builds strong relationships with senior stakeholders." },
@@ -455,7 +454,7 @@ Bottom 3 lowest-rated behaviours (combined Self + Stakeholder avg): ${bottom3.jo
 ${strengthsFeedback ? `Qualitative Strengths Feedback:\n${strengthsFeedback}` : ""}
 ${developmentFeedback ? `Qualitative Development Feedback:\n${developmentFeedback}` : ""}
 
-IMPORTANT: Base your coaching goals primarily on the STAKEHOLDER feedback and comments, not just self-assessment. Note any significant gaps between self-perception and stakeholder scores. Reference specific stakeholder comments in your suggestions where possible.`
+IMPORTANT: Base your coaching goals primarily on the STAKEHOLDER feedback and comments, not just self-assessment. Note any significant gaps between self-perception and stakeholder scores. Reference specific stakeholder comments in your suggestions where possible.
 
 Generate a detailed leadership report. Respond ONLY in this exact JSON format with no other text:
 {
@@ -950,9 +949,9 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           })}
         </div>
 
-        <button onClick={() => setScreen(2)} disabled={!seniority}
+        <button onClick={() => { setSelectedRaters(["self"]); setCurrentRater("self"); setScreen(3); }} disabled={!seniority}
           style={{ ...styles.btnPrimary, width: "100%", opacity: seniority ? 1 : 0.4, cursor: seniority ? "pointer" : "not-allowed" }}>
-          Next: Select Raters →
+          Start Self Assessment →
         </button>
       </div>
     </div>
@@ -1011,19 +1010,16 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           <button onClick={() => setScreen(2)} style={styles.backBtn}>← Back</button>
           <div style={styles.moduleTag}>Leadership Brand Assessment</div>
 
-          {/* Rater tabs */}
-          <div style={{ display: "flex", gap: 6, marginBottom: 24, flexWrap: "wrap" }}>
-            {selectedRaters.map((r) => {
-              const rt = RATER_TYPES.find((x) => x.id === r);
-              const done = Object.keys(ratings[r] || {}).length === COMPETENCIES.length;
-              const active = currentRater === r;
-              return (
-                <button key={r} onClick={() => setCurrentRater(r)}
-                  style={{ padding: "6px 14px", borderRadius: 20, border: active ? "2px solid #2A9D8F" : "1.5px solid rgba(255,255,255,0.1)", background: active ? "rgba(42,157,143,0.15)" : "rgba(255,255,255,0.04)", color: active ? "#2A9D8F" : done ? "#64748b" : "#94a3b8", fontSize: 12, fontWeight: active ? 700 : 500, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>
-                  {rt?.icon} {rt?.label} {done && "✓"}
-                </button>
-              );
-            })}
+          {/* Self-only indicator */}
+          <div style={{ display: "flex", gap: 6, marginBottom: 24 }}>
+            <div style={{ padding: "6px 14px", borderRadius: 20, border: "2px solid #2A9D8F", background: "rgba(42,157,143,0.15)", color: "#2A9D8F", fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
+              🪞 Self Assessment
+            </div>
+            {selectedRaters.filter(r => r !== "self").length > 0 && (
+              <div style={{ padding: "6px 14px", borderRadius: 20, border: "1.5px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "#64748b", fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}>
+                {selectedRaters.filter(r => r !== "self").length} stakeholder{selectedRaters.filter(r => r !== "self").length !== 1 ? "s" : ""} invited — completing via email
+              </div>
+            )}
           </div>
 
           <h1 style={{ ...styles.title, fontSize: 22, marginBottom: 4 }}>
@@ -1056,9 +1052,9 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                     <div key={comp.id} style={{ padding: "16px 18px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12 }}>
                       <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 12 }}>
                         <div style={{ width: 24, height: 24, borderRadius: 6, background: pillar.color + "22", border: `1px solid ${pillar.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: pillar.color, flexShrink: 0 }}>{ci + 1}</div>
-                        <div>
+                        <div style={{ flex: 1, textAlign: "left" }}>
                           <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#e2e8f0" }}>{comp.name}</p>
-                          <p style={{ margin: "3px 0 0", fontSize: 11, color: "#64748b" }}>{comp.description}</p>
+                          <p style={{ margin: "3px 0 0", fontSize: 11, color: "#64748b", lineHeight: 1.4 }}>{comp.description}</p>
                         </div>
                       </div>
                       <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
@@ -1084,8 +1080,8 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
             </div>
           ))}
 
-          {/* Strengths & Development questions */}
-          <div style={{ padding: "20px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, marginBottom: 24 }}>
+          {/* Strengths & Development questions - only for stakeholders */}
+          {currentRater !== "self" && <div style={{ padding: "20px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, marginBottom: 24 }}>
             <p style={{ color: "#e2e8f0", fontSize: 14, fontWeight: 700, margin: "0 0 16px" }}>📝 Additional Feedback</p>
             <div style={{ marginBottom: 16 }}>
               <p style={{ color: "#94a3b8", fontSize: 13, fontWeight: 600, margin: "0 0 6px" }}>
@@ -1103,33 +1099,17 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                 placeholder="Describe areas for growth with specific suggestions..." rows={3}
                 style={{ width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#e2e8f0", fontSize: 13, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box" }} />
             </div>
-          </div>
+          </div>}
 
           {currentRaterDone ? (
-            nextRater ? (
-              <button onClick={() => setCurrentRater(nextRater)} style={{ ...styles.btnPrimary, width: "100%" }}>
-                Next: Rate as {RATER_TYPES.find(r => r.id === nextRater)?.label} →
-              </button>
-            ) : (
-              <>
-                {/* Consent checkbox */}
-                <div style={{ padding: "14px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "flex-start", gap: 12 }}>
-                  <input type="checkbox" id="consent" checked={consentToShare} onChange={(e) => setConsentToShare(e.target.checked)}
-                    style={{ width: 18, height: 18, marginTop: 2, cursor: "pointer", flexShrink: 0, accentColor: "#2A9D8F" }} />
-                  <label htmlFor="consent" style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.5, cursor: "pointer" }}>
-                    I consent to send a copy of my results to <strong style={{ color: "#e2e8f0" }}>sayhello@paritycoaching.org</strong> so a Parity Coaching coach can review and follow up with me.
-                  </label>
-                </div>
-                <button onClick={generateReport} disabled={reportLoading}
-                  style={{ ...styles.btnPrimary, width: "100%", background: "linear-gradient(135deg, #E85D75, #264653)", opacity: reportLoading ? 0.7 : 1 }}>
-                  {reportLoading ? "Generating your report..." : "Generate My Leadership Report →"}
-                </button>
-              </>
-            )
+            <button onClick={() => setScreen(3.5)}
+              style={{ ...styles.btnPrimary, width: "100%" }}>
+              ✅ Self Assessment Complete — View Status →
+            </button>
           ) : (
             <div style={{ padding: "12px 16px", background: "rgba(244,162,97,0.08)", border: "1px solid rgba(244,162,97,0.2)", borderRadius: 10, textAlign: "center" }}>
               <p style={{ color: "#F4A261", fontSize: 13, margin: 0 }}>
-                Rate all {COMPETENCIES.length} behaviours to continue ({Object.keys(ratings[currentRater] || {}).length}/{COMPETENCIES.length} rated)
+                Rate all {COMPETENCIES.length} behaviours to continue ({Object.keys(ratings["self"] || {}).length}/{COMPETENCIES.length} rated)
               </p>
             </div>
           )}
@@ -1138,7 +1118,118 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     );
   }
 
-  // ── Screen 4: Report ─────────────────────────────────────────────────────────
+  // ── Screen 3.5: Invite Stakeholders & Generate ───────────────────────────────
+  if (screen === 3.5) {
+    const completedCount = Object.keys(stakeholderData).length;
+    const totalInvited = Object.keys(inviteTokens).length;
+    const canGenerate = Object.keys(ratings["self"] || {}).length === COMPETENCIES.length;
+    const nonSelfRaterTypes = RATER_TYPES.filter(r => r.id !== "self");
+
+    return (
+      <div style={styles.root}>
+        <div style={styles.container}>
+          <button onClick={() => setScreen(3)} style={styles.backBtn}>← Back to Self Assessment</button>
+          <div style={styles.moduleTag}>Leadership Brand Assessment</div>
+
+          {/* Self complete badge */}
+          <div style={{ padding: "14px 18px", background: "rgba(42,157,143,0.08)", border: "1px solid rgba(42,157,143,0.25)", borderRadius: 12, marginBottom: 24, display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 20 }}>✅</span>
+            <div>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#e2e8f0" }}>Self Assessment Complete</p>
+              <p style={{ margin: 0, fontSize: 12, color: "#2A9D8F" }}>You can generate your report now or invite stakeholders first</p>
+            </div>
+          </div>
+
+          {/* Invite Stakeholders section */}
+          <p style={{ color: "#e2e8f0", fontSize: 15, fontWeight: 700, marginBottom: 4 }}>📧 Invite Stakeholders (Optional)</p>
+          <p style={{ color: "#64748b", fontSize: 13, marginBottom: 16, lineHeight: 1.5 }}>Select who you want to invite and enter their email. They'll receive a private link to rate you.</p>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 20 }}>
+            {nonSelfRaterTypes.map((rater) => {
+              const isSelected = selectedRaters.includes(rater.id);
+              const hasToken = inviteTokens[rater.id];
+              const isCompleted = Object.values(stakeholderData).some(s => s.role === rater.label);
+              return (
+                <div key={rater.id} style={{ padding: "14px 16px", background: isCompleted ? "rgba(42,157,143,0.08)" : isSelected ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.02)", border: `1px solid ${isCompleted ? "rgba(42,157,143,0.3)" : isSelected ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.06)"}`, borderRadius: 12 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: isSelected && !hasToken ? 10 : 0 }}>
+                    {isCompleted ? (
+                      <span style={{ fontSize: 18 }}>✅</span>
+                    ) : (
+                      <input type="checkbox" checked={isSelected} onChange={() => {
+                        setSelectedRaters(prev => isSelected ? prev.filter(r => r !== rater.id) : [...prev, rater.id]);
+                      }} style={{ width: 18, height: 18, cursor: "pointer", accentColor: "#2A9D8F", flexShrink: 0 }} />
+                    )}
+                    <span style={{ fontSize: 18 }}>{rater.icon}</span>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#e2e8f0" }}>{rater.label}</p>
+                      <p style={{ margin: 0, fontSize: 11, color: isCompleted ? "#2A9D8F" : hasToken ? "#F4A261" : "#64748b" }}>
+                        {isCompleted ? "Completed ✓" : hasToken ? "Invited — awaiting response" : rater.description}
+                      </p>
+                    </div>
+                  </div>
+                  {isSelected && !hasToken && !isCompleted && (
+                    <input type="email" value={inviteEmails[rater.id] || ""}
+                      onChange={(e) => setInviteEmails(prev => ({ ...prev, [rater.id]: e.target.value }))}
+                      placeholder={`${rater.label}'s email address...`}
+                      style={{ width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#e2e8f0", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Send invitations button */}
+          {selectedRaters.filter(r => r !== "self" && !inviteTokens[r]).length > 0 && (
+            <button onClick={sendInvitations} disabled={inviteSending}
+              style={{ ...styles.btnSecondary, width: "100%", marginBottom: 16, opacity: inviteSending ? 0.7 : 1 }}>
+              {inviteSending ? "Sending..." : `📨 Send ${selectedRaters.filter(r => r !== "self" && !inviteTokens[r]).length} Invitation${selectedRaters.filter(r => r !== "self" && !inviteTokens[r]).length !== 1 ? "s" : ""}`}
+            </button>
+          )}
+
+          {/* Check responses */}
+          {totalInvited > 0 && (
+            <>
+              <button onClick={loadStakeholderResponses} disabled={loadingStakeholders}
+                style={{ ...styles.btnSecondary, width: "100%", marginBottom: 12, opacity: loadingStakeholders ? 0.7 : 1 }}>
+                {loadingStakeholders ? "Checking..." : "🔄 Check for New Responses"}
+              </button>
+              {completedCount > 0 && (
+                <div style={{ padding: "10px 14px", background: "rgba(42,157,143,0.08)", border: "1px solid rgba(42,157,143,0.2)", borderRadius: 10, marginBottom: 12, textAlign: "center" }}>
+                  <p style={{ color: "#2A9D8F", fontSize: 13, margin: 0, fontWeight: 600 }}>
+                    {completedCount} stakeholder response{completedCount !== 1 ? "s" : ""} received ✓
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+
+          <div style={{ height: 1, background: "rgba(255,255,255,0.08)", margin: "20px 0" }} />
+
+          {/* Consent + Generate */}
+          <div style={{ padding: "14px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "flex-start", gap: 12 }}>
+            <input type="checkbox" id="consent" checked={consentToShare} onChange={(e) => setConsentToShare(e.target.checked)}
+              style={{ width: 18, height: 18, marginTop: 2, cursor: "pointer", flexShrink: 0, accentColor: "#2A9D8F" }} />
+            <label htmlFor="consent" style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.5, cursor: "pointer" }}>
+              I consent to send a copy of my results to <strong style={{ color: "#e2e8f0" }}>sayhello@paritycoaching.org</strong>
+            </label>
+          </div>
+
+          <button onClick={generateReport} disabled={!canGenerate || reportLoading}
+            style={{ ...styles.btnPrimary, width: "100%", background: "linear-gradient(135deg, #E85D75, #264653)", opacity: canGenerate && !reportLoading ? 1 : 0.5 }}>
+            {reportLoading ? "Generating your report..." : completedCount > 0 ? `Generate Report (Self + ${completedCount} stakeholder${completedCount !== 1 ? "s" : ""}) →` : "Generate Report (Self only) →"}
+          </button>
+
+          {totalInvited > 0 && completedCount === 0 && (
+            <p style={{ textAlign: "center", color: "#475569", fontSize: 12, marginTop: 10 }}>
+              You can generate now or wait for stakeholder responses for a richer report.
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Screen 4: Report ─────────────────────────────────────────────────────────  // ── Screen 4: Report ─────────────────────────────────────────────────────────
   if (screen === 4 && report) {
     const selfRatings = ratings["self"] || {};
     const otherRaters = selectedRaters.filter((r) => r !== "self");
@@ -1151,7 +1242,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     return (
       <div style={styles.root}>
         <div style={styles.container}>
-          <button onClick={() => setScreen(3)} style={styles.backBtn}>← Back to Ratings</button>
+          <button onClick={() => setScreen(3.5)} style={styles.backBtn}>← Back to Status</button>
           <div style={styles.moduleTag}>Leadership Brand Assessment</div>
 
           {/* Headline */}
