@@ -307,15 +307,29 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
   const [inviteEmails, setInviteEmails] = useState({}); // { raterId: email }
   const [inviteSending, setInviteSending] = useState(false);
   const [inviteSent, setInviteSent] = useState({}); // { raterId: true }
-  const [inviteTokens, setInviteTokens] = useState({}); // { raterId: token }
+  const [inviteTokens, setInviteTokens] = useState(() => {
+    try { const s = localStorage.getItem('cv_invite_tokens'); return s ? JSON.parse(s) : {}; } catch { return {}; }
+  }); // { raterId: token }
   const [stakeholderData, setStakeholderData] = useState({}); // { raterId: { ratings, comments, strengths, development } }
   const [loadingStakeholders, setLoadingStakeholders] = useState(false);
 
   const loadStakeholderResponses = async () => {
-    if (!currentUser?.email) return;
     setLoadingStakeholders(true);
     try {
-      const data = await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(currentUser.email)}&completed=eq.true&select=*`);
+      // Query by owner email if logged in, otherwise query by rater emails we invited
+      let data = [];
+      if (currentUser?.email) {
+        data = await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(currentUser.email)}&completed=eq.true&select=*`) || [];
+      }
+      // Also check by individual tokens we have stored (catches anonymous invitations)
+      const tokens = Object.values(inviteTokens);
+      if (tokens.length > 0) {
+        const tokenResults = await Promise.all(tokens.map(t => sbFetch(`/leadership_invitations?token=eq.${t}&completed=eq.true&select=*`).catch(() => [])));
+        const tokenData = tokenResults.flat().filter(Boolean);
+        // Merge, avoiding duplicates
+        const existingIds = new Set(data.map(d => d.id));
+        tokenData.forEach(d => { if (!existingIds.has(d.id)) data.push(d); });
+      }
       if (data && data.length > 0) {
         const newData = {};
         data.forEach((inv) => {
@@ -487,7 +501,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer ${import.meta.env.VITE_OPENAI_API_KEY}",
+          "Authorization": "Bearer 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",
         },
         body: JSON.stringify({
           model: "gpt-4o",
@@ -604,7 +618,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
         const result = await sbFetch("/leadership_invitations", {
           method: "POST",
           body: JSON.stringify({
-            owner_email: currentUser?.email || "anonymous",
+            owner_email: currentUser?.email || "",
             rater_role: raterInfo?.label || raterId,
             rater_email: email,
           }),
@@ -626,7 +640,9 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
         console.error("Failed to send invite to", email, e);
       }
     }
-    setInviteTokens(prev => ({ ...prev, ...newTokens }));
+    const merged = { ...inviteTokens, ...newTokens };
+    setInviteTokens(merged);
+    try { localStorage.setItem('cv_invite_tokens', JSON.stringify(merged)); } catch (e) {}
     setInviteSent(prev => ({ ...prev, ...newSent }));
     setInviteSending(false);
   };
