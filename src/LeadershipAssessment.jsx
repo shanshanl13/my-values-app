@@ -958,7 +958,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
   if (screen === 1) return (
     <div style={styles.root}>
       <div style={styles.container}>
-        <button onClick={onBack} style={styles.backBtn}>← Back to Core Values</button>
+        <button onClick={onBack} style={styles.backBtn}>← Back</button>
         <div style={styles.moduleTag}>Leadership Brand Assessment</div>
         <h1 style={styles.title}>What is your seniority level?</h1>
         <p style={styles.subtitle}>This helps us tailor the competency framework to your role.</p>
@@ -1458,7 +1458,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           </button>
 
           <button onClick={onBack} style={{ ...styles.btnSecondary, width: "100%" }}>
-            ← Back to Core Values Exercise
+            ← Back Exercise
           </button>
         </div>
       </div>
