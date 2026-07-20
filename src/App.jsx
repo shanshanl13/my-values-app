@@ -142,8 +142,8 @@ const COMMON_GOALS = {
 };
 
 const PALETTE = [
-  "#E85D75","#F4A261","#2A9D8F","#264653","#E9C46A",
-  "#7B2D8B","#457B9D","#F28482","#84A59D","#F7B267"
+  "#5B2D8E","#C9843A","#2D1B4E","#8B4A6E","#E0A84A",
+  "#4A2D6E","#9B6B9E","#D4956A","#7A4D8E","#B87A3A"
 ];
 
 // ─── PieChart component ────────────────────────────────────────────────────────
@@ -220,13 +220,13 @@ function PieChart({ values, percentages, descriptions, onPercentageChange, activ
           <g>
             <circle cx={cx} cy={cy} r={38} fill="rgba(15,23,42,0.9)" />
             <text x={cx} y={cy - 8} textAnchor="middle" dominantBaseline="middle" fill={PALETTE[activeIndex % PALETTE.length]} fontSize="20" fontWeight="800">{percentages[activeIndex]}%</text>
-            <text x={cx} y={cy + 12} textAnchor="middle" dominantBaseline="middle" fill="#94a3b8" fontSize="9" fontWeight="600">{values[activeIndex]}</text>
+            <text x={cx} y={cy + 12} textAnchor="middle" dominantBaseline="middle" fill="#6B5B7B" fontSize="9" fontWeight="600">{values[activeIndex]}</text>
           </g>
         )}
       </svg>
       {interactive && (
         <div style={{ width: "100%", maxWidth: 540 }}>
-          <p style={{ color: "#94a3b8", fontSize: 13, marginBottom: 14, textAlign: "center" }}>Drag a slider — your previous adjustment stays fixed.</p>
+          <p style={{ color: "#6B5B7B", fontSize: 13, marginBottom: 14, textAlign: "center" }}>Drag a slider — your previous adjustment stays fixed.</p>
           {values.map((v, i) => {
             const isActive = activeIndex === i;
             const isProtected = lastTouched === i && !isActive;
@@ -237,15 +237,15 @@ function PieChart({ values, percentages, descriptions, onPercentageChange, activ
                 border: isActive ? `2px solid ${PALETTE[i % PALETTE.length]}55` : isProtected ? "2px solid rgba(244,162,97,0.15)" : "2px solid transparent",
                 transition: "all 0.2s ease", transform: isActive ? "scale(1.02)" : "scale(1)" }}>
                 <div style={{ width: 16, height: 16, borderRadius: 4, background: PALETTE[i % PALETTE.length], flexShrink: 0, boxShadow: isActive ? `0 0 10px ${PALETTE[i % PALETTE.length]}88` : "none", transition: "box-shadow 0.2s ease" }} />
-                <span style={{ width: 100, fontSize: 13, fontWeight: isActive ? 800 : 600, color: isActive ? "#fff" : isProtected ? "#F4A261" : isAffected ? "#64748b" : "#e2e8f0", transition: "all 0.2s ease" }}>{v}</span>
-                {isProtected && <span style={{ fontSize: 10, color: "#F4A261", flexShrink: 0 }}>set</span>}
+                <span style={{ width: 100, fontSize: 13, fontWeight: isActive ? 800 : 600, color: isActive ? "#fff" : isProtected ? "#C9843A" : isAffected ? "#8B7B9B" : "#1a0a2e", transition: "all 0.2s ease" }}>{v}</span>
+                {isProtected && <span style={{ fontSize: 10, color: "#C9843A", flexShrink: 0 }}>set</span>}
                 <input type="range" min={0} max={100} value={percentages[i]}
                   onChange={(e) => onPercentageChange(i, parseInt(e.target.value))}
                   onMouseDown={() => onActiveChange(i)} onTouchStart={() => onActiveChange(i)}
                   onMouseUp={() => onSliderRelease(i)} onTouchEnd={() => onSliderRelease(i)}
                   style={{ flex: 1, accentColor: PALETTE[i % PALETTE.length], cursor: "pointer" }} />
                 <span style={{ width: 44, fontSize: isActive ? 16 : 13, fontWeight: isActive ? 800 : isProtected ? 700 : 500,
-                  color: isActive ? PALETTE[i % PALETTE.length] : isProtected ? "#F4A261" : isAffected ? "#475569" : "#cbd5e1",
+                  color: isActive ? PALETTE[i % PALETTE.length] : isProtected ? "#C9843A" : isAffected ? "#9B8BAB" : "#4A2D6E",
                   textAlign: "right", transition: "all 0.2s ease" }}>{percentages[i]}%</span>
               </div>
             );
@@ -255,10 +255,10 @@ function PieChart({ values, percentages, descriptions, onPercentageChange, activ
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
         {slices.map((s, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px",
-            background: activeIndex === i ? `${s.color}22` : "rgba(255,255,255,0.04)", borderRadius: 6,
+            background: activeIndex === i ? `${s.color}22` : "rgba(45,27,78,0.05)", borderRadius: 6,
             border: activeIndex === i ? `1px solid ${s.color}44` : "1px solid transparent", transition: "all 0.2s ease" }}>
             <div style={{ width: 10, height: 10, borderRadius: 2, background: s.color }} />
-            <span style={{ fontSize: 12, color: activeIndex === i ? "#fff" : "#cbd5e1", fontWeight: activeIndex === i ? 700 : 400 }}>{s.value} ({s.pct}%)</span>
+            <span style={{ fontSize: 12, color: activeIndex === i ? "#fff" : "#4A2D6E", fontWeight: activeIndex === i ? 700 : 400 }}>{s.value} ({s.pct}%)</span>
           </div>
         ))}
       </div>
@@ -303,26 +303,28 @@ function WelcomeModal({ onNewUser, onLoadUser, onNewUserLeadership, onLoadUserLe
       onMouseLeave={e => e.currentTarget.style.background = `${color}0d`}
     >
       <span style={{ fontSize: 36 }}>{icon}</span>
-      <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: "#e2e8f0", lineHeight: 1.3 }}>{title}</p>
-      <p style={{ margin: 0, fontSize: 11, color: "#64748b", lineHeight: 1.5 }}>{desc}</p>
+      <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: "#1a0a2e", lineHeight: 1.3 }}>{title}</p>
+      <p style={{ margin: 0, fontSize: 11, color: "#8B7B9B", lineHeight: 1.5 }}>{desc}</p>
     </button>
   );
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.92)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div style={{ background: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, width: "100%", maxWidth: 460, overflow: "hidden", boxShadow: "0 25px 60px rgba(0,0,0,0.6)" }}>
-        <div style={{ height: 4, background: "linear-gradient(90deg, #E85D75, #F4A261, #2A9D8F, #7B2D8B)" }} />
+      <div style={{ background: "#EDE8F5", border: "1px solid rgba(45,27,78,0.2)", borderRadius: 20, width: "100%", maxWidth: 460, overflow: "hidden", boxShadow: "0 25px 60px rgba(0,0,0,0.6)" }}>
+        <div style={{ height: 4, background: "linear-gradient(90deg, #5B2D8E, #2D1B4E, #C9843A)" }} />
 
         {/* Screen 1: New or returning */}
         {mode === "choose" && (
           <div style={{ padding: "32px 32px 28px" }}>
-            <div style={{ fontSize: 40, textAlign: "center", marginBottom: 12 }}>🌟</div>
-            <h2 style={{ textAlign: "center", color: "#e2e8f0", fontSize: 24, fontWeight: 800, margin: "0 0 8px" }}>Welcome</h2>
-            <p style={{ textAlign: "center", color: "#94a3b8", fontSize: 13, lineHeight: 1.6, margin: "0 0 28px" }}>Build your leadership identity through values and brand assessment.</p>
-            <button onClick={() => setMode("module_new")} style={{ width: "100%", padding: "14px", background: "linear-gradient(135deg, #2A9D8F, #264653)", border: "none", borderRadius: 10, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", marginBottom: 10 }}>
-              🆕 I'm a new user
+            <div style={{ textAlign: "center", marginBottom: 20 }}>
+              <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 50, objectFit: "contain" }} />
+            </div>
+            <h2 style={{ textAlign: "center", color: "#2D1B4E", fontSize: 22, fontWeight: 800, margin: "0 0 8px" }}>Leadership Brand Assessment</h2>
+            <p style={{ textAlign: "center", color: "#6B5B7B", fontSize: 13, lineHeight: 1.6, margin: "0 0 28px" }}>Understand your leadership competencies and get AI-driven coaching goals.</p>
+            <button onClick={onNewUserLeadership} style={{ width: "100%", padding: "14px", background: "linear-gradient(135deg, #C9843A, #8B4A1E)", border: "none", borderRadius: 10, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", marginBottom: 10 }}>
+              🆕 Start Assessment
             </button>
-            <button onClick={() => setMode("module_returning")} style={{ width: "100%", padding: "14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, color: "#e2e8f0", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+            <button onClick={() => setMode("returning_leadership")} style={{ width: "100%", padding: "14px", background: "rgba(45,27,78,0.08)", border: "1px solid rgba(45,27,78,0.18)", borderRadius: 10, color: "#1a0a2e", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
               👋 I have a saved profile
             </button>
           </div>
@@ -331,22 +333,22 @@ function WelcomeModal({ onNewUser, onLoadUser, onNewUserLeadership, onLoadUserLe
         {/* Screen 2a: New user — pick module */}
         {mode === "module_new" && (
           <div style={{ padding: "28px 28px 28px" }}>
-            <button onClick={() => setMode("choose")} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 13, fontFamily: "inherit", marginBottom: 16 }}>← Back</button>
-            <h2 style={{ textAlign: "center", color: "#e2e8f0", fontSize: 20, fontWeight: 800, margin: "0 0 6px" }}>What would you like to do?</h2>
-            <p style={{ textAlign: "center", color: "#64748b", fontSize: 12, margin: "0 0 20px" }}>You can always access the other module later.</p>
+            <button onClick={() => setMode("choose")} style={{ background: "none", border: "none", color: "#8B7B9B", cursor: "pointer", fontSize: 13, fontFamily: "inherit", marginBottom: 16 }}>← Back</button>
+            <h2 style={{ textAlign: "center", color: "#1a0a2e", fontSize: 20, fontWeight: 800, margin: "0 0 6px" }}>What would you like to do?</h2>
+            <p style={{ textAlign: "center", color: "#8B7B9B", fontSize: 12, margin: "0 0 20px" }}>You can always access the other module later.</p>
             <div style={{ display: "flex", gap: 12 }}>
               <ModuleCard
                 icon="🎯"
                 title="Core Values to Goals"
                 desc="Discover your values, set goals, build your identity statement"
-                color="#2A9D8F"
-                onClick={onNewUser}
+                color="#C9843A"
+                onClick={onNewUserLeadership}
               />
               <ModuleCard
                 icon="🏆"
                 title="Leadership Brand Assessment"
                 desc="Rate your leadership competencies and get a personalised report"
-                color="#7B2D8B"
+                color="#4A2D6E"
                 onClick={onNewUserLeadership}
               />
             </div>
@@ -356,22 +358,22 @@ function WelcomeModal({ onNewUser, onLoadUser, onNewUserLeadership, onLoadUserLe
         {/* Screen 2b: Returning user — pick module */}
         {mode === "module_returning" && (
           <div style={{ padding: "28px 28px 28px" }}>
-            <button onClick={() => setMode("choose")} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 13, fontFamily: "inherit", marginBottom: 16 }}>← Back</button>
-            <h2 style={{ textAlign: "center", color: "#e2e8f0", fontSize: 20, fontWeight: 800, margin: "0 0 6px" }}>Where would you like to go?</h2>
-            <p style={{ textAlign: "center", color: "#64748b", fontSize: 12, margin: "0 0 20px" }}>We'll load your saved profile.</p>
+            <button onClick={() => setMode("choose")} style={{ background: "none", border: "none", color: "#8B7B9B", cursor: "pointer", fontSize: 13, fontFamily: "inherit", marginBottom: 16 }}>← Back</button>
+            <h2 style={{ textAlign: "center", color: "#1a0a2e", fontSize: 20, fontWeight: 800, margin: "0 0 6px" }}>Where would you like to go?</h2>
+            <p style={{ textAlign: "center", color: "#8B7B9B", fontSize: 12, margin: "0 0 20px" }}>We'll load your saved profile.</p>
             <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
               <ModuleCard
                 icon="🎯"
                 title="Core Values to Goals"
                 desc="Continue where you left off with your values and goals"
-                color="#2A9D8F"
+                color="#C9843A"
                 onClick={() => setMode("returning_values")}
               />
               <ModuleCard
                 icon="🏆"
                 title="Leadership Assessment"
                 desc="View or redo your leadership brand assessment"
-                color="#7B2D8B"
+                color="#4A2D6E"
                 onClick={() => setMode("returning_leadership")}
               />
             </div>
@@ -381,42 +383,42 @@ function WelcomeModal({ onNewUser, onLoadUser, onNewUserLeadership, onLoadUserLe
         {/* Screen 3a: Returning — email for values */}
         {mode === "returning_values" && (
           <div style={{ padding: "28px 32px 24px" }}>
-            <button onClick={() => { setMode("module_returning"); setError(""); }} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 13, fontFamily: "inherit", marginBottom: 16 }}>← Back</button>
+            <button onClick={() => { setMode("module_returning"); setError(""); }} style={{ background: "none", border: "none", color: "#8B7B9B", cursor: "pointer", fontSize: 13, fontFamily: "inherit", marginBottom: 16 }}>← Back</button>
             <div style={{ fontSize: 36, textAlign: "center", marginBottom: 12 }}>🎯</div>
-            <h2 style={{ textAlign: "center", color: "#e2e8f0", fontSize: 22, fontWeight: 800, margin: "0 0 8px" }}>Load Your Values Profile</h2>
-            <p style={{ textAlign: "center", color: "#94a3b8", fontSize: 13, lineHeight: 1.6, margin: "0 0 20px" }}>Enter your email to continue where you left off.</p>
+            <h2 style={{ textAlign: "center", color: "#1a0a2e", fontSize: 22, fontWeight: 800, margin: "0 0 8px" }}>Load Your Values Profile</h2>
+            <p style={{ textAlign: "center", color: "#6B5B7B", fontSize: 13, lineHeight: 1.6, margin: "0 0 20px" }}>Enter your email to continue where you left off.</p>
             <input type="email" value={email} autoFocus
               onChange={(e) => { setEmail(e.target.value); setError(""); }}
               onKeyDown={(e) => e.key === "Enter" && handleLoad(false)}
               placeholder="your@email.com"
-              style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.06)", border: `1.5px solid ${error ? "#E85D75" : "rgba(255,255,255,0.12)"}`, borderRadius: 10, color: "#e2e8f0", fontSize: 15, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 6 }} />
-            {error && <p style={{ color: "#E85D75", fontSize: 12, margin: "0 0 10px" }}>{error}</p>}
+              style={{ width: "100%", padding: "12px 16px", background: "rgba(45,27,78,0.08)", border: `1.5px solid ${error ? "#5B2D8E" : "rgba(45,27,78,0.18)"}`, borderRadius: 10, color: "#1a0a2e", fontSize: 15, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 6 }} />
+            {error && <p style={{ color: "#5B2D8E", fontSize: 12, margin: "0 0 10px" }}>{error}</p>}
             <button onClick={() => handleLoad(false)} disabled={loading}
-              style={{ width: "100%", padding: "13px", background: "linear-gradient(135deg, #2A9D8F, #264653)", border: "none", borderRadius: 10, color: "#fff", fontSize: 15, fontWeight: 700, cursor: loading ? "wait" : "pointer", fontFamily: "inherit", marginTop: 8, opacity: loading ? 0.7 : 1 }}>
+              style={{ width: "100%", padding: "13px", background: "linear-gradient(135deg, #C9843A, #8B4A1E)", border: "none", borderRadius: 10, color: "#fff", fontSize: 15, fontWeight: 700, cursor: loading ? "wait" : "pointer", fontFamily: "inherit", marginTop: 8, opacity: loading ? 0.7 : 1 }}>
               {loading ? "Loading..." : "Load My Progress →"}
             </button>
-            <p style={{ textAlign: "center", color: "#334155", fontSize: 11, margin: "12px 0 0" }}>🔒 Only used to find your profile.</p>
+            <p style={{ textAlign: "center", color: "#B0A0BF", fontSize: 11, margin: "12px 0 0" }}>🔒 Only used to find your profile.</p>
           </div>
         )}
 
         {/* Screen 3b: Returning — email for leadership */}
         {mode === "returning_leadership" && (
           <div style={{ padding: "28px 32px 24px" }}>
-            <button onClick={() => { setMode("module_returning"); setError(""); }} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 13, fontFamily: "inherit", marginBottom: 16 }}>← Back</button>
+            <button onClick={() => { setMode("module_returning"); setError(""); }} style={{ background: "none", border: "none", color: "#8B7B9B", cursor: "pointer", fontSize: 13, fontFamily: "inherit", marginBottom: 16 }}>← Back</button>
             <div style={{ fontSize: 36, textAlign: "center", marginBottom: 12 }}>🏆</div>
-            <h2 style={{ textAlign: "center", color: "#e2e8f0", fontSize: 22, fontWeight: 800, margin: "0 0 8px" }}>Load Your Leadership Profile</h2>
-            <p style={{ textAlign: "center", color: "#94a3b8", fontSize: 13, lineHeight: 1.6, margin: "0 0 20px" }}>Enter your email to access your leadership assessment.</p>
+            <h2 style={{ textAlign: "center", color: "#1a0a2e", fontSize: 22, fontWeight: 800, margin: "0 0 8px" }}>Load Your Leadership Profile</h2>
+            <p style={{ textAlign: "center", color: "#6B5B7B", fontSize: 13, lineHeight: 1.6, margin: "0 0 20px" }}>Enter your email to access your leadership assessment.</p>
             <input type="email" value={email} autoFocus
               onChange={(e) => { setEmail(e.target.value); setError(""); }}
               onKeyDown={(e) => e.key === "Enter" && handleLoad(true)}
               placeholder="your@email.com"
-              style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.06)", border: `1.5px solid ${error ? "#E85D75" : "rgba(255,255,255,0.12)"}`, borderRadius: 10, color: "#e2e8f0", fontSize: 15, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 6 }} />
-            {error && <p style={{ color: "#E85D75", fontSize: 12, margin: "0 0 10px" }}>{error}</p>}
+              style={{ width: "100%", padding: "12px 16px", background: "rgba(45,27,78,0.08)", border: `1.5px solid ${error ? "#5B2D8E" : "rgba(45,27,78,0.18)"}`, borderRadius: 10, color: "#1a0a2e", fontSize: 15, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 6 }} />
+            {error && <p style={{ color: "#5B2D8E", fontSize: 12, margin: "0 0 10px" }}>{error}</p>}
             <button onClick={() => handleLoad(true)} disabled={loading}
               style={{ width: "100%", padding: "13px", background: "linear-gradient(135deg, #7B2D8B, #264653)", border: "none", borderRadius: 10, color: "#fff", fontSize: 15, fontWeight: 700, cursor: loading ? "wait" : "pointer", fontFamily: "inherit", marginTop: 8, opacity: loading ? 0.7 : 1 }}>
               {loading ? "Loading..." : "Load My Assessment →"}
             </button>
-            <p style={{ textAlign: "center", color: "#334155", fontSize: 11, margin: "12px 0 0" }}>🔒 Only used to find your profile.</p>
+            <p style={{ textAlign: "center", color: "#B0A0BF", fontSize: 11, margin: "12px 0 0" }}>🔒 Only used to find your profile.</p>
           </div>
         )}
 
@@ -452,35 +454,35 @@ function RegistrationModal({ onComplete, onSkip }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div style={{ background: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, width: "100%", maxWidth: 420, overflow: "hidden", boxShadow: "0 25px 60px rgba(0,0,0,0.6)" }}>
-        <div style={{ height: 4, background: "linear-gradient(90deg, #E85D75, #F4A261, #2A9D8F)" }} />
+      <div style={{ background: "#F9F6F2", border: "1px solid rgba(45,27,78,0.15)", borderRadius: 20, width: "100%", maxWidth: 420, overflow: "hidden", boxShadow: "0 25px 60px rgba(0,0,0,0.6)" }}>
+        <div style={{ height: 4, background: "linear-gradient(90deg, #5B2D8E, #C9843A)" }} />
         {status === "done" ? (
           <div style={{ textAlign: "center", padding: "40px 32px" }}>
-            <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(42,157,143,0.15)", border: "2px solid #2A9D8F", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#2A9D8F", margin: "0 auto 16px", lineHeight: "56px" }}>✓</div>
-            <h2 style={{ color: "#e2e8f0", fontSize: 22, fontWeight: 800, margin: "0 0 8px" }}>Profile saved!</h2>
-            <p style={{ color: "#94a3b8", fontSize: 13 }}>Your values are saved to the cloud — accessible from any device.</p>
+            <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(201,132,58,0.15)", border: "2px solid #2A9D8F", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#C9843A", margin: "0 auto 16px", lineHeight: "56px" }}>✓</div>
+            <h2 style={{ color: "#1a0a2e", fontSize: 22, fontWeight: 800, margin: "0 0 8px" }}>Profile saved!</h2>
+            <p style={{ color: "#6B5B7B", fontSize: 13 }}>Your values are saved to the cloud — accessible from any device.</p>
           </div>
         ) : (
           <div style={{ padding: "28px 32px 24px" }}>
             <div style={{ fontSize: 36, textAlign: "center", marginBottom: 12 }}>🔐</div>
-            <h2 style={{ textAlign: "center", color: "#e2e8f0", fontSize: 22, fontWeight: 800, margin: "0 0 8px" }}>Save Your Progress</h2>
-            <p style={{ textAlign: "center", color: "#94a3b8", fontSize: 13, lineHeight: 1.6, margin: "0 0 20px" }}>
+            <h2 style={{ textAlign: "center", color: "#1a0a2e", fontSize: 22, fontWeight: 800, margin: "0 0 8px" }}>Save Your Progress</h2>
+            <p style={{ textAlign: "center", color: "#6B5B7B", fontSize: 13, lineHeight: 1.6, margin: "0 0 20px" }}>
               Enter your email to save your values to the cloud. Come back on any device and pick up where you left off.
             </p>
             <input type="email" value={email} autoFocus
               onChange={(e) => { setEmail(e.target.value); setError(""); }}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
               placeholder="your@email.com"
-              style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.06)", border: `1.5px solid ${error ? "#E85D75" : "rgba(255,255,255,0.12)"}`, borderRadius: 10, color: "#e2e8f0", fontSize: 15, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 6 }} />
-            {error && <p style={{ color: "#E85D75", fontSize: 12, margin: "0 0 10px" }}>{error}</p>}
+              style={{ width: "100%", padding: "12px 16px", background: "rgba(45,27,78,0.08)", border: `1.5px solid ${error ? "#5B2D8E" : "rgba(45,27,78,0.18)"}`, borderRadius: 10, color: "#1a0a2e", fontSize: 15, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 6 }} />
+            {error && <p style={{ color: "#5B2D8E", fontSize: 12, margin: "0 0 10px" }}>{error}</p>}
             <button onClick={handleSubmit} disabled={status === "saving"}
-              style={{ width: "100%", padding: "13px", background: "linear-gradient(135deg, #2A9D8F, #264653)", border: "none", borderRadius: 10, color: "#fff", fontSize: 15, fontWeight: 700, cursor: status === "saving" ? "wait" : "pointer", fontFamily: "inherit", marginTop: 8, marginBottom: 10, opacity: status === "saving" ? 0.7 : 1 }}>
+              style={{ width: "100%", padding: "13px", background: "linear-gradient(135deg, #C9843A, #8B4A1E)", border: "none", borderRadius: 10, color: "#fff", fontSize: 15, fontWeight: 700, cursor: status === "saving" ? "wait" : "pointer", fontFamily: "inherit", marginTop: 8, marginBottom: 10, opacity: status === "saving" ? 0.7 : 1 }}>
               {status === "saving" ? "Saving..." : "Save to Cloud →"}
             </button>
-            <button onClick={onSkip} style={{ width: "100%", padding: "10px", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, color: "#64748b", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+            <button onClick={onSkip} style={{ width: "100%", padding: "10px", background: "transparent", border: "1px solid rgba(45,27,78,0.1)", borderRadius: 10, color: "#8B7B9B", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
               Skip — save locally only
             </button>
-            <p style={{ textAlign: "center", color: "#334155", fontSize: 11, margin: "12px 0 0" }}>🔒 Only used to save your profile. No spam.</p>
+            <p style={{ textAlign: "center", color: "#B0A0BF", fontSize: 11, margin: "12px 0 0" }}>🔒 Only used to save your profile. No spam.</p>
           </div>
         )}
       </div>
@@ -501,17 +503,17 @@ function ReturnBanner({ email, onLoad, onDismiss }) {
   };
 
   return (
-    <div style={{ margin: "0 0 20px", padding: "14px 18px", background: "rgba(42,157,143,0.1)", border: "1px solid rgba(42,157,143,0.25)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+    <div style={{ margin: "0 0 20px", padding: "14px 18px", background: "rgba(201,132,58,0.1)", border: "1px solid rgba(201,132,58,0.25)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
       <div>
-        <p style={{ color: "#2A9D8F", fontSize: 13, fontWeight: 700, margin: 0 }}>Welcome back!</p>
-        <p style={{ color: "#64748b", fontSize: 12, margin: "2px 0 0" }}>Load your saved progress from the cloud?</p>
+        <p style={{ color: "#C9843A", fontSize: 13, fontWeight: 700, margin: 0 }}>Welcome back!</p>
+        <p style={{ color: "#8B7B9B", fontSize: 12, margin: "2px 0 0" }}>Load your saved progress from the cloud?</p>
       </div>
       <div style={{ display: "flex", gap: 8 }}>
         <button onClick={handleLoad} disabled={loading}
-          style={{ padding: "8px 14px", background: "#2A9D8F", border: "none", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+          style={{ padding: "8px 14px", background: "#C9843A", border: "none", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
           {loading ? "Loading..." : "Load my data"}
         </button>
-        <button onClick={onDismiss} style={{ padding: "8px 14px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#64748b", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
+        <button onClick={onDismiss} style={{ padding: "8px 14px", background: "transparent", border: "1px solid rgba(45,27,78,0.15)", borderRadius: 8, color: "#8B7B9B", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
           Start fresh
         </button>
       </div>
@@ -554,7 +556,7 @@ export default function CoreValuesApp() {
   const [showRegModal, setShowRegModal] = useState(false);
   const [showReturnBanner, setShowReturnBanner] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(!savedUser);
-  const [showLeadership, setShowLeadership] = useState(() => !!new URLSearchParams(window.location.search).get("rate"));
+  const [showLeadership, setShowLeadership] = useState(true);
   const [identityStatement, setIdentityStatement] = useState(savedState?.identityStatement || "");
   const [identityOptions, setIdentityOptions] = useState([]);
   const [identityLoading, setIdentityLoading] = useState(false);
@@ -665,7 +667,7 @@ export default function CoreValuesApp() {
 
       const response = await fetch("/openai/v1/chat/completions", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer ${import.meta.env.VITE_OPENAI_API_KEY}" },
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer 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" },
         body: JSON.stringify({
           model: "gpt-4o",
           max_tokens: 1000,
@@ -723,7 +725,7 @@ Respond ONLY in this exact JSON format with no other text:
 
       const response = await fetch("/openai/v1/chat/completions", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer ${import.meta.env.VITE_OPENAI_API_KEY}" },
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer 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" },
         body: JSON.stringify({ model: "gpt-4o", max_tokens: 1000, messages: [{ role: "user", content: prompt }] }),
       });
       const data = await response.json();
@@ -856,11 +858,11 @@ Respond ONLY in this exact JSON format with no other text:
             <h2 style={styles.stepHeading}>Step 1: Select Your Top 10 Values</h2>
             <p style={styles.stepDesc}>
               Choose exactly 10 values most important to your life and/or work.
-              <strong style={{ color: selectedTen.length === 10 ? "#2A9D8F" : "#F4A261" }}> ({selectedTen.length}/10 selected{selectedTen.length < 10 ? ` — need ${10 - selectedTen.length} more` : " ✓"})</strong>
+              <strong style={{ color: selectedTen.length === 10 ? "#C9843A" : "#C9843A" }}> ({selectedTen.length}/10 selected{selectedTen.length < 10 ? ` — need ${10 - selectedTen.length} more` : " ✓"})</strong>
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
               {allValues.map((v) => (
-                <button key={v} onClick={() => toggleTen(v)} style={{ ...styles.selectableChip, background: selectedTen.includes(v) ? "#2A9D8F" : "rgba(255,255,255,0.06)", color: selectedTen.includes(v) ? "#fff" : "#94a3b8", borderColor: selectedTen.includes(v) ? "#2A9D8F" : "rgba(255,255,255,0.1)" }}>{v}</button>
+                <button key={v} onClick={() => toggleTen(v)} style={{ ...styles.selectableChip, background: selectedTen.includes(v) ? "#C9843A" : "rgba(45,27,78,0.08)", color: selectedTen.includes(v) ? "#fff" : "#6B5B7B", borderColor: selectedTen.includes(v) ? "#C9843A" : "rgba(45,27,78,0.15)" }}>{v}</button>
               ))}
             </div>
             <div style={{ display: "flex", gap: 8 }}>
@@ -875,11 +877,11 @@ Respond ONLY in this exact JSON format with no other text:
             <h2 style={styles.stepHeading}>Step 2: Narrow to 3–5 Core Values</h2>
             <p style={styles.stepDesc}>
               From your top 10, select 3 to 5 values most important to you right now.
-              <strong style={{ color: selectedCore.length >= 3 ? "#2A9D8F" : "#F4A261" }}> ({selectedCore.length}/5 selected{selectedCore.length < 3 ? ` — need at least ${3 - selectedCore.length} more` : " ✓"})</strong>
+              <strong style={{ color: selectedCore.length >= 3 ? "#C9843A" : "#C9843A" }}> ({selectedCore.length}/5 selected{selectedCore.length < 3 ? ` — need at least ${3 - selectedCore.length} more` : " ✓"})</strong>
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
               {selectedTen.map((v) => (
-                <button key={v} onClick={() => toggleCore(v)} style={{ ...styles.selectableChip, padding: "10px 20px", fontSize: 15, background: selectedCore.includes(v) ? "#E85D75" : "rgba(255,255,255,0.06)", color: selectedCore.includes(v) ? "#fff" : "#94a3b8", borderColor: selectedCore.includes(v) ? "#E85D75" : "rgba(255,255,255,0.1)" }}>{v}</button>
+                <button key={v} onClick={() => toggleCore(v)} style={{ ...styles.selectableChip, padding: "10px 20px", fontSize: 15, background: selectedCore.includes(v) ? "#5B2D8E" : "rgba(45,27,78,0.08)", color: selectedCore.includes(v) ? "#fff" : "#6B5B7B", borderColor: selectedCore.includes(v) ? "#5B2D8E" : "rgba(45,27,78,0.15)" }}>{v}</button>
               ))}
             </div>
           </div>
@@ -895,7 +897,7 @@ Respond ONLY in this exact JSON format with no other text:
                 <div key={v} style={{ marginBottom: 16 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                     <div style={{ width: 12, height: 12, borderRadius: 3, background: PALETTE[i % PALETTE.length] }} />
-                    <span style={{ fontSize: 14, fontWeight: 700, color: "#e2e8f0" }}>{v}</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: "#1a0a2e" }}>{v}</span>
                   </div>
                   <textarea value={descriptions[i] || ""} onChange={(e) => handleDescChange(i, e.target.value)} placeholder={`What does "${v}" mean to you? Why this size?`} style={styles.textarea} rows={2} />
                 </div>
@@ -909,12 +911,12 @@ Respond ONLY in this exact JSON format with no other text:
             <h2 style={styles.stepHeading}>Step 4: Select Goals for Each Value</h2>
             <p style={styles.stepDesc}>
               {aiLoading ? "Generating personalized goals..." : "AI generated these goals based on your descriptions. Tap to select the ones you want to pursue."}
-              {!aiLoading && <strong style={{ color: "#F4A261" }}> ({totalGoals} selected)</strong>}
+              {!aiLoading && <strong style={{ color: "#C9843A" }}> ({totalGoals} selected)</strong>}
             </p>
             {/* Save banner — always visible */}
             {!aiLoading && (
-              <div style={{ padding: "12px 16px", background: "rgba(42,157,143,0.08)", border: "1px solid rgba(42,157,143,0.2)", borderRadius: 10, marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-                <p style={{ margin: 0, fontSize: 13, color: "#94a3b8" }}>
+              <div style={{ padding: "12px 16px", background: "rgba(201,132,58,0.08)", border: "1px solid rgba(201,132,58,0.2)", borderRadius: 10, marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                <p style={{ margin: 0, fontSize: 13, color: "#6B5B7B" }}>
                   {currentUser ? `☁️ Saving to ${currentUser.email}` : "💾 Save your progress to the cloud"}
                 </p>
                 <button onClick={async () => {
@@ -927,17 +929,17 @@ Respond ONLY in this exact JSON format with no other text:
                   } else {
                     setShowRegModal(true);
                   }
-                }} style={{ padding: "6px 14px", background: "#2A9D8F", border: "none", borderRadius: 7, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
+                }} style={{ padding: "6px 14px", background: "#C9843A", border: "none", borderRadius: 7, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
                   {currentUser ? "Save Now" : "Save →"}
                 </button>
               </div>
             )}
-            {aiError && <div style={{ padding: 10, background: "rgba(244,162,97,0.1)", border: "1px solid rgba(244,162,97,0.2)", borderRadius: 8, marginBottom: 16 }}><span style={{ fontSize: 12, color: "#F4A261" }}>{aiError}</span></div>}
+            {aiError && <div style={{ padding: 10, background: "rgba(244,162,97,0.1)", border: "1px solid rgba(244,162,97,0.2)", borderRadius: 8, marginBottom: 16 }}><span style={{ fontSize: 12, color: "#C9843A" }}>{aiError}</span></div>}
             {aiLoading ? (
               <div style={{ textAlign: "center", padding: 40 }}>
-                <div style={{ display: "inline-block", width: 40, height: 40, border: "3px solid rgba(42,157,143,0.2)", borderTop: "3px solid #2A9D8F", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
+                <div style={{ display: "inline-block", width: 40, height: 40, border: "3px solid rgba(201,132,58,0.2)", borderTop: "3px solid #2A9D8F", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-                <p style={{ color: "#94a3b8", fontSize: 13, marginTop: 12 }}>Reading your descriptions and crafting personalized goals...</p>
+                <p style={{ color: "#6B5B7B", fontSize: 13, marginTop: 12 }}>Reading your descriptions and crafting personalized goals...</p>
               </div>
             ) : (
               <>
@@ -947,21 +949,21 @@ Respond ONLY in this exact JSON format with no other text:
                     <div key={v} style={{ marginBottom: 28 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                         <div style={{ width: 14, height: 14, borderRadius: 3, background: PALETTE[i % PALETTE.length] }} />
-                        <h3 style={{ margin: 0, color: "#e2e8f0", fontSize: 16 }}>{v}</h3>
-                        <span style={{ fontSize: 12, color: "#64748b", marginLeft: 4 }}>({percentages[i]}%)</span>
+                        <h3 style={{ margin: 0, color: "#1a0a2e", fontSize: 16 }}>{v}</h3>
+                        <span style={{ fontSize: 12, color: "#8B7B9B", marginLeft: 4 }}>({percentages[i]}%)</span>
                       </div>
                       {descriptions[i]?.trim() ? (
-                        <p style={{ fontSize: 11, color: "#64748b", fontStyle: "italic", margin: "0 0 10px 22px" }}>Based on: "{descriptions[i].length > 80 ? descriptions[i].slice(0, 80) + "..." : descriptions[i]}"</p>
+                        <p style={{ fontSize: 11, color: "#8B7B9B", fontStyle: "italic", margin: "0 0 10px 22px" }}>Based on: "{descriptions[i].length > 80 ? descriptions[i].slice(0, 80) + "..." : descriptions[i]}"</p>
                       ) : (
-                        <p style={{ fontSize: 11, color: "#475569", margin: "0 0 10px 22px" }}>Goals scaled to {percentages[i]}% importance</p>
+                        <p style={{ fontSize: 11, color: "#9B8BAB", margin: "0 0 10px 22px" }}>Goals scaled to {percentages[i]}% importance</p>
                       )}
                       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                         {goals.map((goal) => {
                           const sel = (selectedGoals[v] || []).includes(goal);
                           return (
-                            <button key={goal} onClick={() => toggleGoal(v, goal)} style={{ ...styles.goalSelectBtn, background: sel ? "rgba(42,157,143,0.15)" : "rgba(255,255,255,0.03)", borderColor: sel ? "#2A9D8F" : "rgba(255,255,255,0.08)" }}>
-                              <span style={{ width: 20, height: 20, borderRadius: 4, border: sel ? "2px solid #2A9D8F" : "2px solid #475569", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#2A9D8F", flexShrink: 0 }}>{sel ? "✓" : ""}</span>
-                              <span style={{ fontSize: 13, color: sel ? "#e2e8f0" : "#94a3b8" }}>{goal}</span>
+                            <button key={goal} onClick={() => toggleGoal(v, goal)} style={{ ...styles.goalSelectBtn, background: sel ? "rgba(201,132,58,0.15)" : "rgba(45,27,78,0.04)", borderColor: sel ? "#C9843A" : "rgba(45,27,78,0.1)" }}>
+                              <span style={{ width: 20, height: 20, borderRadius: 4, border: sel ? "2px solid #2A9D8F" : "2px solid #475569", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#C9843A", flexShrink: 0 }}>{sel ? "✓" : ""}</span>
+                              <span style={{ fontSize: 13, color: sel ? "#1a0a2e" : "#6B5B7B" }}>{goal}</span>
                             </button>
                           );
                         })}
@@ -983,15 +985,15 @@ Respond ONLY in this exact JSON format with no other text:
             </p>
 
             {/* Values summary */}
-            <div style={{ padding: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, marginBottom: 24 }}>
-              <p style={{ color: "#64748b", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 12px" }}>Your Core Values Summary</p>
+            <div style={{ padding: 16, background: "rgba(45,27,78,0.04)", border: "1px solid rgba(45,27,78,0.1)", borderRadius: 12, marginBottom: 24 }}>
+              <p style={{ color: "#8B7B9B", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 12px" }}>Your Core Values Summary</p>
               {selectedCore.map((v, i) => (
                 <div key={v} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
                   <div style={{ width: 10, height: 10, borderRadius: 2, background: PALETTE[i % PALETTE.length], flexShrink: 0, marginTop: 4 }} />
                   <div>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0" }}>{v}</span>
-                    <span style={{ fontSize: 12, color: "#64748b", marginLeft: 6 }}>({percentages[i]}%)</span>
-                    {descriptions[i] && <p style={{ fontSize: 12, color: "#94a3b8", fontStyle: "italic", margin: "2px 0 0" }}>&ldquo;{descriptions[i].length > 100 ? descriptions[i].slice(0, 100) + "..." : descriptions[i]}&rdquo;</p>}
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "#1a0a2e" }}>{v}</span>
+                    <span style={{ fontSize: 12, color: "#8B7B9B", marginLeft: 6 }}>({percentages[i]}%)</span>
+                    {descriptions[i] && <p style={{ fontSize: 12, color: "#6B5B7B", fontStyle: "italic", margin: "2px 0 0" }}>&ldquo;{descriptions[i].length > 100 ? descriptions[i].slice(0, 100) + "..." : descriptions[i]}&rdquo;</p>}
                   </div>
                 </div>
               ))}
@@ -999,14 +1001,14 @@ Respond ONLY in this exact JSON format with no other text:
 
             {identityLoading ? (
               <div style={{ textAlign: "center", padding: 40 }}>
-                <div style={{ display: "inline-block", width: 40, height: 40, border: "3px solid rgba(42,157,143,0.2)", borderTop: "3px solid #2A9D8F", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
-                <p style={{ color: "#94a3b8", fontSize: 13, marginTop: 12 }}>Crafting your personal identity statements...</p>
+                <div style={{ display: "inline-block", width: 40, height: 40, border: "3px solid rgba(201,132,58,0.2)", borderTop: "3px solid #2A9D8F", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
+                <p style={{ color: "#6B5B7B", fontSize: 13, marginTop: 12 }}>Crafting your personal identity statements...</p>
               </div>
             ) : (
               <>
                 {identityError && (
                   <div style={{ padding: 10, background: "rgba(244,162,97,0.1)", border: "1px solid rgba(244,162,97,0.2)", borderRadius: 8, marginBottom: 16 }}>
-                    <span style={{ fontSize: 12, color: "#F4A261" }}>{identityError}</span>
+                    <span style={{ fontSize: 12, color: "#C9843A" }}>{identityError}</span>
                   </div>
                 )}
 
@@ -1015,12 +1017,12 @@ Respond ONLY in this exact JSON format with no other text:
                     const selected = identityStatement === option;
                     return (
                       <button key={i} onClick={() => setIdentityStatement(option)}
-                        style={{ padding: "18px 20px", borderRadius: 12, border: selected ? "2px solid #2A9D8F" : "1.5px solid rgba(255,255,255,0.1)", background: selected ? "rgba(42,157,143,0.12)" : "rgba(255,255,255,0.03)", cursor: "pointer", fontFamily: "inherit", textAlign: "left", transition: "all 0.2s" }}>
+                        style={{ padding: "18px 20px", borderRadius: 12, border: selected ? "2px solid #2A9D8F" : "1.5px solid rgba(45,27,78,0.15)", background: selected ? "rgba(201,132,58,0.12)" : "rgba(45,27,78,0.04)", cursor: "pointer", fontFamily: "inherit", textAlign: "left", transition: "all 0.2s" }}>
                         <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-                          <div style={{ width: 22, height: 22, borderRadius: "50%", border: selected ? "2px solid #2A9D8F" : "2px solid #475569", background: selected ? "#2A9D8F" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#fff", flexShrink: 0, marginTop: 2 }}>
+                          <div style={{ width: 22, height: 22, borderRadius: "50%", border: selected ? "2px solid #2A9D8F" : "2px solid #475569", background: selected ? "#C9843A" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#fff", flexShrink: 0, marginTop: 2 }}>
                             {selected ? "✓" : (i + 1)}
                           </div>
-                          <p style={{ margin: 0, fontSize: 14, color: selected ? "#e2e8f0" : "#94a3b8", lineHeight: 1.6, fontStyle: "italic" }}>"{option}"</p>
+                          <p style={{ margin: 0, fontSize: 14, color: selected ? "#1a0a2e" : "#6B5B7B", lineHeight: 1.6, fontStyle: "italic" }}>"{option}"</p>
                         </div>
                       </button>
                     );
@@ -1028,9 +1030,9 @@ Respond ONLY in this exact JSON format with no other text:
                 </div>
 
                 {identityStatement && (
-                  <div style={{ padding: "16px 20px", background: "rgba(42,157,143,0.08)", border: "1px solid rgba(42,157,143,0.2)", borderRadius: 12, marginBottom: 20 }}>
-                    <p style={{ color: "#2A9D8F", fontSize: 12, fontWeight: 700, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1 }}>Your Identity Statement</p>
-                    <p style={{ color: "#e2e8f0", fontSize: 15, margin: 0, fontStyle: "italic", lineHeight: 1.6 }}>"{identityStatement}"</p>
+                  <div style={{ padding: "16px 20px", background: "rgba(201,132,58,0.08)", border: "1px solid rgba(201,132,58,0.2)", borderRadius: 12, marginBottom: 20 }}>
+                    <p style={{ color: "#C9843A", fontSize: 12, fontWeight: 700, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1 }}>Your Identity Statement</p>
+                    <p style={{ color: "#1a0a2e", fontSize: 15, margin: 0, fontStyle: "italic", lineHeight: 1.6 }}>"{identityStatement}"</p>
                   </div>
                 )}
 
@@ -1041,8 +1043,8 @@ Respond ONLY in this exact JSON format with no other text:
                   </button>
                 </div>
 
-                <div style={{ marginTop: 20, padding: "14px 18px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10 }}>
-                  <p style={{ color: "#64748b", fontSize: 12, margin: "0 0 8px" }}>Or write your own:</p>
+                <div style={{ marginTop: 20, padding: "14px 18px", background: "rgba(45,27,78,0.04)", border: "1px solid rgba(45,27,78,0.1)", borderRadius: 10 }}>
+                  <p style={{ color: "#8B7B9B", fontSize: 12, margin: "0 0 8px" }}>Or write your own:</p>
                   <textarea
                     value={identityStatement}
                     onChange={(e) => setIdentityStatement(e.target.value)}
@@ -1053,13 +1055,13 @@ Respond ONLY in this exact JSON format with no other text:
                 </div>
 
                 {/* Book a session CTA */}
-                <div style={{ marginTop: 24, padding: "20px 24px", background: "linear-gradient(135deg, rgba(42,157,143,0.12), rgba(38,70,83,0.2))", border: "1px solid rgba(42,157,143,0.25)", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+                <div style={{ marginTop: 24, padding: "20px 24px", background: "linear-gradient(135deg, rgba(201,132,58,0.12), rgba(38,70,83,0.2))", border: "1px solid rgba(201,132,58,0.25)", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
                   <div>
-                    <p style={{ color: "#e2e8f0", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Want to explore this further?</p>
-                    <p style={{ color: "#94a3b8", fontSize: 12, margin: 0, lineHeight: 1.5 }}>Book a 1:1 session to discuss your core values and identity statement with a coach.</p>
+                    <p style={{ color: "#1a0a2e", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Want to explore this further?</p>
+                    <p style={{ color: "#6B5B7B", fontSize: 12, margin: 0, lineHeight: 1.5 }}>Book a 1:1 session to discuss your core values and identity statement with a coach.</p>
                   </div>
                   <a href="https://www.paritycoaching.org" target="_blank" rel="noopener noreferrer"
-                    style={{ padding: "10px 20px", background: "#2A9D8F", borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none", flexShrink: 0, display: "inline-block" }}>
+                    style={{ padding: "10px 20px", background: "#C9843A", borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none", flexShrink: 0, display: "inline-block" }}>
                     Book a Session →
                   </a>
                 </div>
@@ -1077,12 +1079,12 @@ Respond ONLY in this exact JSON format with no other text:
           <div>
             <h2 style={styles.stepHeading}>Step 5: Add Your Own Goals</h2>
             <p style={styles.stepDesc}>Have a goal that wasn't in the AI suggestions? Add it here.</p>
-            <div style={{ padding: 20, background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", marginBottom: 24 }}>
+            <div style={{ padding: 20, background: "rgba(45,27,78,0.05)", borderRadius: 12, border: "1px solid rgba(45,27,78,0.1)", marginBottom: 24 }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <p style={{ color: "#e2e8f0", fontSize: 14, fontWeight: 600, margin: 0 }}>Which value does this goal support?</p>
+                <p style={{ color: "#1a0a2e", fontSize: 14, fontWeight: 600, margin: 0 }}>Which value does this goal support?</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                   {selectedCore.map((v, i) => (
-                    <button key={v} onClick={() => setCustomGoalValue(v)} style={{ padding: "8px 16px", borderRadius: 8, border: customGoalValue === v ? `2px solid ${PALETTE[i % PALETTE.length]}` : "1.5px solid rgba(255,255,255,0.1)", background: customGoalValue === v ? `${PALETTE[i % PALETTE.length]}22` : "rgba(255,255,255,0.04)", color: customGoalValue === v ? PALETTE[i % PALETTE.length] : "#94a3b8", fontWeight: customGoalValue === v ? 700 : 500, fontSize: 14, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>{v}</button>
+                    <button key={v} onClick={() => setCustomGoalValue(v)} style={{ padding: "8px 16px", borderRadius: 8, border: customGoalValue === v ? `2px solid ${PALETTE[i % PALETTE.length]}` : "1.5px solid rgba(45,27,78,0.15)", background: customGoalValue === v ? `${PALETTE[i % PALETTE.length]}22` : "rgba(45,27,78,0.05)", color: customGoalValue === v ? PALETTE[i % PALETTE.length] : "#6B5B7B", fontWeight: customGoalValue === v ? 700 : 500, fontSize: 14, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>{v}</button>
                   ))}
                 </div>
                 <input value={customGoalText} onChange={(e) => setCustomGoalText(e.target.value)} placeholder={customGoalValue ? `Type a goal for "${customGoalValue}"...` : "Select a value first..."} style={{ ...styles.input, marginTop: 4 }} onKeyDown={(e) => e.key === "Enter" && addCustomGoal()} disabled={!customGoalValue} />
@@ -1091,7 +1093,7 @@ Respond ONLY in this exact JSON format with no other text:
             </div>
             {selectedCore.some((v) => (customGoalsByValue[v] || []).length > 0) && (
               <div>
-                <p style={{ color: "#e2e8f0", fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Your Custom Goals</p>
+                <p style={{ color: "#1a0a2e", fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Your Custom Goals</p>
                 {selectedCore.map((v, i) => {
                   const customs = customGoalsByValue[v] || [];
                   if (customs.length === 0) return null;
@@ -1099,12 +1101,12 @@ Respond ONLY in this exact JSON format with no other text:
                     <div key={v} style={{ marginBottom: 16 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                         <div style={{ width: 12, height: 12, borderRadius: 3, background: PALETTE[i % PALETTE.length] }} />
-                        <span style={{ fontSize: 13, fontWeight: 600, color: "#e2e8f0" }}>{v}</span>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: "#1a0a2e" }}>{v}</span>
                       </div>
                       {customs.map((g, gi) => (
-                        <div key={gi} style={{ padding: "8px 14px", background: "rgba(42,157,143,0.1)", border: "1px solid rgba(42,157,143,0.2)", borderRadius: 8, marginBottom: 4, marginLeft: 20, fontSize: 13, color: "#e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <div key={gi} style={{ padding: "8px 14px", background: "rgba(201,132,58,0.1)", border: "1px solid rgba(201,132,58,0.2)", borderRadius: 8, marginBottom: 4, marginLeft: 20, fontSize: 13, color: "#1a0a2e", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                           <span>{g}</span>
-                          <button onClick={() => setSelectedGoals((prev) => ({ ...prev, [v]: (prev[v] || []).filter((x) => x !== g) }))} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 16, padding: "2px 6px", fontFamily: "inherit" }}>×</button>
+                          <button onClick={() => setSelectedGoals((prev) => ({ ...prev, [v]: (prev[v] || []).filter((x) => x !== g) }))} style={{ background: "none", border: "none", color: "#8B7B9B", cursor: "pointer", fontSize: 16, padding: "2px 6px", fontFamily: "inherit" }}>×</button>
                         </div>
                       ))}
                     </div>
@@ -1123,20 +1125,20 @@ Respond ONLY in this exact JSON format with no other text:
             <PieChart values={selectedCore} percentages={percentages} descriptions={descriptions} activeIndex={null} onActiveChange={() => {}} />
             <div style={{ marginTop: 32 }}>
               {selectedCore.map((v, i) => (
-                <div key={v} style={{ marginBottom: 28, padding: 20, background: "rgba(255,255,255,0.03)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.06)" }}>
+                <div key={v} style={{ marginBottom: 28, padding: 20, background: "rgba(45,27,78,0.04)", borderRadius: 12, border: "1px solid rgba(45,27,78,0.08)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                     <div style={{ width: 16, height: 16, borderRadius: 4, background: PALETTE[i % PALETTE.length] }} />
-                    <h3 style={{ margin: 0, color: "#e2e8f0", fontSize: 18 }}>{v}</h3>
+                    <h3 style={{ margin: 0, color: "#1a0a2e", fontSize: 18 }}>{v}</h3>
                     <span style={{ fontSize: 14, color: PALETTE[i % PALETTE.length], fontWeight: 700 }}>{percentages[i]}%</span>
                   </div>
-                  {descriptions[i] && <p style={{ color: "#94a3b8", fontSize: 13, fontStyle: "italic", marginBottom: 12, paddingLeft: 26 }}>"{descriptions[i]}"</p>}
+                  {descriptions[i] && <p style={{ color: "#6B5B7B", fontSize: 13, fontStyle: "italic", marginBottom: 12, paddingLeft: 26 }}>"{descriptions[i]}"</p>}
                   <div style={{ paddingLeft: 26 }}>
-                    <p style={{ color: "#64748b", fontSize: 11, marginBottom: 6, textTransform: "uppercase", letterSpacing: 1 }}>Selected Goals</p>
+                    <p style={{ color: "#8B7B9B", fontSize: 11, marginBottom: 6, textTransform: "uppercase", letterSpacing: 1 }}>Selected Goals</p>
                     {(selectedGoals[v] || []).length === 0 ? (
-                      <p style={{ color: "#475569", fontSize: 13 }}>No goals selected.</p>
+                      <p style={{ color: "#9B8BAB", fontSize: 13 }}>No goals selected.</p>
                     ) : (
                       (selectedGoals[v] || []).map((g, gi) => (
-                        <div key={gi} style={{ padding: "6px 12px", background: "rgba(42,157,143,0.08)", borderRadius: 6, marginBottom: 4, fontSize: 13, color: "#cbd5e1" }}>{g}</div>
+                        <div key={gi} style={{ padding: "6px 12px", background: "rgba(201,132,58,0.08)", borderRadius: 6, marginBottom: 4, fontSize: 13, color: "#4A2D6E" }}>{g}</div>
                       ))
                     )}
                   </div>
@@ -1197,32 +1199,32 @@ Respond ONLY in this exact JSON format with no other text:
             <h2 style={styles.stepHeading}>Weekly Action Tracker</h2>
             <p style={styles.stepDesc}>Track your weekly actions, then see how well they align with your core values.</p>
             <div style={{ display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
-              <div style={{ flex: 1, minWidth: 140, padding: 16, borderRadius: 12, textAlign: "center", background: overallAlignment >= 75 ? "rgba(42,157,143,0.1)" : overallAlignment >= 50 ? "rgba(244,162,97,0.1)" : "rgba(232,93,117,0.1)", border: `1px solid ${overallAlignment >= 75 ? "rgba(42,157,143,0.25)" : overallAlignment >= 50 ? "rgba(244,162,97,0.25)" : "rgba(232,93,117,0.25)"}` }}>
-                <p style={{ color: "#94a3b8", fontSize: 10, marginTop: 0, marginBottom: 2, textTransform: "uppercase", letterSpacing: 0.5 }}>Overall Alignment</p>
-                <p style={{ fontSize: 36, fontWeight: 800, margin: 0, color: overallAlignment >= 75 ? "#2A9D8F" : overallAlignment >= 50 ? "#F4A261" : "#E85D75" }}>{totalActions > 0 ? `${overallAlignment}%` : "—"}</p>
-                <p style={{ color: "#64748b", fontSize: 10, margin: "2px 0 0" }}>vs your pie chart</p>
+              <div style={{ flex: 1, minWidth: 140, padding: 16, borderRadius: 12, textAlign: "center", background: overallAlignment >= 75 ? "rgba(201,132,58,0.1)" : overallAlignment >= 50 ? "rgba(244,162,97,0.1)" : "rgba(91,45,142,0.1)", border: `1px solid ${overallAlignment >= 75 ? "rgba(201,132,58,0.25)" : overallAlignment >= 50 ? "rgba(244,162,97,0.25)" : "rgba(232,93,117,0.25)"}` }}>
+                <p style={{ color: "#6B5B7B", fontSize: 10, marginTop: 0, marginBottom: 2, textTransform: "uppercase", letterSpacing: 0.5 }}>Overall Alignment</p>
+                <p style={{ fontSize: 36, fontWeight: 800, margin: 0, color: overallAlignment >= 75 ? "#C9843A" : overallAlignment >= 50 ? "#C9843A" : "#5B2D8E" }}>{totalActions > 0 ? `${overallAlignment}%` : "—"}</p>
+                <p style={{ color: "#8B7B9B", fontSize: 10, margin: "2px 0 0" }}>vs your pie chart</p>
               </div>
-              <div style={{ flex: 1, minWidth: 140, padding: 16, borderRadius: 12, textAlign: "center", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <p style={{ color: "#94a3b8", fontSize: 10, marginTop: 0, marginBottom: 2, textTransform: "uppercase", letterSpacing: 0.5 }}>Value Coverage</p>
-                <p style={{ fontSize: 36, fontWeight: 800, margin: 0, color: "#e2e8f0" }}>{valuesWithActions}/{selectedCore.length}</p>
-                <p style={{ color: "#64748b", fontSize: 10, margin: "2px 0 0" }}>values with actions</p>
+              <div style={{ flex: 1, minWidth: 140, padding: 16, borderRadius: 12, textAlign: "center", background: "rgba(45,27,78,0.04)", border: "1px solid rgba(45,27,78,0.1)" }}>
+                <p style={{ color: "#6B5B7B", fontSize: 10, marginTop: 0, marginBottom: 2, textTransform: "uppercase", letterSpacing: 0.5 }}>Value Coverage</p>
+                <p style={{ fontSize: 36, fontWeight: 800, margin: 0, color: "#1a0a2e" }}>{valuesWithActions}/{selectedCore.length}</p>
+                <p style={{ color: "#8B7B9B", fontSize: 10, margin: "2px 0 0" }}>values with actions</p>
               </div>
-              <div style={{ flex: 1, minWidth: 140, padding: 16, borderRadius: 12, textAlign: "center", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <p style={{ color: "#94a3b8", fontSize: 10, marginTop: 0, marginBottom: 2, textTransform: "uppercase", letterSpacing: 0.5 }}>Goal Progress</p>
-                <p style={{ fontSize: 36, fontWeight: 800, margin: 0, color: "#e2e8f0" }}>{goalsWithActions}/{totalGoalsCount}</p>
-                <p style={{ color: "#64748b", fontSize: 10, margin: "2px 0 0" }}>goals with activity</p>
+              <div style={{ flex: 1, minWidth: 140, padding: 16, borderRadius: 12, textAlign: "center", background: "rgba(45,27,78,0.04)", border: "1px solid rgba(45,27,78,0.1)" }}>
+                <p style={{ color: "#6B5B7B", fontSize: 10, marginTop: 0, marginBottom: 2, textTransform: "uppercase", letterSpacing: 0.5 }}>Goal Progress</p>
+                <p style={{ fontSize: 36, fontWeight: 800, margin: 0, color: "#1a0a2e" }}>{goalsWithActions}/{totalGoalsCount}</p>
+                <p style={{ color: "#8B7B9B", fontSize: 10, margin: "2px 0 0" }}>goals with activity</p>
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: 4, marginBottom: 16, background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 4 }}>
+            <div style={{ display: "flex", gap: 4, marginBottom: 16, background: "rgba(45,27,78,0.05)", borderRadius: 10, padding: 4 }}>
               {[{ key: "manual", label: "Manual Entry" }, { key: "todo", label: "To-Do List" }, { key: "calendar", label: "History" }].map((m) => (
-                <button key={m.key} onClick={() => setInputMode(m.key)} style={{ flex: 1, padding: "10px 8px", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 600, background: inputMode === m.key ? "#2A9D8F" : "transparent", color: inputMode === m.key ? "#fff" : "#64748b", cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>{m.label}</button>
+                <button key={m.key} onClick={() => setInputMode(m.key)} style={{ flex: 1, padding: "10px 8px", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 600, background: inputMode === m.key ? "#C9843A" : "transparent", color: inputMode === m.key ? "#fff" : "#8B7B9B", cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>{m.label}</button>
               ))}
             </div>
 
             {inputMode === "manual" && (
-              <div style={{ padding: 20, background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", marginBottom: 24 }}>
-                <p style={{ color: "#e2e8f0", fontSize: 14, fontWeight: 600, marginTop: 0, marginBottom: 12 }}>Log an Action</p>
+              <div style={{ padding: 20, background: "rgba(45,27,78,0.05)", borderRadius: 12, border: "1px solid rgba(45,27,78,0.1)", marginBottom: 24 }}>
+                <p style={{ color: "#1a0a2e", fontSize: 14, fontWeight: 600, marginTop: 0, marginBottom: 12 }}>Log an Action</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <input value={newActionText} onChange={(e) => setNewActionText(e.target.value)} placeholder="What did you do? (e.g. Went for a 30-min run)" style={styles.input} />
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -1248,8 +1250,8 @@ Respond ONLY in this exact JSON format with no other text:
             )}
 
             {inputMode === "todo" && (
-              <div style={{ padding: 20, background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", marginBottom: 24 }}>
-                <p style={{ color: "#e2e8f0", fontSize: 14, fontWeight: 600, marginTop: 0, marginBottom: 12 }}>Create Tasks & Check Them Off</p>
+              <div style={{ padding: 20, background: "rgba(45,27,78,0.05)", borderRadius: 12, border: "1px solid rgba(45,27,78,0.1)", marginBottom: 24 }}>
+                <p style={{ color: "#1a0a2e", fontSize: 14, fontWeight: 600, marginTop: 0, marginBottom: 12 }}>Create Tasks & Check Them Off</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
                   <input value={newTodoText} onChange={(e) => setNewTodoText(e.target.value)} placeholder="Task description..." style={styles.input} />
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -1270,14 +1272,14 @@ Respond ONLY in this exact JSON format with no other text:
                 {todoItems.map((t) => {
                   const vIdx = selectedCore.indexOf(t.value);
                   return (
-                    <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: t.done ? "rgba(42,157,143,0.08)" : "rgba(255,255,255,0.03)", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)", marginBottom: 6 }}>
-                      <button onClick={() => !t.done && completeTodo(t)} style={{ width: 24, height: 24, borderRadius: 6, flexShrink: 0, cursor: t.done ? "default" : "pointer", border: t.done ? "2px solid #2A9D8F" : "2px solid #475569", background: t.done ? "#2A9D8F" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#fff", fontFamily: "inherit" }}>{t.done ? "✓" : ""}</button>
+                    <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: t.done ? "rgba(201,132,58,0.08)" : "rgba(45,27,78,0.04)", borderRadius: 8, border: "1px solid rgba(45,27,78,0.08)", marginBottom: 6 }}>
+                      <button onClick={() => !t.done && completeTodo(t)} style={{ width: 24, height: 24, borderRadius: 6, flexShrink: 0, cursor: t.done ? "default" : "pointer", border: t.done ? "2px solid #2A9D8F" : "2px solid #475569", background: t.done ? "#C9843A" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#fff", fontFamily: "inherit" }}>{t.done ? "✓" : ""}</button>
                       <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: 13, color: t.done ? "#64748b" : "#e2e8f0", textDecoration: t.done ? "line-through" : "none" }}>{t.text}</span>
+                        <span style={{ fontSize: 13, color: t.done ? "#8B7B9B" : "#1a0a2e", textDecoration: t.done ? "line-through" : "none" }}>{t.text}</span>
                         <div style={{ display: "flex", gap: 6, marginTop: 2, flexWrap: "wrap" }}>
-                          <span style={{ fontSize: 10, color: vIdx >= 0 ? PALETTE[vIdx % PALETTE.length] : "#64748b", fontWeight: 600 }}>{t.value}</span>
-                          {t.goal && <span style={{ fontSize: 10, color: "#475569" }}>→ {t.goal}</span>}
-                          <span style={{ fontSize: 10, color: "#475569" }}>📅 {t.date}</span>
+                          <span style={{ fontSize: 10, color: vIdx >= 0 ? PALETTE[vIdx % PALETTE.length] : "#8B7B9B", fontWeight: 600 }}>{t.value}</span>
+                          {t.goal && <span style={{ fontSize: 10, color: "#9B8BAB" }}>→ {t.goal}</span>}
+                          <span style={{ fontSize: 10, color: "#9B8BAB" }}>📅 {t.date}</span>
                         </div>
                       </div>
                     </div>
@@ -1288,11 +1290,11 @@ Respond ONLY in this exact JSON format with no other text:
 
             {inputMode === "calendar" && (
               <div style={{ marginBottom: 24 }}>
-                <div style={{ padding: 16, background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", marginBottom: 12 }}>
+                <div style={{ padding: 16, background: "rgba(45,27,78,0.05)", borderRadius: 12, border: "1px solid rgba(45,27,78,0.1)", marginBottom: 12 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                    <button onClick={() => { const d = new Date(calendarDate + "T12:00:00"); d.setDate(d.getDate() - 7); setCalendarDate(toLocalStr(d)); }} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: 20, fontFamily: "inherit", padding: "4px 12px" }}>←</button>
-                    <span style={{ color: "#e2e8f0", fontSize: 14, fontWeight: 600 }}>Week of {weekDates[0]}</span>
-                    <button onClick={() => { const d = new Date(calendarDate + "T12:00:00"); d.setDate(d.getDate() + 7); setCalendarDate(toLocalStr(d)); }} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: 20, fontFamily: "inherit", padding: "4px 12px" }}>→</button>
+                    <button onClick={() => { const d = new Date(calendarDate + "T12:00:00"); d.setDate(d.getDate() - 7); setCalendarDate(toLocalStr(d)); }} style={{ background: "none", border: "none", color: "#6B5B7B", cursor: "pointer", fontSize: 20, fontFamily: "inherit", padding: "4px 12px" }}>←</button>
+                    <span style={{ color: "#1a0a2e", fontSize: 14, fontWeight: 600 }}>Week of {weekDates[0]}</span>
+                    <button onClick={() => { const d = new Date(calendarDate + "T12:00:00"); d.setDate(d.getDate() + 7); setCalendarDate(toLocalStr(d)); }} style={{ background: "none", border: "none", color: "#6B5B7B", cursor: "pointer", fontSize: 20, fontFamily: "inherit", padding: "4px 12px" }}>→</button>
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 6 }}>
                     {weekDates.map((date, di) => {
@@ -1301,35 +1303,35 @@ Respond ONLY in this exact JSON format with no other text:
                       const isSelected = date === selectedCalendarDate;
                       const dotCount = dayActs.length;
                       return (
-                        <button key={date} onClick={() => setSelectedCalendarDate(date)} style={{ padding: "8px 4px", borderRadius: 10, minHeight: 72, textAlign: "center", cursor: "pointer", fontFamily: "inherit", border: "none", background: isSelected ? "rgba(42,157,143,0.2)" : isToday ? "rgba(42,157,143,0.08)" : dotCount > 0 ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)", outline: isSelected ? "2px solid #2A9D8F" : "none", transition: "all 0.15s ease" }}>
-                          <p style={{ fontSize: 10, color: "#64748b", margin: "0 0 2px" }}>{dayNames[di]}</p>
-                          <p style={{ fontSize: 16, fontWeight: 700, color: isSelected || isToday ? "#2A9D8F" : "#e2e8f0", margin: "0 0 4px" }}>{date.split("-")[2]}</p>
+                        <button key={date} onClick={() => setSelectedCalendarDate(date)} style={{ padding: "8px 4px", borderRadius: 10, minHeight: 72, textAlign: "center", cursor: "pointer", fontFamily: "inherit", border: "none", background: isSelected ? "rgba(201,132,58,0.2)" : isToday ? "rgba(201,132,58,0.08)" : dotCount > 0 ? "rgba(45,27,78,0.05)" : "rgba(255,255,255,0.02)", outline: isSelected ? "2px solid #2A9D8F" : "none", transition: "all 0.15s ease" }}>
+                          <p style={{ fontSize: 10, color: "#8B7B9B", margin: "0 0 2px" }}>{dayNames[di]}</p>
+                          <p style={{ fontSize: 16, fontWeight: 700, color: isSelected || isToday ? "#C9843A" : "#1a0a2e", margin: "0 0 4px" }}>{date.split("-")[2]}</p>
                           <div style={{ display: "flex", justifyContent: "center", gap: 3, flexWrap: "wrap" }}>
-                            {dayActs.slice(0, 4).map((a, ai) => { const vIdx = selectedCore.indexOf(a.value); return <div key={ai} style={{ width: 7, height: 7, borderRadius: "50%", background: vIdx >= 0 ? PALETTE[vIdx % PALETTE.length] : "#475569" }} />; })}
+                            {dayActs.slice(0, 4).map((a, ai) => { const vIdx = selectedCore.indexOf(a.value); return <div key={ai} style={{ width: 7, height: 7, borderRadius: "50%", background: vIdx >= 0 ? PALETTE[vIdx % PALETTE.length] : "#9B8BAB" }} />; })}
                           </div>
                         </button>
                       );
                     })}
                   </div>
                 </div>
-                <div style={{ padding: 20, background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)" }}>
-                  <p style={{ color: "#e2e8f0", fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{selectedCalendarDate}</p>
+                <div style={{ padding: 20, background: "rgba(45,27,78,0.05)", borderRadius: 12, border: "1px solid rgba(45,27,78,0.1)" }}>
+                  <p style={{ color: "#1a0a2e", fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{selectedCalendarDate}</p>
                   {(actionsByDate[selectedCalendarDate] || []).length === 0 ? (
-                    <p style={{ color: "#475569", fontSize: 13 }}>Nothing logged for this day.</p>
+                    <p style={{ color: "#9B8BAB", fontSize: 13 }}>Nothing logged for this day.</p>
                   ) : (
                     (actionsByDate[selectedCalendarDate] || []).map((a) => {
                       const valIdx = selectedCore.indexOf(a.value);
                       return (
-                        <div key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "rgba(255,255,255,0.03)", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)", marginBottom: 4 }}>
-                          <div style={{ width: 10, height: 10, borderRadius: 2, background: valIdx >= 0 ? PALETTE[valIdx % PALETTE.length] : "#475569", flexShrink: 0 }} />
+                        <div key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "rgba(45,27,78,0.04)", borderRadius: 8, border: "1px solid rgba(45,27,78,0.08)", marginBottom: 4 }}>
+                          <div style={{ width: 10, height: 10, borderRadius: 2, background: valIdx >= 0 ? PALETTE[valIdx % PALETTE.length] : "#9B8BAB", flexShrink: 0 }} />
                           <div style={{ flex: 1 }}>
-                            <span style={{ fontSize: 13, color: "#e2e8f0" }}>{a.text}</span>
+                            <span style={{ fontSize: 13, color: "#1a0a2e" }}>{a.text}</span>
                             <div style={{ display: "flex", gap: 6, marginTop: 2 }}>
-                              <span style={{ fontSize: 10, color: valIdx >= 0 ? PALETTE[valIdx % PALETTE.length] : "#64748b", fontWeight: 600 }}>{a.value}</span>
-                              {a.goal && <span style={{ fontSize: 10, color: "#475569" }}>→ {a.goal}</span>}
+                              <span style={{ fontSize: 10, color: valIdx >= 0 ? PALETTE[valIdx % PALETTE.length] : "#8B7B9B", fontWeight: 600 }}>{a.value}</span>
+                              {a.goal && <span style={{ fontSize: 10, color: "#9B8BAB" }}>→ {a.goal}</span>}
                             </div>
                           </div>
-                          <button onClick={() => removeAction(a.id)} style={{ background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 16, padding: "4px 8px", fontFamily: "inherit" }}>×</button>
+                          <button onClick={() => removeAction(a.id)} style={{ background: "none", border: "none", color: "#9B8BAB", cursor: "pointer", fontSize: 16, padding: "4px 8px", fontFamily: "inherit" }}>×</button>
                         </div>
                       );
                     })
@@ -1340,23 +1342,23 @@ Respond ONLY in this exact JSON format with no other text:
 
             {weeklyActions.length > 0 && (
               <div style={{ marginBottom: 24 }}>
-                <p style={{ color: "#e2e8f0", fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Action Log ({weeklyActions.length})</p>
+                <p style={{ color: "#1a0a2e", fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Action Log ({weeklyActions.length})</p>
                 {sortedDates.map((date) => (
                   <div key={date} style={{ marginBottom: 12 }}>
-                    <p style={{ fontSize: 11, color: "#64748b", marginBottom: 6, fontWeight: 600 }}>{date}</p>
+                    <p style={{ fontSize: 11, color: "#8B7B9B", marginBottom: 6, fontWeight: 600 }}>{date}</p>
                     {actionsByDate[date].map((a) => {
                       const valIdx = selectedCore.indexOf(a.value);
                       return (
-                        <div key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "rgba(255,255,255,0.03)", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)", marginBottom: 4 }}>
-                          <div style={{ width: 10, height: 10, borderRadius: 2, background: valIdx >= 0 ? PALETTE[valIdx % PALETTE.length] : "#475569", flexShrink: 0 }} />
+                        <div key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "rgba(45,27,78,0.04)", borderRadius: 8, border: "1px solid rgba(45,27,78,0.08)", marginBottom: 4 }}>
+                          <div style={{ width: 10, height: 10, borderRadius: 2, background: valIdx >= 0 ? PALETTE[valIdx % PALETTE.length] : "#9B8BAB", flexShrink: 0 }} />
                           <div style={{ flex: 1 }}>
-                            <span style={{ fontSize: 13, color: "#e2e8f0" }}>{a.text}</span>
+                            <span style={{ fontSize: 13, color: "#1a0a2e" }}>{a.text}</span>
                             <div style={{ display: "flex", gap: 6, marginTop: 2, flexWrap: "wrap" }}>
-                              <span style={{ fontSize: 10, color: valIdx >= 0 ? PALETTE[valIdx % PALETTE.length] : "#64748b", fontWeight: 600 }}>{a.value}</span>
-                              {a.goal && <span style={{ fontSize: 10, color: "#475569" }}>→ {a.goal}</span>}
+                              <span style={{ fontSize: 10, color: valIdx >= 0 ? PALETTE[valIdx % PALETTE.length] : "#8B7B9B", fontWeight: 600 }}>{a.value}</span>
+                              {a.goal && <span style={{ fontSize: 10, color: "#9B8BAB" }}>→ {a.goal}</span>}
                             </div>
                           </div>
-                          <button onClick={() => removeAction(a.id)} style={{ background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 16, padding: "4px 8px", fontFamily: "inherit" }}>×</button>
+                          <button onClick={() => removeAction(a.id)} style={{ background: "none", border: "none", color: "#9B8BAB", cursor: "pointer", fontSize: 16, padding: "4px 8px", fontFamily: "inherit" }}>×</button>
                         </div>
                       );
                     })}
@@ -1379,33 +1381,33 @@ Respond ONLY in this exact JSON format with no other text:
       {showRegModal && <RegistrationModal onComplete={handleRegistrationComplete} onSkip={handleSkipReg} />}
 
       {showLeadership ? (
-        <LeadershipAssessment onBack={() => setShowLeadership(false)} currentUser={currentUser} coreValues={selectedCore} />
+        <LeadershipAssessment onBack={() => setShowWelcomeModal(true)} currentUser={currentUser} coreValues={selectedCore} />
       ) : (
       <>
       {/* Top right: user badge */}
       <div style={{ position: "absolute", top: 20, right: 20, zIndex: 10, display: "flex", alignItems: "center", gap: 8 }}>
         {currentUser ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 20, background: "rgba(42,157,143,0.1)", border: "1px solid rgba(42,157,143,0.25)" }}>
-            <span style={{ width: 22, height: 22, borderRadius: "50%", background: "#2A9D8F", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 800 }}>{currentUser.email[0].toUpperCase()}</span>
-            <span style={{ fontSize: 12, color: "#2A9D8F", fontWeight: 600 }}>{currentUser.email.split("@")[0]}</span>
-            {currentUser.localOnly && <span style={{ fontSize: 9, color: "#F4A261", padding: "1px 5px", background: "rgba(244,162,97,0.15)", borderRadius: 4 }}>local</span>}
-            <button onClick={handleLogout} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>✕</button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 20, background: "rgba(201,132,58,0.1)", border: "1px solid rgba(201,132,58,0.25)" }}>
+            <span style={{ width: 22, height: 22, borderRadius: "50%", background: "#C9843A", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 800 }}>{currentUser.email[0].toUpperCase()}</span>
+            <span style={{ fontSize: 12, color: "#C9843A", fontWeight: 600 }}>{currentUser.email.split("@")[0]}</span>
+            {currentUser.localOnly && <span style={{ fontSize: 9, color: "#C9843A", padding: "1px 5px", background: "rgba(244,162,97,0.15)", borderRadius: 4 }}>local</span>}
+            <button onClick={handleLogout} style={{ background: "none", border: "none", color: "#8B7B9B", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>✕</button>
           </div>
         ) : (
-          <button onClick={() => setShowWelcomeModal(true)} style={{ padding: "8px 14px", background: "rgba(42,157,143,0.1)", border: "1px solid rgba(42,157,143,0.25)", borderRadius: 20, color: "#2A9D8F", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>Sign in</button>
+          <button onClick={() => setShowWelcomeModal(true)} style={{ padding: "8px 14px", background: "rgba(201,132,58,0.1)", border: "1px solid rgba(201,132,58,0.25)", borderRadius: 20, color: "#C9843A", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>Sign in</button>
         )}
-        <button onClick={() => setShowLeadership(true)} style={{ padding: "8px 14px", background: "rgba(123,45,139,0.1)", border: "1px solid rgba(123,45,139,0.3)", borderRadius: 20, color: "#7B2D8B", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>🏆 Leadership Assessment</button>
-        <button onClick={handleClearData} title="Clear all data" style={{ padding: "8px 10px", background: "rgba(232,93,117,0.08)", border: "1px solid rgba(232,93,117,0.2)", borderRadius: 20, color: "#E85D75", fontSize: 11, cursor: "pointer", fontFamily: "inherit" }}>Reset</button>
+
+        <button onClick={handleClearData} title="Clear all data" style={{ padding: "8px 10px", background: "rgba(91,45,142,0.08)", border: "1px solid rgba(232,93,117,0.2)", borderRadius: 20, color: "#5B2D8E", fontSize: 11, cursor: "pointer", fontFamily: "inherit" }}>Reset</button>
       </div>
 
       <div style={styles.container}>
         <div style={styles.header}>
-          <h1 style={styles.title}>Core Values to Goals</h1>
-          <p style={styles.subtitle}>Discover what matters most and build goals around it</p>
+          <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 48, objectFit: "contain", marginBottom: 4 }} />
+          <p style={styles.subtitle}>Core Values to Goals</p>
         </div>
 
         {/* Auto-save indicator */}
-        <p style={{ textAlign: "center", fontSize: 11, color: "#334155", marginBottom: 8 }}>
+        <p style={{ textAlign: "center", fontSize: 11, color: "#B0A0BF", marginBottom: 8 }}>
           {currentUser && !currentUser.localOnly ? "☁️ Auto-saving to cloud" : "💾 Saving locally"}
         </p>
 
@@ -1417,7 +1419,7 @@ Respond ONLY in this exact JSON format with no other text:
         <div style={styles.progressBar}>
           <div style={{ ...styles.progressFill, width: `${((step + 1) / 8) * 100}%` }} />
         </div>
-        <p style={{ textAlign: "center", color: "#64748b", fontSize: 12, marginBottom: 24 }}>{step + 1} of 8</p>
+        <p style={{ textAlign: "center", color: "#8B7B9B", fontSize: 12, marginBottom: 24 }}>{step + 1} of 8</p>
 
         {renderStep()}
 
@@ -1437,20 +1439,20 @@ Respond ONLY in this exact JSON format with no other text:
 }
 
 const styles = {
-  root: { minHeight: "100vh", background: "#0f172a", fontFamily: "'DM Sans', system-ui, sans-serif", color: "#e2e8f0", padding: "20px 0" },
+  root: { minHeight: "100vh", background: "#F9F6F2", fontFamily: "'Raleway', 'Lato', system-ui, sans-serif", color: "#1a0a2e", padding: "20px 0" },
   container: { maxWidth: 600, margin: "0 auto", padding: "0 20px" },
   header: { textAlign: "center", marginBottom: 20 },
-  title: { fontSize: 28, fontWeight: 800, margin: "0 0 6px", background: "linear-gradient(135deg, #E85D75, #F4A261, #2A9D8F)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" },
-  subtitle: { fontSize: 14, color: "#64748b", margin: 0 },
-  progressBar: { height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 4, overflow: "hidden", marginBottom: 6 },
-  progressFill: { height: "100%", background: "linear-gradient(90deg, #E85D75, #2A9D8F)", borderRadius: 4, transition: "width 0.4s ease" },
-  stepHeading: { fontSize: 22, fontWeight: 800, color: "#e2e8f0", marginBottom: 8 },
-  stepDesc: { fontSize: 14, color: "#94a3b8", marginBottom: 20, lineHeight: 1.5 },
-  selectableChip: { padding: "8px 16px", borderRadius: 20, border: "1.5px solid", fontSize: 13, cursor: "pointer", fontFamily: "inherit", fontWeight: 500, transition: "all 0.2s", WebkitTapHighlightColor: "transparent", touchAction: "manipulation", userSelect: "none" },
-  input: { padding: "10px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#e2e8f0", fontSize: 13, fontFamily: "inherit", outline: "none" },
-  textarea: { width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#e2e8f0", fontSize: 13, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box" },
-  goalSelectBtn: { display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 8, border: "1px solid", cursor: "pointer", fontFamily: "inherit", textAlign: "left", transition: "all 0.15s", WebkitTapHighlightColor: "transparent", touchAction: "manipulation" },
-  btnPrimary: { padding: "10px 20px", background: "#2A9D8F", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s", WebkitTapHighlightColor: "transparent", touchAction: "manipulation" },
-  btnSecondary: { padding: "10px 20px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#94a3b8", fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s", WebkitTapHighlightColor: "transparent", touchAction: "manipulation" },
+  title: { fontSize: 28, fontWeight: 800, margin: "0 0 6px", background: "linear-gradient(135deg, #2D1B4E, #5B2D8E, #C9843A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" },
+  subtitle: { fontSize: 14, color: "#6B5B7B", margin: 0 },
+  progressBar: { height: 4, background: "rgba(45,27,78,0.1)", borderRadius: 4, overflow: "hidden", marginBottom: 6 },
+  progressFill: { height: "100%", background: "linear-gradient(90deg, #5B2D8E, #C9843A)", borderRadius: 4, transition: "width 0.4s ease" },
+  stepHeading: { fontSize: 22, fontWeight: 800, color: "#1a0a2e", marginBottom: 8 },
+  stepDesc: { fontSize: 14, color: "#6B5B7B", marginBottom: 20, lineHeight: 1.5 },
+  selectableChip: { padding: "8px 16px", borderRadius: 20, border: "1.5px solid rgba(45,27,78,0.25)", fontSize: 13, cursor: "pointer", fontFamily: "inherit", fontWeight: 500, transition: "all 0.2s", WebkitTapHighlightColor: "transparent", touchAction: "manipulation", userSelect: "none", background: "#fff", color: "#4A2D6E" },
+  input: { padding: "10px 14px", background: "rgba(45,27,78,0.08)", border: "1px solid rgba(45,27,78,0.15)", borderRadius: 8, color: "#1a0a2e", fontSize: 13, fontFamily: "inherit", outline: "none" },
+  textarea: { width: "100%", padding: "10px 14px", background: "rgba(45,27,78,0.08)", border: "1px solid rgba(45,27,78,0.15)", borderRadius: 8, color: "#1a0a2e", fontSize: 13, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box" },
+  goalSelectBtn: { display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(45,27,78,0.2)", cursor: "pointer", fontFamily: "inherit", textAlign: "left", transition: "all 0.15s", WebkitTapHighlightColor: "transparent", touchAction: "manipulation", background: "#fff" },
+  btnPrimary: { padding: "10px 20px", background: "#C9843A", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s", WebkitTapHighlightColor: "transparent", touchAction: "manipulation" },
+  btnSecondary: { padding: "10px 20px", background: "rgba(45,27,78,0.08)", border: "1px solid rgba(45,27,78,0.15)", borderRadius: 8, color: "#6B5B7B", fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s", WebkitTapHighlightColor: "transparent", touchAction: "manipulation" },
   nav: { display: "flex", justifyContent: "space-between", marginTop: 32, paddingBottom: 40 },
 };
