@@ -199,7 +199,7 @@ function StakeholderView({ token }) {
         <div style={{ textAlign: "center", marginBottom: 20, paddingBottom: 16, borderBottom: "2px solid #C9843A" }}>
           <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 44, objectFit: "contain" }} />
         </div>
-        <div style={styles.moduleTag}>Leadership Brand Assessment</div>
+        <div style={styles.moduleTag}>Leadership Assessment</div>
         <h1 style={{ ...styles.title, fontSize: 22, marginBottom: 4 }}>
           {invitation?.rater_role} Feedback
         </h1>
@@ -478,7 +478,7 @@ IMPORTANT: Base your coaching goals primarily on the STAKEHOLDER feedback and co
 
 Generate a detailed leadership report. Respond ONLY in this exact JSON format with no other text:
 {
-  "headline": "A 1-sentence leadership brand statement",
+  "headline": "A 1-sentence leadership statement",
   "top3": ["highest rated behaviour 1", "highest rated behaviour 2", "highest rated behaviour 3"],
   "bottom3": ["lowest rated behaviour 1", "lowest rated behaviour 2", "lowest rated behaviour 3"],
   "coaching_goals": [
@@ -681,7 +681,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Leadership Brand Assessment Report</title>
+<title>Leadership Assessment Report</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Raleway', 'Lato', 'Arial', sans-serif; color: #2D1B4E; background: white; }
@@ -746,14 +746,14 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
 <div class="page">
   <div class="header">
     <img src="${window.location.origin}/parity-logo.png" alt="Parity Coaching" onerror="this.style.display='none'" />
-    <h1>Leadership Brand Assessment Report</h1>
+    <h1>Leadership Assessment Report</h1>
     <div class="user">${currentUser?.email || "Assessment Participant"}</div>
     <p>${SENIORITY_LEVELS.find(s => s.id === seniority)?.label || ""} · ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
   </div>
 
   ${report?.headline ? `
   <div class="section">
-    <div class="section-title">Your Leadership Brand</div>
+    <div class="section-title">Your Leadership Summary</div>
     <div class="headline-box"><p>"${report.headline}"</p></div>
   </div>` : ""}
 
@@ -903,7 +903,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
         <div style={styles.container}>
           <button onClick={() => setShowInviteScreen(false)} style={styles.backBtn}>← Back</button>
           <div style={{ marginTop: 16 }} />
-          <div style={styles.moduleTag}>Leadership Brand Assessment</div>
+          <div style={styles.moduleTag}>Leadership Assessment</div>
           <h1 style={{ ...styles.title, fontSize: 22, marginBottom: 8 }}>Invite Your Stakeholders</h1>
           <p style={styles.subtitle}>Enter the email address for each rater. They'll receive a personalised link to complete their section privately.</p>
 
@@ -959,7 +959,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     <div style={styles.root}>
       <div style={styles.container}>
         <button onClick={onBack} style={styles.backBtn}>← Back</button>
-        <div style={styles.moduleTag}>Leadership Brand Assessment</div>
+        <div style={styles.moduleTag}>Leadership Assessment</div>
         <h1 style={styles.title}>What is your seniority level?</h1>
         <p style={styles.subtitle}>This helps us tailor the competency framework to your role.</p>
 
@@ -993,7 +993,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     <div style={styles.root}>
       <div style={styles.container}>
         <button onClick={() => setScreen(1)} style={styles.backBtn}>← Back</button>
-        <div style={styles.moduleTag}>Leadership Brand Assessment</div>
+        <div style={styles.moduleTag}>Leadership Assessment</div>
         <h1 style={styles.title}>Who is completing this assessment?</h1>
         <p style={styles.subtitle}>Select all that apply. You can complete each perspective separately. <strong style={{ color: "#C9843A" }}>Self</strong> is always included.</p>
 
@@ -1043,7 +1043,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           </div>
           <button onClick={() => setScreen(1)} style={styles.backBtn}>← Back</button>
           <div style={{ marginTop: 16 }} />
-          <div style={styles.moduleTag}>Leadership Brand Assessment</div>
+          <div style={styles.moduleTag}>Leadership Assessment</div>
 
           {/* Self-only indicator */}
           <div style={{ display: "flex", gap: 6, marginBottom: 24 }}>
@@ -1170,7 +1170,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           </div>
           <button onClick={() => setScreen(3)} style={styles.backBtn}>← Back to Self Assessment</button>
           <div style={{ marginTop: 16 }} />
-          <div style={styles.moduleTag}>Leadership Brand Assessment</div>
+          <div style={styles.moduleTag}>Leadership Assessment</div>
 
           {/* Self complete badge */}
           <div style={{ padding: "14px 18px", background: "rgba(201,132,58,0.08)", border: "1px solid rgba(201,132,58,0.25)", borderRadius: 12, marginBottom: 24, display: "flex", alignItems: "center", gap: 10 }}>
@@ -1288,11 +1288,11 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           </div>
           <button onClick={() => setScreen(3.5)} style={styles.backBtn}>← Back to Status</button>
           <div style={{ marginTop: 16 }} />
-          <div style={styles.moduleTag}>Leadership Brand Assessment</div>
+          <div style={styles.moduleTag}>Leadership Assessment</div>
 
           {/* Headline */}
           <div style={{ padding: "24px", background: "linear-gradient(135deg, rgba(201,132,58,0.15), rgba(38,70,83,0.25))", border: "1px solid rgba(201,132,58,0.3)", borderRadius: 16, marginBottom: 24 }}>
-            <p style={{ color: "#C9843A", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>Your Leadership Brand</p>
+            <p style={{ color: "#C9843A", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>Your Leadership Summary</p>
             <p style={{ color: "#1a0a2e", fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: 0, fontWeight: 600 }}>"{report.headline}"</p>
           </div>
 
