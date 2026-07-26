@@ -319,8 +319,8 @@ function WelcomeModal({ onNewUser, onLoadUser, onNewUserLeadership, onLoadUserLe
             <div style={{ textAlign: "center", marginBottom: 20 }}>
               <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 50, objectFit: "contain" }} />
             </div>
-            <h2 style={{ textAlign: "center", color: "#2D1B4E", fontSize: 22, fontWeight: 800, margin: "0 0 8px" }}>Leadership Brand Assessment</h2>
-            <p style={{ textAlign: "center", color: "#6B5B7B", fontSize: 13, lineHeight: 1.6, margin: "0 0 28px" }}>Understand your leadership competencies and get AI-driven coaching goals.</p>
+            <h2 style={{ textAlign: "center", color: "#2D1B4E", fontSize: 22, fontWeight: 800, margin: "0 0 8px" }}>Leadership Competency Assessment</h2>
+            <p style={{ textAlign: "center", color: "#6B5B7B", fontSize: 13, lineHeight: 1.6, margin: "0 0 28px" }}>Understand your leadership competencies and get AI-driven generated coaching goals.</p>
             <button onClick={onNewUserLeadership} style={{ width: "100%", padding: "14px", background: "linear-gradient(135deg, #C9843A, #8B4A1E)", border: "none", borderRadius: 10, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
               Start Assessment
             </button>
@@ -343,7 +343,7 @@ function WelcomeModal({ onNewUser, onLoadUser, onNewUserLeadership, onLoadUserLe
               />
               <ModuleCard
                 icon="🏆"
-                title="Leadership Brand Assessment"
+                title="Leadership Competency Assessment"
                 desc="Rate your leadership competencies and get a personalised report"
                 color="#4A2D6E"
                 onClick={onNewUserLeadership}
@@ -369,7 +369,7 @@ function WelcomeModal({ onNewUser, onLoadUser, onNewUserLeadership, onLoadUserLe
               <ModuleCard
                 icon="🏆"
                 title="Leadership Assessment"
-                desc="View or redo your leadership brand assessment"
+                desc="View or redo your leadership competency assessment"
                 color="#4A2D6E"
                 onClick={() => setMode("returning_leadership")}
               />
