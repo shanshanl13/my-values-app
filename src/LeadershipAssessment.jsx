@@ -62,7 +62,7 @@ const RATER_TYPES = [
   { id: "line_manager", label: "Line Manager", icon: "👆", description: "Your direct manager" },
   { id: "peers", label: "Peers", icon: "🤝", description: "Colleagues at the same level" },
   { id: "direct_reports", label: "Direct Reports", icon: "👥", description: "People you manage" },
-  { id: "stakeholders", label: "Stakeholders", icon: "🌐", description: "Key internal/external partners" },
+  { id: "others", label: "Others", icon: "🌐", description: "Other colleagues or partners" },
 ];
 
 const PILLARS = [
@@ -85,7 +85,7 @@ const PILLARS = [
     name: "Capacity",
     fullName: "Capacity — Thinking & Strategic Acumen",
     description: "The ability to think critically, solve complex problems, and provide clear strategic direction. Moving beyond day-to-day tasks to understand the bigger picture and make sound decisions that balance immediate needs with long-term vision.",
-    color: "#E0A84A",
+    color: "#C9843A",
     competencies: [
       { id: "c1", name: "Strategic Mindset", description: "Possesses a strategic mindset, with solid understanding of the company's vision and strategy." },
       { id: "c2", name: "Innovation & Challenge", description: "Thinks outside the box and challenges the status quo." },
@@ -172,7 +172,7 @@ function StakeholderView({ token }) {
 
   if (loading) return (
     <div style={{ ...styles.root, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <p style={{ color: "#8B5A1E" }}>Loading your assessment...</p>
+      <p style={{ color: "#6B5B7B" }}>Loading your assessment...</p>
     </div>
   );
 
@@ -187,7 +187,7 @@ function StakeholderView({ token }) {
       <div style={{ textAlign: "center", padding: 40 }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
         <h2 style={{ color: "#1a0a2e", fontSize: 24, fontWeight: 800, margin: "0 0 8px" }}>Thank you!</h2>
-        <p style={{ color: "#8B5A1E", fontSize: 14 }}>Your feedback has been submitted successfully. You can close this window.</p>
+        <p style={{ color: "#6B5B7B", fontSize: 14 }}>Your feedback has been submitted successfully. You can close this window.</p>
         <p style={{ color: "#8B7B9B", fontSize: 12, marginTop: 16 }}>— Parity Coaching</p>
       </div>
     </div>
@@ -199,7 +199,7 @@ function StakeholderView({ token }) {
         <div style={{ textAlign: "center", marginBottom: 20, paddingBottom: 16, borderBottom: "2px solid #C9843A" }}>
           <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 44, objectFit: "contain" }} />
         </div>
-        <div style={styles.moduleTag}>Leadership Assessment</div>
+        <div style={styles.moduleTag}>Leadership Brand Assessment</div>
         <h1 style={{ ...styles.title, fontSize: 22, marginBottom: 4 }}>
           {invitation?.rater_role} Feedback
         </h1>
@@ -210,9 +210,9 @@ function StakeholderView({ token }) {
         {/* Legend */}
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 24 }}>
           {[1,2,3,4,5].map((val) => (
-            <div key={val} style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: "rgba(201,132,58,0.1)", borderRadius: 6, border: "1px solid rgba(201,132,58,0.3)" }}>
-              <span style={{ fontSize: 12, fontWeight: 800, color: "#C9843A" }}>{val}</span>
-              <span style={{ fontSize: 11, color: "#C9843A" }}>{RATING_LABELS[val].label}</span>
+            <div key={val} style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: "rgba(45,27,78,0.05)", borderRadius: 6, border: "1px solid rgba(45,27,78,0.09)" }}>
+              <span style={{ fontSize: 12, fontWeight: 800, color: RATING_LABELS[val].color }}>{val}</span>
+              <span style={{ fontSize: 11, color: "#8B7B9B" }}>{RATING_LABELS[val].label}</span>
             </div>
           ))}
         </div>
@@ -222,7 +222,7 @@ function StakeholderView({ token }) {
           <div key={pillar.id} style={{ marginBottom: 32 }}>
             <div style={{ padding: "14px 18px", background: pillar.color + "15", border: `1px solid ${pillar.color}30`, borderRadius: 12, marginBottom: 16 }}>
               <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: pillar.color }}>{pillar.name}</p>
-              <p style={{ margin: "4px 0 0", fontSize: 11, color: pillar.id === "capacity" ? "#8B5A1E" : pillar.color + "cc" }}>{pillar.description}</p>
+              <p style={{ margin: "4px 0 0", fontSize: 11, color: "#8B7B9B", lineHeight: 1.5 }}>{pillar.description}</p>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {pillar.competencies.map((comp, ci) => {
@@ -232,8 +232,8 @@ function StakeholderView({ token }) {
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 10 }}>
                       <div style={{ width: 22, height: 22, borderRadius: 5, background: pillar.color + "22", border: `1px solid ${pillar.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: pillar.color, flexShrink: 0 }}>{ci+1}</div>
                       <div>
-                        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: pillar.color }}>{comp.name}</p>
-                        <p style={{ margin: "2px 0 0", fontSize: 11, color: pillar.id === "capacity" ? "#8B5A1E" : pillar.color + "cc" }}>{comp.description}</p>
+                        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#1a0a2e" }}>{comp.name}</p>
+                        <p style={{ margin: "2px 0 0", fontSize: 12, fontWeight: 500, color: pillar.color, lineHeight: 1.5 }}>{comp.description}</p>
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
@@ -242,7 +242,7 @@ function StakeholderView({ token }) {
                         const ri = RATING_LABELS[val];
                         return (
                           <button key={val} onClick={() => setRating(comp.id, val)}
-                            style={{ flex: 1, padding: "8px 4px", borderRadius: 8, border: selected ? `2px solid ${ri.color}` : `1px solid ${pillar.color}44`, background: selected ? ri.color + "22" : pillar.color + "08", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                            style={{ flex: 1, padding: "8px 4px", borderRadius: 8, border: selected ? `2px solid ${pillar.color}` : `1px solid ${pillar.color}44`, background: selected ? pillar.color + "33" : pillar.color + "08", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
                             <span style={{ fontSize: 15, fontWeight: 800, color: pillar.id === "capacity" ? "#C9843A" : pillar.color }}>{val}</span>
                             <span style={{ fontSize: 8, color: pillar.id === "capacity" ? "#8B5A1E" : pillar.color + "aa", fontWeight: 600 }}>{ri.label}</span>
                           </button>
@@ -251,7 +251,7 @@ function StakeholderView({ token }) {
                     </div>
                     <textarea value={comments[comp.id] || ""} onChange={(e) => setComment(comp.id, e.target.value)}
                       placeholder="Add examples or observations (optional)..." rows={2}
-                      style={{ width: "100%", padding: "8px 12px", background: "rgba(45,27,78,0.05)", border: "1px solid rgba(45,27,78,0.09)", borderRadius: 8, color: "#8B5A1E", fontSize: 12, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box" }} />
+                      style={{ width: "100%", padding: "8px 12px", background: "rgba(45,27,78,0.05)", border: "1px solid rgba(45,27,78,0.09)", borderRadius: 8, color: "#6B5B7B", fontSize: 12, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box" }} />
                   </div>
                 );
               })}
@@ -263,13 +263,13 @@ function StakeholderView({ token }) {
         <div style={{ padding: "20px", background: "rgba(45,27,78,0.04)", border: "1px solid rgba(45,27,78,0.09)", borderRadius: 14, marginBottom: 24 }}>
           <p style={{ color: "#1a0a2e", fontSize: 14, fontWeight: 700, margin: "0 0 16px" }}>📝 Additional Feedback</p>
           <div style={{ marginBottom: 14 }}>
-            <p style={{ color: "#8B5A1E", fontSize: 13, fontWeight: 600, margin: "0 0 6px" }}>What are this person's greatest strengths?</p>
+            <p style={{ color: "#6B5B7B", fontSize: 13, fontWeight: 600, margin: "0 0 6px" }}>What are this person's greatest strengths?</p>
             <textarea value={strengths} onChange={(e) => setStrengths(e.target.value)}
               placeholder="Describe key strengths with specific examples..." rows={3}
               style={{ width: "100%", padding: "10px 14px", background: "rgba(45,27,78,0.06)", border: "1px solid rgba(45,27,78,0.12)", borderRadius: 8, color: "#1a0a2e", fontSize: 13, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box" }} />
           </div>
           <div>
-            <p style={{ color: "#8B5A1E", fontSize: 13, fontWeight: 600, margin: "0 0 6px" }}>What are this person's main areas for development?</p>
+            <p style={{ color: "#6B5B7B", fontSize: 13, fontWeight: 600, margin: "0 0 6px" }}>What are this person's main areas for development?</p>
             <textarea value={development} onChange={(e) => setDevelopment(e.target.value)}
               placeholder="Describe areas for growth with specific suggestions..." rows={3}
               style={{ width: "100%", padding: "10px 14px", background: "rgba(45,27,78,0.06)", border: "1px solid rgba(45,27,78,0.12)", borderRadius: 8, color: "#1a0a2e", fontSize: 13, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box" }} />
@@ -298,8 +298,9 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
     return <StakeholderView token={urlToken} />;
   }
 
-  const [screen, setScreen] = useState(1); // 1=seniority, 2=raters, 3=rate competencies, 4=report
-  const [seniority, setSeniority] = useState(null);
+  const [screen, setScreen] = useState(1); // 1=user info, 3=rate, 3.5=invite, 4=report
+  const [seniority, setSeniority] = useState("management"); // default seniority
+  const [userInfo, setUserInfo] = useState({ email: "", firstName: "", lastName: "", role: "" });
   const [selectedRaters, setSelectedRaters] = useState(["self"]);
   const [currentRater, setCurrentRater] = useState("self");
   const [ratings, setRatings] = useState({}); // { raterId: { competencyId: score } }
@@ -308,11 +309,20 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
   const [development, setDevelopment] = useState({}); // { raterId: text }
   const [reportLoading, setReportLoading] = useState(false);
   const [consentToShare, setConsentToShare] = useState(false);
-  const [inviteEmails, setInviteEmails] = useState({}); // { raterId: email }
+  const [inviteEmails, setInviteEmails] = useState({ peers: [""], direct_reports: [""], others: [""], line_manager: "" }); // tracks previously invited
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [showInviteSentPopup, setShowInviteSentPopup] = useState(false);
+  const [showDupePopup, setShowDupePopup] = useState(false);
+  const [dupeMsg, setDupeMsg] = useState("");
+  const [newInviteEmails, setNewInviteEmails] = useState({ peers: [""], direct_reports: [""], others: [""], line_manager: "" }); // fresh input only
   const [inviteSending, setInviteSending] = useState(false);
   const [inviteSent, setInviteSent] = useState({}); // { raterId: true }
-  const [inviteTokens, setInviteTokens] = useState({}); // reset each session
-  const [stakeholderData, setStakeholderData] = useState({}); // { raterId: { ratings, comments, strengths, development } }
+  const [inviteTokens, setInviteTokens] = useState(() => {
+    try { const s = localStorage.getItem('cv_invite_tokens'); return s ? JSON.parse(s) : {}; } catch { return {}; }
+  }); // { raterId: token }
+  const [stakeholderData, setStakeholderData] = useState({});
+  const [statusData, setStatusData] = useState({}); // { raterId: { ratings, comments, strengths, development } }
   const [loadingStakeholders, setLoadingStakeholders] = useState(false);
 
   const loadStakeholderResponses = async () => {
@@ -333,18 +343,45 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
         tokenData.forEach(d => { if (!existingIds.has(d.id)) data.push(d); });
       }
       if (data && data.length > 0) {
-        const newData = {};
+        const grouped = {};
         data.forEach((inv) => {
-          const roleKey = inv.rater_role.toLowerCase().replace(/\s+/g, '_');
-          newData[roleKey] = {
-            role: inv.rater_role,
-            ratings: inv.ratings || {},
-            comments: inv.comments || {},
-            strengths: inv.strengths || "",
-            development: inv.development || "",
-          };
+          const role = inv.rater_role;
+          if (!grouped[role]) grouped[role] = [];
+          grouped[role].push(inv);
         });
-        setStakeholderData(newData);
+
+        // For STATUS: track all completed (any count)
+        // For REPORT: only include if meets minimum
+        const newData = {};
+        const statusData = {};
+
+        Object.entries(grouped).forEach(([role, invites]) => {
+          const isManager = role === "Line Manager";
+          const minRequired = isManager ? 1 : 3;
+          const roleKey = role.toLowerCase().replace(/\s+/g, '_');
+
+          const avgRatings = {};
+          const allComments = {};
+          const strengths = invites.map(i => i.strengths).filter(Boolean).join(" | ");
+          const development = invites.map(i => i.development).filter(Boolean).join(" | ");
+          COMPETENCIES.forEach(c => {
+            const scores = invites.map(i => i.ratings?.[c.id] || 0).filter(s => s > 0);
+            if (scores.length > 0) avgRatings[c.id] = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length * 10) / 10;
+            const comms = invites.map(i => i.comments?.[c.id]).filter(Boolean);
+            if (comms.length > 0) allComments[c.id] = comms.join(" | ");
+          });
+
+          // Always track for status display
+          statusData[roleKey] = { role, ratings: avgRatings, comments: allComments, strengths, development, count: invites.length, meetsMin: invites.length >= minRequired };
+
+          // Only include in report data if meets minimum
+          if (invites.length >= minRequired) {
+            newData[roleKey] = { ...statusData[roleKey] };
+          }
+        });
+
+        setStakeholderData(newData); // used for report
+        setStatusData(statusData);   // used for status display
       }
     } catch (e) {
       console.error("Failed to load stakeholder responses:", e);
@@ -353,6 +390,47 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
   };
   const [showInviteScreen, setShowInviteScreen] = useState(false);
   const [report, setReport] = useState(null);
+
+  // Auto-save self assessment progress to Supabase
+  useEffect(() => {
+    if (!userInfo.email || screen < 3) return;
+    const timer = setTimeout(async () => {
+      try {
+        // Try to update existing row first, then insert
+        const existing = await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(userInfo.email)}&rater_role=eq.self&select=id&limit=1`);
+        if (existing && existing.length > 0) {
+          await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(userInfo.email)}&rater_role=eq.self`, {
+            method: "PATCH",
+            body: JSON.stringify({
+              ratings: ratings["self"] || {},
+              comments: comments["self"] || {},
+              strengths: strengths["self"] || "",
+              development: development["self"] || "",
+              owner_name: `${userInfo.firstName} ${userInfo.lastName}`.trim(),
+              owner_role: userInfo.role,
+            }),
+          });
+        } else {
+          await sbFetch("/leadership_invitations", {
+            method: "POST",
+            body: JSON.stringify({
+              owner_email: userInfo.email,
+              owner_name: `${userInfo.firstName} ${userInfo.lastName}`.trim(),
+              owner_role: userInfo.role,
+              rater_role: "self",
+              rater_email: userInfo.email,
+              ratings: ratings["self"] || {},
+              comments: comments["self"] || {},
+              strengths: strengths["self"] || "",
+              development: development["self"] || "",
+              completed: false,
+            }),
+          });
+        }
+      } catch (e) { console.error("Auto-save failed:", e); }
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [ratings, comments, strengths, development, userInfo.email]);
 
   const toggleRater = (id) => {
     if (id === "self") return; // self always required
@@ -387,7 +465,7 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
   });
 
   const allRatersDone = ratersDone.length === selectedRaters.length;
-  const selfExcluded = ["p1", "p2"];
+  const selfExcluded = []; // show all 15 questions for self
   const requiredForSelf = COMPETENCIES.filter(c => !selfExcluded.includes(c.id)).length;
   const currentRaterDone = currentRater === "self" 
     ? Object.keys(ratings["self"] || {}).filter(k => !selfExcluded.includes(k)).length >= requiredForSelf
@@ -478,7 +556,7 @@ IMPORTANT: Base your coaching goals primarily on the STAKEHOLDER feedback and co
 
 Generate a detailed leadership report. Respond ONLY in this exact JSON format with no other text:
 {
-  "headline": "A 1-sentence leadership statement",
+  "headline": "A 1-sentence leadership brand statement",
   "top3": ["highest rated behaviour 1", "highest rated behaviour 2", "highest rated behaviour 3"],
   "bottom3": ["lowest rated behaviour 1", "lowest rated behaviour 2", "lowest rated behaviour 3"],
   "coaching_goals": [
@@ -611,45 +689,103 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
   const sendInvitations = async () => {
     setInviteSending(true);
     await loadEmailJS();
-    const nonSelfRaters = selectedRaters.filter(r => r !== "self");
-    const newTokens = {};
-    const newSent = {};
+    const newTokens = { ...inviteTokens };
+    const newSent = { ...inviteSent };
 
-    for (const raterId of nonSelfRaters) {
-      const email = inviteEmails[raterId]?.trim();
-      if (!email) continue;
+    // Build list of all email/rater pairs to invite
+    const toInvite = [];
+    let hasDupes = false;
+    let hasSelf = false;
+    const selfEmail = userInfo.email?.trim().toLowerCase();
+
+    // Collect all already-invited emails for dupe checking
+    const allAlreadyInvited = new Set([
+      ...(Array.isArray(inviteEmails.peers) ? inviteEmails.peers : []).map(e => e?.trim().toLowerCase()).filter(Boolean),
+      ...(Array.isArray(inviteEmails.direct_reports) ? inviteEmails.direct_reports : []).map(e => e?.trim().toLowerCase()).filter(Boolean),
+      ...(Array.isArray(inviteEmails.others) ? inviteEmails.others : []).map(e => e?.trim().toLowerCase()).filter(Boolean),
+      typeof inviteEmails.line_manager === "string" ? inviteEmails.line_manager.trim().toLowerCase() : "",
+    ].filter(Boolean));
+
+    // Line manager
+    const mgEmail = (typeof newInviteEmails.line_manager === "string" ? newInviteEmails.line_manager : "").trim();
+    if (mgEmail) {
+      if (mgEmail.toLowerCase() === selfEmail) hasSelf = true;
+      else if (allAlreadyInvited.has(mgEmail.toLowerCase())) hasDupes = true;
+      else toInvite.push({ raterId: "line_manager", email: mgEmail });
+    }
+
+    // Multi-email raters
+    for (const raterId of ["peers", "direct_reports", "others"]) {
+      const emails = Array.isArray(newInviteEmails[raterId]) ? newInviteEmails[raterId] : [newInviteEmails[raterId] || ""];
+      const seen = new Set();
+      emails.filter(e => e?.trim()).forEach(e => {
+        const lower = e.trim().toLowerCase();
+        if (lower === selfEmail) { hasSelf = true; return; }
+        if (allAlreadyInvited.has(lower) || seen.has(lower)) { hasDupes = true; return; }
+        seen.add(lower);
+        toInvite.push({ raterId, email: e.trim() });
+      });
+    }
+
+    // Show error popups if needed
+    if (hasSelf) { setDupeMsg("You cannot invite yourself."); setShowDupePopup(true); setTimeout(() => setShowDupePopup(false), 3500); }
+    else if (hasDupes) { setDupeMsg("Some emails were already invited and skipped."); setShowDupePopup(true); setTimeout(() => setShowDupePopup(false), 3500); }
+
+    // Reset new inputs after sending
+    setTimeout(() => setNewInviteEmails({ peers: [""], direct_reports: [""], others: [""], line_manager: "" }), 500);
+
+    const raterTokens = {}; // raterId -> [tokens]
+
+    for (const { raterId, email } of toInvite) {
       try {
-        // Create invitation in Supabase
         const raterInfo = RATER_TYPES.find(r => r.id === raterId);
         const result = await sbFetch("/leadership_invitations", {
           method: "POST",
           body: JSON.stringify({
-            owner_email: currentUser?.email || "",
+            owner_email: userInfo.email || currentUser?.email || "",
+            owner_name: `${userInfo.firstName} ${userInfo.lastName}`.trim() || "",
+            owner_role: userInfo.role || "",
             rater_role: raterInfo?.label || raterId,
             rater_email: email,
           }),
         });
         const token = result?.[0]?.token;
         if (token) {
-          newTokens[raterId] = token;
-          // Send email via EmailJS
+          if (!raterTokens[raterId]) raterTokens[raterId] = [];
+          raterTokens[raterId].push(token);
+          newTokens[`${raterId}_${token}`] = token;
+          newSent[raterId] = (newSent[raterId] || 0) + 1;
           const assessmentLink = `${window.location.origin}?rate=${token}`;
           await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-            from_name: currentUser?.email?.split("@")[0] || "Someone",
+            from_name: userInfo.firstName || "Someone",
             rater_role: raterInfo?.label || raterId,
             assessment_link: assessmentLink,
             email: email,
           });
-          newSent[raterId] = true;
         }
       } catch (e) {
         console.error("Failed to send invite to", email, e);
       }
     }
-    const merged = { ...inviteTokens, ...newTokens };
-    setInviteTokens(merged);
-    try { localStorage.setItem('cv_invite_tokens', JSON.stringify(merged)); } catch (e) {}
-    setInviteSent(prev => ({ ...prev, ...newSent }));
+    setInviteTokens(newTokens);
+    setInviteSent(newSent);
+    // Track sent emails in inviteEmails for future dupe prevention
+    setInviteEmails(prev => {
+      const updated = { ...prev };
+      toInvite.forEach(({ raterId, email }) => {
+        if (raterId === "line_manager") {
+          updated.line_manager = email;
+        } else {
+          const existing = Array.isArray(updated[raterId]) ? updated[raterId] : [];
+          if (!existing.includes(email)) updated[raterId] = [...existing, email];
+        }
+      });
+      return updated;
+    });
+    if (toInvite.length > 0) { setShowInviteSentPopup(true); setTimeout(() => setShowInviteSentPopup(false), 3000); }
+    if (hasSelf && hasDupes) { setDupeMsg("Some emails skipped: cannot invite yourself or re-invite same email."); setShowDupePopup(true); setTimeout(() => setShowDupePopup(false), 4000); }
+    else if (hasSelf) { setDupeMsg("You cannot invite yourself — that email was skipped."); setShowDupePopup(true); setTimeout(() => setShowDupePopup(false), 3500); }
+    else if (hasDupes) { setDupeMsg("Some emails were already invited and skipped."); setShowDupePopup(true); setTimeout(() => setShowDupePopup(false), 3500); }
     setInviteSending(false);
   };
 
@@ -675,23 +811,23 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
       return "No evidence";
     };
 
-    const pillarColors = { delivery: "#5B2D8E", capacity: "#E0A84A", people: "#C9843A" };
+    const pillarColors = { delivery: "#5B2D8E", capacity: "#C9843A", people: "#5B2D8E" };
 
     const html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Leadership Assessment Report</title>
+<title>Leadership Brand Assessment Report</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Raleway', 'Lato', 'Arial', sans-serif; color: #2D1B4E; background: white; }
   .page { max-width: 800px; margin: 0 auto; padding: 40px; }
   @media print { .page { padding: 20px; } .no-print { display: none; } }
   
-  .header { background: #EDE8F5; color: #2D1B4E; padding: 40px; margin: -40px -40px 40px; text-align: center; }
+  .header { background: linear-gradient(135deg, #2D1B4E, #4A2D6E); color: white; padding: 40px; margin: -40px -40px 40px; text-align: center; }
   .header img { height: 50px; object-fit: contain; margin-bottom: 16px; }
   .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #C9843A; }
-  .header p { font-size: 13px; color: #4A2D6E; }
+  .header p { font-size: 13px; opacity: 0.8; }
   .header .user { font-size: 18px; font-weight: 600; margin: 16px 0 4px; opacity: 0.9; }
   
   .section { margin-bottom: 32px; }
@@ -746,14 +882,14 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
 <div class="page">
   <div class="header">
     <img src="${window.location.origin}/parity-logo.png" alt="Parity Coaching" onerror="this.style.display='none'" />
-    <h1>Leadership Assessment Report</h1>
-    <div class="user">${currentUser?.email || "Assessment Participant"}</div>
-    <p>${SENIORITY_LEVELS.find(s => s.id === seniority)?.label || ""} · ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
+    <h1>Leadership Brand Assessment Report</h1>
+    <div class="user">${userInfo.firstName ? userInfo.firstName + " " + userInfo.lastName : (currentUser?.email || "Assessment Participant")}</div>
+    <p>${userInfo.role || ""} · ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
   </div>
 
   ${report?.headline ? `
   <div class="section">
-    <div class="section-title">Your Leadership Summary</div>
+    <div class="section-title">Your Leadership Brand</div>
     <div class="headline-box"><p>"${report.headline}"</p></div>
   </div>` : ""}
 
@@ -903,7 +1039,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
         <div style={styles.container}>
           <button onClick={() => setShowInviteScreen(false)} style={styles.backBtn}>← Back</button>
           <div style={{ marginTop: 16 }} />
-          <div style={styles.moduleTag}>Leadership Assessment</div>
+          <div style={styles.moduleTag}>Leadership Brand Assessment</div>
           <h1 style={{ ...styles.title, fontSize: 22, marginBottom: 8 }}>Invite Your Stakeholders</h1>
           <p style={styles.subtitle}>Enter the email address for each rater. They'll receive a personalised link to complete their section privately.</p>
 
@@ -932,12 +1068,10 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
             })}
           </div>
 
-          {!allSent && (
-            <button onClick={sendInvitations} disabled={inviteSending}
-              style={{ ...styles.btnPrimary, width: "100%", marginBottom: 12, opacity: inviteSending ? 0.7 : 1 }}>
-              {inviteSending ? "Sending invitations..." : `Send ${nonSelfRaters.length} Invitation${nonSelfRaters.length !== 1 ? "s" : ""} →`}
-            </button>
-          )}
+          <button onClick={sendInvitations} disabled={inviteSending}
+            style={{ ...styles.btnPrimary, width: "100%", marginBottom: 12, opacity: inviteSending ? 0.7 : 1 }}>
+            {inviteSending ? "Sending invitations..." : "Send Invitations"}
+          </button>
 
           <button onClick={() => { setShowInviteScreen(false); setCurrentRater("self"); setScreen(3); }}
             style={{ ...styles.btnPrimary, width: "100%", background: allSent ? "#C9843A" : "rgba(45,27,78,0.07)", color: allSent ? "#fff" : "#6B5B7B", border: allSent ? "none" : "1px solid rgba(45,27,78,0.12)" }}>
@@ -954,35 +1088,185 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     );
   }
 
-  // ── Screen 1: Seniority ──────────────────────────────────────────────────────
-  if (screen === 1) return (
+  // ── Screen 1: Email entry + load existing ────────────────────────────────────
+  if (screen === 1) {
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userInfo.email);
+
+    const handleEmailNext = async () => {
+      if (!emailValid) { setEmailError("Please enter a valid email."); return; }
+      setEmailLoading(true);
+      setEmailError("");
+      try {
+        // Load all invitations for this email (as owner)
+        const allData = await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(userInfo.email)}&select=*`);
+        
+        if (allData && allData.length > 0) {
+          const profile = allData.find(r => r.owner_name);
+          if (profile?.owner_name) {
+            // Restore name/role
+            const [fn, ...ln] = (profile.owner_name || "").split(" ");
+            setUserInfo(prev => ({ ...prev, firstName: fn || "", lastName: ln.join(" ") || "", role: profile.owner_role || "" }));
+          }
+
+          // Restore self assessment
+          const selfRow = allData.find(r => r.rater_role === "self" || r.rater_email === userInfo.email);
+          if (selfRow?.ratings && Object.keys(selfRow.ratings).length > 0) {
+            setRatings(prev => ({ ...prev, self: selfRow.ratings }));
+            if (selfRow.comments) setComments(prev => ({ ...prev, self: selfRow.comments }));
+            if (selfRow.strengths) setStrengths(prev => ({ ...prev, self: selfRow.strengths }));
+            if (selfRow.development) setDevelopment(prev => ({ ...prev, self: selfRow.development }));
+          }
+
+          // Restore invited stakeholders - show their tokens, emails and completion status
+          const invited = allData.filter(r => r.rater_email !== userInfo.email && r.token);
+          if (invited.length > 0) {
+            const restoredTokens = {};
+            const restoredSent = {};
+            const restoredEmails = { peers: [], direct_reports: [], others: [], line_manager: "" };
+            const restoredCompleted = {};
+
+            invited.forEach(r => {
+              const roleKey = r.rater_role?.toLowerCase().replace(/\s+/g, '_') || "others";
+              restoredTokens[`${roleKey}_${r.token}`] = r.token;
+              restoredSent[roleKey] = (restoredSent[roleKey] || 0) + 1;
+              if (r.completed) restoredCompleted[r.token] = true;
+
+              // Restore email into the right slot
+              if (roleKey === "line_manager") {
+                restoredEmails.line_manager = r.rater_email;
+              } else if (["peers", "direct_reports", "others"].includes(roleKey)) {
+                restoredEmails[roleKey] = [...(restoredEmails[roleKey] || []), r.rater_email];
+              }
+            });
+
+            // Ensure at least one empty slot for multi-email raters
+            ["peers", "direct_reports", "others"].forEach(k => {
+              if (!restoredEmails[k] || restoredEmails[k].length === 0) restoredEmails[k] = [""];
+            });
+
+            setInviteTokens(restoredTokens);
+            setInviteSent(restoredSent);
+            setInviteEmails(restoredEmails);
+
+            // Load completed stakeholder responses
+            const completedInvites = invited.filter(r => r.completed);
+            if (completedInvites.length > 0) {
+              const grouped = {};
+              completedInvites.forEach(inv => {
+                const role = inv.rater_role;
+                if (!grouped[role]) grouped[role] = [];
+                grouped[role].push(inv);
+              });
+              const newStakeholderData = {};
+              Object.entries(grouped).forEach(([role, invites]) => {
+                const isManager = role === "Line Manager";
+                if (invites.length >= (isManager ? 1 : 3)) {
+                  const avgRatings = {};
+                  COMPETENCIES.forEach(c => {
+                    const scores = invites.map(i => i.ratings?.[c.id] || 0).filter(s => s > 0);
+                    if (scores.length > 0) avgRatings[c.id] = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length * 10) / 10;
+                  });
+                  const roleKey = role.toLowerCase().replace(/\s+/g, '_');
+                  newStakeholderData[roleKey] = { role, ratings: avgRatings, comments: {}, strengths: "", development: "", count: invites.length };
+                }
+              });
+              if (Object.keys(newStakeholderData).length > 0) setStakeholderData(newStakeholderData);
+            }
+          }
+
+          setEmailLoading(false);
+          if (profile?.owner_name) {
+            // Check if self assessment is complete
+            const selfComplete = selfRow?.ratings && Object.keys(selfRow.ratings).length >= COMPETENCIES.length;
+            const hasInvited = invited.length > 0;
+            if (selfComplete || hasInvited) {
+              setCurrentRater("self");
+              setScreen(3.5); // Go straight to invite/generate page
+            } else {
+              setCurrentRater("self");
+              setScreen(3); // Continue self assessment
+            }
+          } else {
+            setScreen(1.5); // Has email but no name yet
+          }
+          return;
+        }
+      } catch (e) { console.error(e); }
+      setEmailLoading(false);
+      setScreen(1.5); // New user
+    };
+
+    return (
+      <div style={styles.root}>
+        <div style={styles.container}>
+          <div style={{ textAlign: "center", marginBottom: 20, paddingBottom: 16, borderBottom: "2px solid #C9843A" }}>
+            <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 44, objectFit: "contain" }} />
+          </div>
+          <div style={styles.moduleTag}>Leadership Assessment</div>
+          <h1 style={{ ...styles.title, marginTop: 12 }}>Start Assessment</h1>
+          <p style={styles.subtitle}>Enter your email to begin or continue your assessment.</p>
+
+          <div style={{ marginBottom: 20 }}>
+            <p style={{ fontSize: 12, fontWeight: 600, color: "#2D1B4E", margin: "0 0 6px" }}>Email Address *</p>
+            <input type="email" value={userInfo.email} autoFocus
+              onChange={(e) => { setUserInfo(prev => ({ ...prev, email: e.target.value })); setEmailError(""); }}
+              onKeyDown={(e) => e.key === "Enter" && handleEmailNext()}
+              placeholder="your@email.com"
+              style={{ width: "100%", padding: "12px 14px", background: "#fff", border: `1px solid ${emailError ? "#E85D75" : "rgba(45,27,78,0.2)"}`, borderRadius: 8, color: "#2D1B4E", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+            {emailError && <p style={{ color: "#E85D75", fontSize: 12, margin: "6px 0 0" }}>{emailError}</p>}
+          </div>
+
+          <button onClick={handleEmailNext} disabled={!emailValid || emailLoading}
+            style={{ ...styles.btnPrimary, width: "100%", opacity: emailValid && !emailLoading ? 1 : 0.4 }}>
+            {emailLoading ? "Checking..." : "Continue →"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Screen 1.5: Name & Role ───────────────────────────────────────────────────
+  if (screen === 1.5) return (
     <div style={styles.root}>
       <div style={styles.container}>
-        <button onClick={onBack} style={styles.backBtn}>← Back</button>
+        <div style={{ textAlign: "center", marginBottom: 20, paddingBottom: 16, borderBottom: "2px solid #C9843A" }}>
+          <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 44, objectFit: "contain" }} />
+        </div>
+        <button onClick={() => setScreen(1)} style={{ ...styles.backBtn, marginBottom: 16 }}>← Back</button>
         <div style={styles.moduleTag}>Leadership Assessment</div>
-        <h1 style={styles.title}>What is your seniority level?</h1>
-        <p style={styles.subtitle}>This helps us tailor the competency framework to your role.</p>
+        <h1 style={{ ...styles.title, marginTop: 12 }}>Your Details</h1>
+        <p style={styles.subtitle}>Tell us a bit about yourself.</p>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
-          {SENIORITY_LEVELS.map((level) => {
-            const selected = seniority === level.id;
-            return (
-              <button key={level.id} onClick={() => setSeniority(level.id)}
-                style={{ padding: "18px 20px", borderRadius: 14, border: selected ? "2px solid #2A9D8F" : "1.5px solid rgba(45,27,78,0.12)", background: selected ? "rgba(201,132,58,0.12)" : "rgba(45,27,78,0.04)", cursor: "pointer", fontFamily: "inherit", textAlign: "left", transition: "all 0.2s", display: "flex", alignItems: "center", gap: 16 }}>
-                
-                <div>
-                  <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: selected ? "#1a0a2e" : "#4A2D6E" }}>{level.label}</p>
-                  <p style={{ margin: "4px 0 0", fontSize: 12, color: "#8B7B9B" }}>{level.description}</p>
-                </div>
-                {selected && <span style={{ marginLeft: "auto", color: "#C9843A", fontSize: 20 }}>✓</span>}
-              </button>
-            );
-          })}
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 28 }}>
+          <div style={{ display: "flex", gap: 12 }}>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: "#2D1B4E", margin: "0 0 6px" }}>First Name *</p>
+              <input type="text" value={userInfo.firstName} autoFocus
+                onChange={(e) => setUserInfo(prev => ({ ...prev, firstName: e.target.value }))}
+                placeholder="First name"
+                style={{ width: "100%", padding: "10px 14px", background: "#fff", border: "1px solid rgba(45,27,78,0.2)", borderRadius: 8, color: "#2D1B4E", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: "#2D1B4E", margin: "0 0 6px" }}>Last Name *</p>
+              <input type="text" value={userInfo.lastName}
+                onChange={(e) => setUserInfo(prev => ({ ...prev, lastName: e.target.value }))}
+                placeholder="Last name"
+                style={{ width: "100%", padding: "10px 14px", background: "#fff", border: "1px solid rgba(45,27,78,0.2)", borderRadius: 8, color: "#2D1B4E", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+            </div>
+          </div>
+          <div>
+            <p style={{ fontSize: 12, fontWeight: 600, color: "#2D1B4E", margin: "0 0 6px" }}>Job Role / Title *</p>
+            <input type="text" value={userInfo.role}
+              onChange={(e) => setUserInfo(prev => ({ ...prev, role: e.target.value }))}
+              placeholder="e.g. Senior Manager, Director"
+              style={{ width: "100%", padding: "10px 14px", background: "#fff", border: "1px solid rgba(45,27,78,0.2)", borderRadius: 8, color: "#2D1B4E", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+          </div>
         </div>
 
-        <button onClick={() => { setSelectedRaters(["self"]); setCurrentRater("self"); setScreen(3); }} disabled={!seniority}
-          style={{ ...styles.btnPrimary, width: "100%", opacity: seniority ? 1 : 0.4, cursor: seniority ? "pointer" : "not-allowed" }}>
-          Start Self Assessment →
+        <button onClick={() => { setCurrentRater("self"); setScreen(3); }}
+          disabled={!userInfo.firstName || !userInfo.lastName || !userInfo.role}
+          style={{ ...styles.btnPrimary, width: "100%", opacity: userInfo.firstName && userInfo.lastName && userInfo.role ? 1 : 0.4 }}>
+          Start Assessment →
         </button>
       </div>
     </div>
@@ -993,7 +1277,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     <div style={styles.root}>
       <div style={styles.container}>
         <button onClick={() => setScreen(1)} style={styles.backBtn}>← Back</button>
-        <div style={styles.moduleTag}>Leadership Assessment</div>
+        <div style={styles.moduleTag}>Leadership Brand Assessment</div>
         <h1 style={styles.title}>Who is completing this assessment?</h1>
         <p style={styles.subtitle}>Select all that apply. You can complete each perspective separately. <strong style={{ color: "#C9843A" }}>Self</strong> is always included.</p>
 
@@ -1043,7 +1327,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           </div>
           <button onClick={() => setScreen(1)} style={styles.backBtn}>← Back</button>
           <div style={{ marginTop: 16 }} />
-          <div style={styles.moduleTag}>Leadership Assessment</div>
+          <div style={styles.moduleTag}>Leadership Brand Assessment</div>
 
           {/* Self-only indicator */}
           <div style={{ display: "flex", gap: 6, marginBottom: 24 }}>
@@ -1065,9 +1349,9 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           {/* Legend */}
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 24 }}>
             {[1,2,3,4,5].map((val) => (
-              <div key={val} style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: "rgba(201,132,58,0.1)", borderRadius: 6, border: "1px solid rgba(201,132,58,0.3)" }}>
-                <span style={{ fontSize: 12, fontWeight: 800, color: "#C9843A" }}>{val}</span>
-                <span style={{ fontSize: 11, color: "#C9843A" }}>{RATING_LABELS[val].label}</span>
+              <div key={val} style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: "rgba(45,27,78,0.05)", borderRadius: 6, border: "1px solid rgba(45,27,78,0.09)" }}>
+                <span style={{ fontSize: 12, fontWeight: 800, color: RATING_LABELS[val].color }}>{val}</span>
+                <span style={{ fontSize: 11, color: "#8B7B9B" }}>{RATING_LABELS[val].label}</span>
               </div>
             ))}
           </div>
@@ -1077,19 +1361,19 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
             <div key={pillar.id} style={{ marginBottom: 32 }}>
               <div style={{ padding: "14px 18px", background: pillar.color + "15", border: `1px solid ${pillar.color}30`, borderRadius: 12, marginBottom: 16 }}>
                 <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: pillar.color }}>{pillar.name}</p>
-                <p style={{ margin: "4px 0 0", fontSize: 11, color: pillar.id === "capacity" ? "#8B5A1E" : pillar.color + "cc", lineHeight: 1.5 }}>{pillar.description}</p>
+                <p style={{ margin: "4px 0 0", fontSize: 11, color: "#8B7B9B", lineHeight: 1.5 }}>{pillar.description}</p>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                {pillar.competencies.filter(comp => currentRater === "self" ? !["p1", "p2"].includes(comp.id) : true).map((comp, ci) => {
+                {pillar.competencies.map((comp, ci) => {
                   const score = getRating(comp.id);
                   const comment = getComment(comp.id);
                   return (
-                    <div key={comp.id} style={{ padding: "16px 18px", background: pillar.color + "0d", border: "1px solid " + pillar.color + "30", borderRadius: 12 }}>
+                    <div key={comp.id} style={{ padding: "16px 18px", background: "rgba(45,27,78,0.04)", border: "1px solid rgba(45,27,78,0.08)", borderRadius: 12 }}>
                       <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 12 }}>
                         <div style={{ width: 24, height: 24, borderRadius: 6, background: pillar.color + "22", border: `1px solid ${pillar.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: pillar.color, flexShrink: 0 }}>{ci + 1}</div>
                         <div style={{ flex: 1, textAlign: "left" }}>
                           <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#1a0a2e" }}>{comp.name}</p>
-                          <p style={{ margin: "3px 0 0", fontSize: 11, color: pillar.id === "capacity" ? "#8B5A1E" : pillar.color + "cc", lineHeight: 1.4 }}>{comp.description}</p>
+                          <p style={{ margin: "3px 0 0", fontSize: 12, fontWeight: 500, color: pillar.color, lineHeight: 1.5 }}>{comp.description}</p>
                         </div>
                       </div>
                       <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
@@ -1098,16 +1382,16 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                           const ratingInfo = RATING_LABELS[val];
                           return (
                             <button key={val} onClick={() => setRating(comp.id, val)}
-                              style={{ flex: 1, padding: "10px 4px", borderRadius: 8, border: selected ? `2px solid ${pillar.color}` : `1px solid ${pillar.color}44`, background: selected ? pillar.color + "22" : pillar.color + "08", cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s", display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-                              <span style={{ fontSize: 16, fontWeight: 800, color: pillar.id === "capacity" ? "#C9843A" : pillar.color }}>{val}</span>
-                              <span style={{ fontSize: 9, color: pillar.id === "capacity" ? "#8B5A1E" : pillar.color + "aa", fontWeight: 600 }}>{ratingInfo.label}</span>
+                              style={{ flex: 1, padding: "8px 2px", borderRadius: 8, minWidth: 0, border: selected ? `2px solid ${pillar.color}` : `1px solid ${pillar.color}44`, background: selected ? pillar.color + "33" : pillar.color + "08", cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s", display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+                              <span style={{ fontSize: 16, fontWeight: 800, color: pillar.color }}>{val}</span>
+                              <span style={{ fontSize: 9, color: pillar.color + "aa", fontWeight: 600 }}>{ratingInfo.label}</span>
                             </button>
                           );
                         })}
                       </div>
                       <textarea value={comment} onChange={(e) => setComment(comp.id, e.target.value)}
                         placeholder="Add specific examples or observations (optional)..." rows={2}
-                        style={{ width: "100%", padding: "8px 12px", background: pillar.color + "08", border: `1px solid ${pillar.color}33`, borderRadius: 8, color: "#2D1B4E", fontSize: 12, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box" }} />
+                        style={{ width: "100%", padding: "8px 12px", background: pillar.color + "08", border: `1px solid ${pillar.color}33`, borderRadius: 8, color: pillar.color, fontSize: 12, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box" }} />
                     </div>
                   );
                 })}
@@ -1119,7 +1403,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           {currentRater !== "self" && <div style={{ padding: "20px", background: "rgba(45,27,78,0.04)", border: "1px solid rgba(45,27,78,0.09)", borderRadius: 14, marginBottom: 24 }}>
             <p style={{ color: "#1a0a2e", fontSize: 14, fontWeight: 700, margin: "0 0 16px" }}>📝 Additional Feedback</p>
             <div style={{ marginBottom: 16 }}>
-              <p style={{ color: "#8B5A1E", fontSize: 13, fontWeight: 600, margin: "0 0 6px" }}>
+              <p style={{ color: "#6B5B7B", fontSize: 13, fontWeight: 600, margin: "0 0 6px" }}>
                 {currentRater === "self" ? "What are your greatest strengths? Please describe." : "What are this person's greatest strengths? Please describe."}
               </p>
               <textarea value={strengths[currentRater] || ""} onChange={(e) => setStrengths(prev => ({ ...prev, [currentRater]: e.target.value }))}
@@ -1127,7 +1411,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                 style={{ width: "100%", padding: "10px 14px", background: "rgba(45,27,78,0.06)", border: "1px solid rgba(45,27,78,0.12)", borderRadius: 8, color: "#1a0a2e", fontSize: 13, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box" }} />
             </div>
             <div>
-              <p style={{ color: "#8B5A1E", fontSize: 13, fontWeight: 600, margin: "0 0 6px" }}>
+              <p style={{ color: "#6B5B7B", fontSize: 13, fontWeight: 600, margin: "0 0 6px" }}>
                 {currentRater === "self" ? "What are your main areas for development? Please describe." : "What are this person's main areas for development? Please describe."}
               </p>
               <textarea value={development[currentRater] || ""} onChange={(e) => setDevelopment(prev => ({ ...prev, [currentRater]: e.target.value }))}
@@ -1137,7 +1421,28 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           </div>}
 
           {currentRaterDone ? (
-            <button onClick={() => setScreen(3.5)}
+            <button onClick={async () => {
+              // Save self assessment progress before moving on
+              try {
+                await sbFetch("/leadership_invitations", {
+                  method: "POST",
+                  headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+                  body: JSON.stringify({
+                    owner_email: userInfo.email,
+                    owner_name: `${userInfo.firstName} ${userInfo.lastName}`.trim(),
+                    owner_role: userInfo.role,
+                    rater_role: "self",
+                    rater_email: userInfo.email,
+                    ratings: ratings["self"] || {},
+                    comments: comments["self"] || {},
+                    strengths: strengths["self"] || "",
+                    development: development["self"] || "",
+                    completed: false,
+                  }),
+                });
+              } catch(e) {}
+              setScreen(3.5);
+            }}
               style={{ ...styles.btnPrimary, width: "100%" }}>
               Self Assessment Complete — View Status →
             </button>
@@ -1153,124 +1458,237 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     );
   }
 
-  // ── Screen 3.5: Invite Stakeholders & Generate ───────────────────────────────
+  // ── Screen 3.5: Invite & Generate ───────────────────────────────────────────
   if (screen === 3.5) {
-    const completedCount = Object.keys(stakeholderData).length;
-    const totalInvited = Object.keys(inviteTokens).length;
-    const selfExcluded2 = ["p1", "p2"];
-    const requiredForSelf2 = COMPETENCIES.filter(c => !selfExcluded2.includes(c.id)).length;
-    const canGenerate = Object.keys(ratings["self"] || {}).filter(k => !selfExcluded2.includes(k)).length >= requiredForSelf2;
-    const nonSelfRaterTypes = RATER_TYPES.filter(r => r.id !== "self");
+    const selfDone = Object.keys(ratings["self"] || {}).length >= COMPETENCIES.length - 0;
+    const hasManager = Object.values(stakeholderData).some(s => s.role === "Line Manager");
+    const canGenerate = selfDone && hasManager;
+
+    // Count completed by rater type
+    const completedByType = {};
+    Object.values(stakeholderData).forEach(s => {
+      const key = s.role?.toLowerCase().replace(/ /g, "_") || "others";
+      completedByType[key] = (completedByType[key] || 0) + 1;
+    });
+
+    // Multi-email helpers
+    const multiRaters = ["peers", "direct_reports", "others"];
+    const addEmail = (raterId) => {
+      setInviteEmails(prev => ({ ...prev, [raterId]: [...(Array.isArray(prev[raterId]) ? prev[raterId] : [prev[raterId] || ""]), ""] }));
+    };
+    const updateEmail = (raterId, idx, val) => {
+      setNewInviteEmails(prev => {
+        const arr = Array.isArray(prev[raterId]) ? [...prev[raterId]] : [""];
+        arr[idx] = val;
+        return { ...prev, [raterId]: arr };
+      });
+    };
 
     return (
       <div style={styles.root}>
         <div style={styles.container}>
-          <div style={{ textAlign: "center", marginBottom: 16, paddingBottom: 12, borderBottom: "2px solid #C9843A" }}>
+          <div style={{ textAlign: "center", marginBottom: 20, paddingBottom: 16, borderBottom: "2px solid #C9843A" }}>
             <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 40, objectFit: "contain" }} />
           </div>
-          <button onClick={() => setScreen(3)} style={styles.backBtn}>← Back to Self Assessment</button>
-          <div style={{ marginTop: 16 }} />
+          <button onClick={() => setScreen(3)} style={{ ...styles.backBtn, marginBottom: 16 }}>← Back</button>
           <div style={styles.moduleTag}>Leadership Assessment</div>
 
-          {/* Self complete badge */}
-          <div style={{ padding: "14px 18px", background: "rgba(201,132,58,0.08)", border: "1px solid rgba(201,132,58,0.25)", borderRadius: 12, marginBottom: 24, display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 20 }}>✅</span>
-            <div>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#1a0a2e" }}>Self Assessment Complete</p>
-              <p style={{ margin: 0, fontSize: 12, color: "#C9843A" }}>You can generate your report now or invite stakeholders first</p>
+          {/* Success popup */}
+          {showInviteSentPopup && (
+            <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 9999, padding: "14px 24px", background: "#2D1B4E", borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.2)", display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ color: "#C9843A", fontSize: 18 }}>✓</span>
+              <span style={{ color: "#fff", fontSize: 14, fontWeight: 600 }}>Invitations sent successfully!</span>
             </div>
+          )}
+
+          {/* Error popup */}
+          {showDupePopup && (
+            <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 9999, padding: "14px 24px", background: "#E85D75", borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.2)", display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ color: "#fff", fontSize: 14, fontWeight: 600 }}>{dupeMsg}</span>
+            </div>
+          )}
+
+          {/* Self complete badge */}
+          <div style={{ padding: "14px 18px", background: "rgba(201,132,58,0.1)", border: "1px solid #C9843A", borderRadius: 12, marginBottom: 24, textAlign: "center" }}>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#C9843A" }}>Self Assessment Complete</p>
+            <p style={{ margin: "4px 0 0", fontSize: 12, color: "#C9843A" }}>You can generate your report now or invite stakeholders first</p>
           </div>
 
-          {/* Invite Stakeholders section */}
-          <p style={{ color: "#1a0a2e", fontSize: 15, fontWeight: 700, marginBottom: 4 }}>📧 Invite Stakeholders (Optional)</p>
-          <p style={{ color: "#8B7B9B", fontSize: 13, marginBottom: 16, lineHeight: 1.5 }}>Select who you want to invite and enter their email. They'll receive a private link to rate you.</p>
+          {/* Report requirements notice */}
+          <div style={{ padding: "12px 16px", background: hasManager ? "rgba(201,132,58,0.06)" : "rgba(91,45,142,0.06)", border: `1px solid ${hasManager ? "#C9843A" : "rgba(91,45,142,0.3)"}`, borderRadius: 10, marginBottom: 20 }}>
+            <p style={{ margin: 0, fontSize: 12, color: hasManager ? "#8B5A1E" : "#5B2D8E", lineHeight: 1.5 }}>
+              {hasManager ? "✓ Requirements met — ready to generate report" : "⚠ Report requires: Self + at least 1 Line Manager response. Peers, Direct Reports and Others need at least 3 responses each to be included."}
+            </p>
+          </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 20 }}>
-            {nonSelfRaterTypes.map((rater) => {
-              const isSelected = selectedRaters.includes(rater.id);
-              const hasToken = inviteTokens[rater.id];
-              const isCompleted = Object.values(stakeholderData).some(s => s.role === rater.label);
-              return (
-                <div key={rater.id} style={{ padding: "14px 16px", background: isCompleted ? "rgba(201,132,58,0.08)" : isSelected ? "rgba(45,27,78,0.06)" : "rgba(255,255,255,0.02)", border: `1px solid ${isCompleted ? "rgba(201,132,58,0.3)" : isSelected ? "rgba(45,27,78,0.18)" : "rgba(45,27,78,0.07)"}`, borderRadius: 12 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: isSelected && !hasToken ? 10 : 0 }}>
-                    {isCompleted ? (
-                      <span style={{ fontSize: 18 }}>✅</span>
-                    ) : (
-                      <input type="checkbox" checked={isSelected} onChange={() => {
-                        setSelectedRaters(prev => isSelected ? prev.filter(r => r !== rater.id) : [...prev, rater.id]);
-                      }} style={{ width: 18, height: 18, cursor: "pointer", accentColor: "#C9843A", flexShrink: 0 }} />
-                    )}
-                    
-                    <div style={{ flex: 1 }}>
-                      <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#1a0a2e" }}>{rater.label}</p>
-                      <p style={{ margin: 0, fontSize: 11, color: isCompleted ? "#C9843A" : hasToken ? "#E0A84A" : "#8B7B9B" }}>
-                        {isCompleted ? "Completed ✓" : hasToken ? "Invited — awaiting response" : rater.description}
-                      </p>
-                    </div>
-                  </div>
-                  {isSelected && !hasToken && !isCompleted && (
-                    <input type="email" value={inviteEmails[rater.id] || ""}
-                      onChange={(e) => setInviteEmails(prev => ({ ...prev, [rater.id]: e.target.value }))}
-                      placeholder={`${rater.label}'s email address...`}
-                      style={{ width: "100%", padding: "10px 14px", background: "rgba(45,27,78,0.07)", border: "1px solid rgba(45,27,78,0.12)", borderRadius: 8, color: "#1a0a2e", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
-                  )}
+          {/* Invite section */}
+          <p style={{ color: "#C9843A", fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Invite Stakeholders (Optional)</p>
+          <p style={{ color: "#C9843A", fontSize: 13, marginBottom: 16, lineHeight: 1.5 }}>Select who you want to invite and enter their email. They'll receive a private link.</p>
+
+          {/* Line Manager - single email with swap option */}
+          <div style={{ padding: "14px 16px", background: "rgba(201,132,58,0.06)", border: "1px solid #C9843A", borderRadius: 12, marginBottom: 12 }}>
+            <p style={{ margin: "0 0 8px", fontSize: 14, fontWeight: 700, color: "#C9843A" }}>Line Manager <span style={{ fontSize: 11, fontWeight: 400, color: "#8B5A1E" }}>(1 only)</span></p>
+            {inviteSent["line_manager"] ? (
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", background: "#fff", borderRadius: 8, marginBottom: 8 }}>
+                  <span style={{ fontSize: 12, color: "#4A2D6E" }}>{typeof inviteEmails.line_manager === "string" ? inviteEmails.line_manager : "1 manager invited"}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: stakeholderData["line_manager"] ? "#C9843A" : "#8B7B9B" }}>
+                    {stakeholderData["line_manager"] ? "✓ Done" : "Awaiting"}
+                  </span>
                 </div>
-              );
-            })}
+                <button onClick={async () => {
+                  // Invalidate old line manager invitation in Supabase
+                  try {
+                    const oldEmail = typeof inviteEmails.line_manager === "string" ? inviteEmails.line_manager : "";
+                    if (oldEmail) {
+                      await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(userInfo.email)}&rater_role=eq.Line%20Manager`, {
+                        method: "PATCH",
+                        headers: { "Prefer": "return=minimal" },
+                        body: JSON.stringify({ completed: true, ratings: {}, comments: {} }), // nullify ratings
+                      });
+                    }
+                  } catch(e) {}
+                  // Reset line manager state
+                  setInviteSent(prev => { const n = {...prev}; delete n["line_manager"]; return n; });
+                  setInviteTokens(prev => { const n = {...prev}; Object.keys(n).filter(k => k.startsWith("line_manager")).forEach(k => delete n[k]); return n; });
+                  setInviteEmails(prev => ({ ...prev, line_manager: "" }));
+                  setNewInviteEmails(prev => ({ ...prev, line_manager: "" }));
+                  setStakeholderData(prev => { const n = {...prev}; delete n["line_manager"]; return n; });
+                }}
+                  style={{ fontSize: 12, color: "#E85D75", background: "none", border: "1px solid #E85D75", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}>
+                  Remove & invite different manager
+                </button>
+              </div>
+            ) : (
+              <input type="email"
+                value={typeof newInviteEmails.line_manager === "string" ? newInviteEmails.line_manager : ""}
+                onChange={(e) => setNewInviteEmails(prev => ({ ...prev, line_manager: e.target.value }))}
+                placeholder="manager@email.com"
+                style={{ width: "100%", padding: "8px 12px", background: "#fff", border: "1px solid rgba(45,27,78,0.2)", borderRadius: 8, color: "#2D1B4E", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+            )}
           </div>
 
-          {/* Send invitations button */}
-          {selectedRaters.filter(r => r !== "self" && !inviteTokens[r]).length > 0 && (
-            <button onClick={sendInvitations} disabled={inviteSending}
-              style={{ ...styles.btnSecondary, width: "100%", marginBottom: 16, opacity: inviteSending ? 0.7 : 1 }}>
-              {inviteSending ? "Sending..." : `Send ${selectedRaters.filter(r => r !== "self" && !inviteTokens[r]).length} Invitation${selectedRaters.filter(r => r !== "self" && !inviteTokens[r]).length !== 1 ? "s" : ""}`}
-            </button>
+          {/* Multi-email raters */}
+          {[
+            { id: "peers", label: "Peers", min: 3 },
+            { id: "direct_reports", label: "Direct Reports", min: 3 },
+            { id: "others", label: "Others", min: 3 },
+          ].map(({ id, label, min }) => {
+            const emails = Array.isArray(newInviteEmails[id]) ? newInviteEmails[id] : [""];
+            const sentCount = inviteSent[id] || 0;
+            const completedCount2 = completedByType[id] || 0;
+            return (
+              <div key={id} style={{ padding: "14px 16px", background: "rgba(201,132,58,0.06)", border: "1px solid #C9843A", borderRadius: 12, marginBottom: 12 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#C9843A" }}>
+                    {label} <span style={{ fontSize: 11, fontWeight: 400, color: "#8B5A1E" }}>(min {min} for data to count)</span>
+                  </p>
+
+                </div>
+                {emails.map((email, idx) => {
+                  // Check if this email has completed
+                  const isCompleted = Object.entries(inviteTokens).some(([k, token]) => 
+                    k.startsWith(id) && stakeholderData[id] && email === email
+                  );
+                  const tokenForEmail = Object.entries(inviteTokens).find(([k]) => k.startsWith(id));
+                  const emailDone = tokenForEmail && Object.values(stakeholderData).some(s => s.role?.toLowerCase().replace(/\s+/g, '_') === id);
+                  return (
+                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                      <input type="email" value={newInviteEmails[id]?.[idx] || ""}
+                        onChange={(e) => updateEmail(id, idx, e.target.value)}
+                        placeholder={`${label.toLowerCase().slice(0,-1)} ${idx + 1} email...`}
+                        style={{ flex: 1, padding: "8px 12px", background: "#fff", border: "1px solid rgba(45,27,78,0.2)", borderRadius: 8, color: "#2D1B4E", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+                      {email && (inviteSent[id] || 0) > idx && (
+                        <span style={{ fontSize: 11, color: emailDone ? "#C9843A" : "#8B7B9B", fontWeight: 600, whiteSpace: "nowrap" }}>
+                          {emailDone ? "✓ Done" : "Sent"}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+                <button onClick={() => addEmail(id)}
+                  style={{ fontSize: 12, color: "#C9843A", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
+                  + Add another {label.toLowerCase().slice(0,-1)}
+                </button>
+              </div>
+            );
+          })}
+
+          {/* Send button */}
+          <button onClick={sendInvitations} disabled={inviteSending}
+            style={{ ...styles.btnSecondary, width: "100%", marginBottom: 16, opacity: inviteSending ? 0.7 : 1 }}>
+            {inviteSending ? "Sending..." : "Send Invitations"}
+          </button>
+
+          {/* Previously invited - status tracker */}
+          {Object.keys(inviteSent).length > 0 && (
+            <div style={{ padding: "14px 16px", background: "rgba(201,132,58,0.06)", border: "1px solid #C9843A", borderRadius: 12, marginBottom: 16 }}>
+              <p style={{ margin: "0 0 10px", fontSize: 13, fontWeight: 700, color: "#C9843A" }}>Invitation Status</p>
+              {["line_manager", "peers", "direct_reports", "others"].map(roleKey => {
+                const count = inviteSent[roleKey] || 0;
+                if (count === 0) return null;
+                const label = roleKey === "line_manager" ? "Line Manager" : roleKey === "direct_reports" ? "Direct Reports" : roleKey.charAt(0).toUpperCase() + roleKey.slice(1);
+                const completed = statusData[roleKey] && statusData[roleKey].count > 0;
+                const emails = roleKey === "line_manager"
+                  ? [typeof inviteEmails.line_manager === "string" ? inviteEmails.line_manager : ""]
+                  : (Array.isArray(inviteEmails[roleKey]) ? inviteEmails[roleKey] : []).filter(Boolean);
+                return (
+                  <div key={roleKey} style={{ marginBottom: 8 }}>
+                    <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 600, color: "#2D1B4E" }}>{label}</p>
+                    {emails.map((email, i) => (
+                      <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 8px", background: "#fff", borderRadius: 6, marginBottom: 3 }}>
+                        <span style={{ fontSize: 12, color: "#4A2D6E" }}>{email}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: completed ? "#C9843A" : "#8B7B9B" }}>
+                          {completed ? "✓ Completed" : "Awaiting"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
           )}
 
           {/* Check responses */}
-          {totalInvited > 0 && (
-            <>
-              <button onClick={loadStakeholderResponses} disabled={loadingStakeholders}
-                style={{ ...styles.btnSecondary, width: "100%", marginBottom: 12, opacity: loadingStakeholders ? 0.7 : 1 }}>
-                {loadingStakeholders ? "Checking..." : "Check for New Responses"}
-              </button>
-              {completedCount > 0 && (
-                <div style={{ padding: "10px 14px", background: "rgba(201,132,58,0.08)", border: "1px solid rgba(201,132,58,0.2)", borderRadius: 10, marginBottom: 12, textAlign: "center" }}>
-                  <p style={{ color: "#C9843A", fontSize: 13, margin: 0, fontWeight: 600 }}>
-                    {completedCount} stakeholder response{completedCount !== 1 ? "s" : ""} received ✓
-                  </p>
-                </div>
-              )}
-            </>
-          )}
+          <button onClick={loadStakeholderResponses} disabled={loadingStakeholders}
+            style={{ ...styles.btnSecondary, width: "100%", marginBottom: 16, opacity: loadingStakeholders ? 0.7 : 1 }}>
+            {loadingStakeholders ? "Checking..." : "Check for New Responses"}
+          </button>
 
-          <div style={{ height: 1, background: "rgba(45,27,78,0.09)", margin: "20px 0" }} />
+          <div style={{ height: 1, background: "rgba(45,27,78,0.1)", margin: "8px 0 16px" }} />
 
-          {/* Consent + Generate */}
-          <div style={{ padding: "14px 16px", background: "rgba(45,27,78,0.04)", border: "1px solid rgba(45,27,78,0.09)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "flex-start", gap: 12 }}>
+          {/* Consent */}
+          <div style={{ padding: "12px 16px", background: "rgba(201,132,58,0.06)", border: "1px solid #C9843A", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "flex-start", gap: 12 }}>
             <input type="checkbox" id="consent" checked={consentToShare} onChange={(e) => setConsentToShare(e.target.checked)}
               style={{ width: 18, height: 18, marginTop: 2, cursor: "pointer", flexShrink: 0, accentColor: "#C9843A" }} />
-            <label htmlFor="consent" style={{ fontSize: 13, color: "#8B5A1E", lineHeight: 1.5, cursor: "pointer" }}>
-              I consent to send a copy of my results to <strong style={{ color: "#1a0a2e" }}>sayhello@paritycoaching.org</strong>
+            <label htmlFor="consent" style={{ fontSize: 13, color: "#C9843A", lineHeight: 1.5, cursor: "pointer" }}>
+              I consent to send a copy of my results to <strong>sayhello@paritycoaching.org</strong>
             </label>
           </div>
 
-          <button onClick={generateReport} disabled={!canGenerate || reportLoading}
-            style={{ ...styles.btnPrimary, width: "100%", background: "linear-gradient(135deg, #5B2D8E, #2D1B4E)", opacity: canGenerate && !reportLoading ? 1 : 0.5 }}>
-            {reportLoading ? "Generating your report..." : completedCount > 0 ? `Generate Report (Self + ${completedCount} stakeholder${completedCount !== 1 ? "s" : ""}) →` : "Generate Report (Self only) →"}
-          </button>
-
-          {totalInvited > 0 && completedCount === 0 && (
-            <p style={{ textAlign: "center", color: "#9B8BAB", fontSize: 12, marginTop: 10 }}>
-              You can generate now or wait for stakeholder responses for a richer report.
+          {!canGenerate && (
+            <p style={{ fontSize: 12, color: "#8B5A1E", marginBottom: 8, textAlign: "center" }}>
+              Waiting for Line Manager response before report can be generated
             </p>
           )}
+
+          <button onClick={generateReport} disabled={!canGenerate || reportLoading}
+            style={{ ...styles.btnPrimary, width: "100%", background: "linear-gradient(135deg, #5B2D8E, #2D1B4E)", opacity: canGenerate && !reportLoading ? 1 : 0.5 }}>
+            {reportLoading ? "Generating your report..." : (() => {
+              const parts = ["Self"];
+              if (stakeholderData["line_manager"]) parts.push("Line Manager");
+              if (stakeholderData["peers"]) parts.push("Peers");
+              if (stakeholderData["direct_reports"]) parts.push("Direct Reports");
+              if (stakeholderData["others"]) parts.push("Others");
+              return `Generate Report (${parts.join(" + ")}) →`;
+            })()}
+          </button>
         </div>
       </div>
     );
   }
 
-  // ── Screen 4: Report ─────────────────────────────────────────────────────────  // ── Screen 4: Report ─────────────────────────────────────────────────────────
+    // ── Screen 4: Report ─────────────────────────────────────────────────────────  // ── Screen 4: Report ─────────────────────────────────────────────────────────
   if (screen === 4 && report) {
     const selfRatings = ratings["self"] || {};
     const otherRaters = selectedRaters.filter((r) => r !== "self");
@@ -1288,11 +1706,11 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           </div>
           <button onClick={() => setScreen(3.5)} style={styles.backBtn}>← Back to Status</button>
           <div style={{ marginTop: 16 }} />
-          <div style={styles.moduleTag}>Leadership Assessment</div>
+          <div style={styles.moduleTag}>Leadership Brand Assessment</div>
 
           {/* Headline */}
           <div style={{ padding: "24px", background: "linear-gradient(135deg, rgba(201,132,58,0.15), rgba(38,70,83,0.25))", border: "1px solid rgba(201,132,58,0.3)", borderRadius: 16, marginBottom: 24 }}>
-            <p style={{ color: "#C9843A", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>Your Leadership Summary</p>
+            <p style={{ color: "#C9843A", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>Your Leadership Brand</p>
             <p style={{ color: "#1a0a2e", fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: 0, fontWeight: 600 }}>"{report.headline}"</p>
           </div>
 
@@ -1306,7 +1724,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                   <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 700, color: pillar.color }}>{pillar.name}</p>
                   <p style={{ margin: 0, fontSize: 28, fontWeight: 800, color: "#1a0a2e" }}>{selfAvg}</p>
                   <p style={{ margin: "2px 0 0", fontSize: 10, color: "#8B7B9B" }}>Self / 5.0</p>
-                  {otherAvg && <p style={{ margin: "4px 0 0", fontSize: 11, color: "#8B5A1E" }}>Others: {otherAvg}</p>}
+                  {otherAvg && <p style={{ margin: "4px 0 0", fontSize: 11, color: "#6B5B7B" }}>Others: {otherAvg}</p>}
                 </div>
               );
             })}
@@ -1338,7 +1756,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                         <div style={{ flex: 1, height: 8, background: "rgba(45,27,78,0.07)", borderRadius: 4, overflow: "hidden" }}>
                           <div style={{ width: `${(val / 5) * 100}%`, height: "100%", background: PALETTE[i % PALETTE.length], borderRadius: 4, opacity, transition: "width 0.4s" }} />
                         </div>
-                        <span style={{ width: 24, fontSize: 10, color: "#8B5A1E", textAlign: "right" }}>{typeof val === "number" ? val.toFixed(1) : val}</span>
+                        <span style={{ width: 24, fontSize: 10, color: "#6B5B7B", textAlign: "right" }}>{typeof val === "number" ? val.toFixed(1) : val}</span>
                       </div>
                     ))}
                   </div>
@@ -1388,7 +1806,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                   {(goal.actions || []).map((action, ai) => (
                     <div key={ai} style={{ display: "flex", gap: 8, marginBottom: 4 }}>
                       <span style={{ color: "#E0A84A", fontSize: 12, flexShrink: 0 }}>•</span>
-                      <p style={{ margin: 0, fontSize: 12, color: "#8B5A1E" }}>{action}</p>
+                      <p style={{ margin: 0, fontSize: 12, color: "#6B5B7B" }}>{action}</p>
                     </div>
                   ))}
                 </div>
@@ -1419,7 +1837,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           {report.comments_summary && (
             <div style={{ padding: "18px 20px", background: "rgba(45,27,78,0.04)", border: "1px solid rgba(45,27,78,0.09)", borderRadius: 12, marginBottom: 16 }}>
               <p style={{ color: "#1a0a2e", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>Qualitative Feedback Summary</p>
-              <p style={{ margin: 0, fontSize: 13, color: "#8B5A1E", lineHeight: 1.6 }}>{report.comments_summary}</p>
+              <p style={{ margin: 0, fontSize: 13, color: "#6B5B7B", lineHeight: 1.6 }}>{report.comments_summary}</p>
             </div>
           )}
 
@@ -1427,7 +1845,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           <div style={{ padding: "20px 24px", background: "linear-gradient(135deg, rgba(201,132,58,0.12), rgba(38,70,83,0.2))", border: "1px solid rgba(201,132,58,0.25)", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 32 }}>
             <div>
               <p style={{ color: "#1a0a2e", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Discuss your results with a coach</p>
-              <p style={{ color: "#8B5A1E", fontSize: 12, margin: 0 }}>Book a 1:1 session to debrief your leadership brand report.</p>
+              <p style={{ color: "#6B5B7B", fontSize: 12, margin: 0 }}>Book a 1:1 session to debrief your leadership brand report.</p>
             </div>
             <a href="https://www.paritycoaching.org" target="_blank" rel="noopener noreferrer"
               style={{ padding: "10px 20px", background: "#C9843A", borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none", flexShrink: 0 }}>
@@ -1458,7 +1876,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           </button>
 
           <button onClick={onBack} style={{ ...styles.btnSecondary, width: "100%" }}>
-            ← Back Exercise
+            ← Back to Core Values Exercise
           </button>
         </div>
       </div>
@@ -1474,7 +1892,7 @@ const styles = {
   backBtn: { background: "none", border: "none", color: "#C9843A", cursor: "pointer", fontSize: 13, fontFamily: "inherit", marginBottom: 16, padding: 0 },
   moduleTag: { display: "inline-block", padding: "4px 12px", background: "rgba(45,27,78,0.1)", border: "1px solid rgba(45,27,78,0.25)", borderRadius: 20, color: "#2D1B4E", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginBottom: 16 },
   title: { fontSize: 26, fontWeight: 800, color: "#2D1B4E", margin: "0 0 8px", lineHeight: 1.2 },
-  subtitle: { fontSize: 14, color: "#8B5A1E", margin: "0 0 24px", lineHeight: 1.5 },
+  subtitle: { fontSize: 14, color: "#6B5B7B", margin: "0 0 24px", lineHeight: 1.5 },
   btnPrimary: { padding: "13px 24px", background: "#C9843A", border: "none", borderRadius: 10, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" },
-  btnSecondary: { padding: "12px 24px", background: "rgba(45,27,78,0.07)", border: "1px solid rgba(45,27,78,0.12)", borderRadius: 10, color: "#8B5A1E", fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" },
+  btnSecondary: { padding: "12px 24px", background: "rgba(45,27,78,0.07)", border: "1px solid rgba(45,27,78,0.12)", borderRadius: 10, color: "#6B5B7B", fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" },
 };

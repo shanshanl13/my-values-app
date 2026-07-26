@@ -309,7 +309,7 @@ function WelcomeModal({ onNewUser, onLoadUser, onNewUserLeadership, onLoadUserLe
   );
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.92)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(255,255,255,0.85)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div style={{ background: "#EDE8F5", border: "1px solid rgba(45,27,78,0.2)", borderRadius: 20, width: "100%", maxWidth: 460, overflow: "hidden", boxShadow: "0 25px 60px rgba(0,0,0,0.6)" }}>
         <div style={{ height: 4, background: "linear-gradient(90deg, #5B2D8E, #2D1B4E, #C9843A)" }} />
 
@@ -319,13 +319,10 @@ function WelcomeModal({ onNewUser, onLoadUser, onNewUserLeadership, onLoadUserLe
             <div style={{ textAlign: "center", marginBottom: 20 }}>
               <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 50, objectFit: "contain" }} />
             </div>
-            <h2 style={{ textAlign: "center", color: "#2D1B4E", fontSize: 22, fontWeight: 800, margin: "0 0 8px" }}>Leadership Assessment</h2>
+            <h2 style={{ textAlign: "center", color: "#2D1B4E", fontSize: 22, fontWeight: 800, margin: "0 0 8px" }}>Leadership Brand Assessment</h2>
             <p style={{ textAlign: "center", color: "#6B5B7B", fontSize: 13, lineHeight: 1.6, margin: "0 0 28px" }}>Understand your leadership competencies and get AI-driven coaching goals.</p>
-            <button onClick={onNewUserLeadership} style={{ width: "100%", padding: "14px", background: "linear-gradient(135deg, #C9843A, #8B4A1E)", border: "none", borderRadius: 10, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", marginBottom: 10 }}>
-              🆕 Start Assessment
-            </button>
-            <button onClick={() => setMode("returning_leadership")} style={{ width: "100%", padding: "14px", background: "rgba(45,27,78,0.08)", border: "1px solid rgba(45,27,78,0.18)", borderRadius: 10, color: "#1a0a2e", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
-              👋 I have a saved profile
+            <button onClick={onNewUserLeadership} style={{ width: "100%", padding: "14px", background: "linear-gradient(135deg, #C9843A, #8B4A1E)", border: "none", borderRadius: 10, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+              Start Assessment
             </button>
           </div>
         )}
@@ -346,7 +343,7 @@ function WelcomeModal({ onNewUser, onLoadUser, onNewUserLeadership, onLoadUserLe
               />
               <ModuleCard
                 icon="🏆"
-                title="Leadership Assessment"
+                title="Leadership Brand Assessment"
                 desc="Rate your leadership competencies and get a personalised report"
                 color="#4A2D6E"
                 onClick={onNewUserLeadership}
