@@ -322,7 +322,10 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
     try { const s = localStorage.getItem('cv_invite_tokens'); return s ? JSON.parse(s) : {}; } catch { return {}; }
   }); // { raterId: token }
   const [stakeholderData, setStakeholderData] = useState({});
-  const [statusData, setStatusData] = useState({}); // { raterId: { ratings, comments, strengths, development } }
+  const [statusData, setStatusData] = useState({});
+  const [generatedLink, setGeneratedLink] = useState("");
+  const [copied, setCopied] = useState(false);
+
   const [loadingStakeholders, setLoadingStakeholders] = useState(false);
 
   const loadStakeholderResponses = async () => {
@@ -1511,23 +1514,17 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           {/* Self complete badge */}
           <div style={{ padding: "14px 18px", background: "rgba(201,132,58,0.1)", border: "1px solid #C9843A", borderRadius: 12, marginBottom: 24, textAlign: "center" }}>
             <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#C9843A" }}>Self Assessment Complete</p>
-            <p style={{ margin: "4px 0 0", fontSize: 12, color: "#C9843A" }}>You can generate your report now or invite stakeholders first</p>
+            <p style={{ margin: "4px 0 0", fontSize: 12, color: "#C9843A" }}></p>
           </div>
 
-          {/* Report requirements notice */}
-          <div style={{ padding: "12px 16px", background: hasManager ? "rgba(201,132,58,0.06)" : "rgba(91,45,142,0.06)", border: `1px solid ${hasManager ? "#C9843A" : "rgba(91,45,142,0.3)"}`, borderRadius: 10, marginBottom: 20 }}>
-            <p style={{ margin: 0, fontSize: 12, color: hasManager ? "#8B5A1E" : "#5B2D8E", lineHeight: 1.5 }}>
-              {hasManager ? "✓ Requirements met — ready to generate report" : "⚠ Report requires: Self + at least 1 Line Manager response. Peers, Direct Reports and Others need at least 3 responses each to be included."}
-            </p>
-          </div>
 
           {/* Invite section */}
-          <p style={{ color: "#C9843A", fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Invite Stakeholders (Optional)</p>
-          <p style={{ color: "#C9843A", fontSize: 13, marginBottom: 16, lineHeight: 1.5 }}>Select who you want to invite and enter their email. They'll receive a private link.</p>
+          <p style={{ color: "#C9843A", fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Invite Stakeholders</p>
+          
 
           {/* Line Manager - single email with swap option */}
           <div style={{ padding: "14px 16px", background: "rgba(201,132,58,0.06)", border: "1px solid #C9843A", borderRadius: 12, marginBottom: 12 }}>
-            <p style={{ margin: "0 0 8px", fontSize: 14, fontWeight: 700, color: "#C9843A" }}>Line Manager <span style={{ fontSize: 11, fontWeight: 400, color: "#8B5A1E" }}>(1 only)</span></p>
+            <p style={{ margin: "0 0 8px", fontSize: 14, fontWeight: 700, color: "#C9843A" }}>Line Manager</p>
             {inviteSent["line_manager"] ? (
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", background: "#fff", borderRadius: 8, marginBottom: 8 }}>
@@ -1560,65 +1557,56 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                 </button>
               </div>
             ) : (
-              <input type="email"
-                value={typeof newInviteEmails.line_manager === "string" ? newInviteEmails.line_manager : ""}
-                onChange={(e) => setNewInviteEmails(prev => ({ ...prev, line_manager: e.target.value }))}
-                placeholder="manager@email.com"
-                style={{ width: "100%", padding: "8px 12px", background: "#fff", border: "1px solid rgba(45,27,78,0.2)", borderRadius: 8, color: "#2D1B4E", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+              <div />
             )}
           </div>
 
-          {/* Multi-email raters */}
-          {[
-            { id: "peers", label: "Peers", min: 3 },
-            { id: "direct_reports", label: "Direct Reports", min: 3 },
-            { id: "others", label: "Others", min: 3 },
-          ].map(({ id, label, min }) => {
-            const emails = Array.isArray(newInviteEmails[id]) ? newInviteEmails[id] : [""];
-            const sentCount = inviteSent[id] || 0;
-            const completedCount2 = completedByType[id] || 0;
-            return (
-              <div key={id} style={{ padding: "14px 16px", background: "rgba(201,132,58,0.06)", border: "1px solid #C9843A", borderRadius: 12, marginBottom: 12 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                  <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#C9843A" }}>
-                    {label} <span style={{ fontSize: 11, fontWeight: 400, color: "#8B5A1E" }}>(min {min} for data to count)</span>
-                  </p>
+          {/* Send button */}
+          <button onClick={async () => {
+            // Generate link for line manager without sending email
+            if (inviteSent["line_manager"]) { setDupeMsg("Line Manager already invited."); setShowDupePopup(true); setTimeout(() => setShowDupePopup(false), 3000); return; }
+            setInviteSending(true);
+            try {
+              const result = await sbFetch("/leadership_invitations", {
+                method: "POST",
+                body: JSON.stringify({
+                  owner_email: userInfo.email || "",
+                  owner_name: `${userInfo.firstName} ${userInfo.lastName}`.trim(),
+                  owner_role: userInfo.role,
+                  rater_role: "Line Manager",
+                  rater_email: "pending",
+                }),
+              });
+              const token = result?.[0]?.token;
+              if (token) {
+                const link = `${window.location.origin}?rate=${token}`;
+                setGeneratedLink(link);
+                setInviteEmails(prev => ({ ...prev, line_manager: "invited" }));
+                setInviteSent(prev => ({ ...prev, line_manager: 1 }));
+                const newTokens = { ...inviteTokens, [`line_manager_${token}`]: token };
+                setInviteTokens(newTokens);
+              }
+            } catch(e) { console.error(e); }
+            setInviteSending(false);
+            setNewInviteEmails(prev => ({ ...prev, line_manager: "" }));
+          }} disabled={inviteSending}
+            style={{ ...styles.btnSecondary, width: "100%", marginBottom: 12, opacity: inviteSending ? 0.7 : 1 }}>
+            {inviteSending ? "Generating..." : "Generate Invitation Link"}
+          </button>
 
-                </div>
-                {emails.map((email, idx) => {
-                  // Check if this email has completed
-                  const isCompleted = Object.entries(inviteTokens).some(([k, token]) => 
-                    k.startsWith(id) && stakeholderData[id] && email === email
-                  );
-                  const tokenForEmail = Object.entries(inviteTokens).find(([k]) => k.startsWith(id));
-                  const emailDone = tokenForEmail && Object.values(stakeholderData).some(s => s.role?.toLowerCase().replace(/\s+/g, '_') === id);
-                  return (
-                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                      <input type="email" value={newInviteEmails[id]?.[idx] || ""}
-                        onChange={(e) => updateEmail(id, idx, e.target.value)}
-                        placeholder={`${label.toLowerCase().slice(0,-1)} ${idx + 1} email...`}
-                        style={{ flex: 1, padding: "8px 12px", background: "#fff", border: "1px solid rgba(45,27,78,0.2)", borderRadius: 8, color: "#2D1B4E", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
-                      {email && (inviteSent[id] || 0) > idx && (
-                        <span style={{ fontSize: 11, color: emailDone ? "#C9843A" : "#8B7B9B", fontWeight: 600, whiteSpace: "nowrap" }}>
-                          {emailDone ? "✓ Done" : "Sent"}
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
-                <button onClick={() => addEmail(id)}
-                  style={{ fontSize: 12, color: "#C9843A", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
-                  + Add another {label.toLowerCase().slice(0,-1)}
+          {generatedLink && (
+            <div style={{ padding: "14px 16px", background: "#fff", border: "1.5px solid #C9843A", borderRadius: 10, marginBottom: 16 }}>
+              <p style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 700, color: "#C9843A" }}>Share this link with your Line Manager:</p>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <input readOnly value={generatedLink}
+                  style={{ flex: 1, padding: "8px 10px", background: "#f9f6f2", border: "1px solid rgba(45,27,78,0.15)", borderRadius: 6, fontSize: 11, color: "#2D1B4E", fontFamily: "inherit", outline: "none" }} />
+                <button onClick={() => { navigator.clipboard.writeText(generatedLink); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+                  style={{ padding: "8px 14px", background: "#2D1B4E", border: "none", borderRadius: 6, color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+                  {copied ? "Copied!" : "Copy"}
                 </button>
               </div>
-            );
-          })}
-
-          {/* Send button */}
-          <button onClick={sendInvitations} disabled={inviteSending}
-            style={{ ...styles.btnSecondary, width: "100%", marginBottom: 16, opacity: inviteSending ? 0.7 : 1 }}>
-            {inviteSending ? "Sending..." : "Send Invitations"}
-          </button>
+            </div>
+          )}
 
           {/* Previously invited - status tracker */}
           {Object.keys(inviteSent).length > 0 && (
