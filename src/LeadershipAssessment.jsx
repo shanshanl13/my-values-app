@@ -85,7 +85,7 @@ const PILLARS = [
     name: "Capacity",
     fullName: "Capacity — Thinking & Strategic Acumen",
     description: "The ability to think critically, solve complex problems, and provide clear strategic direction. Moving beyond day-to-day tasks to understand the bigger picture and make sound decisions that balance immediate needs with long-term vision.",
-    color: "#C9843A",
+    color: "#E0A84A",
     competencies: [
       { id: "c1", name: "Strategic Mindset", description: "Possesses a strategic mindset, with solid understanding of the company's vision and strategy." },
       { id: "c2", name: "Innovation & Challenge", description: "Thinks outside the box and challenges the status quo." },
@@ -199,7 +199,7 @@ function StakeholderView({ token }) {
         <div style={{ textAlign: "center", marginBottom: 20, paddingBottom: 16, borderBottom: "2px solid #C9843A" }}>
           <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 44, objectFit: "contain" }} />
         </div>
-        <div style={styles.moduleTag}>Leadership Brand Assessment</div>
+        <div style={styles.moduleTag}>Leadership Competency Assessment</div>
         <h1 style={{ ...styles.title, fontSize: 22, marginBottom: 4 }}>
           {invitation?.rater_role} Feedback
         </h1>
@@ -222,7 +222,7 @@ function StakeholderView({ token }) {
           <div key={pillar.id} style={{ marginBottom: 32 }}>
             <div style={{ padding: "14px 18px", background: pillar.color + "15", border: `1px solid ${pillar.color}30`, borderRadius: 12, marginBottom: 16 }}>
               <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: pillar.color }}>{pillar.name}</p>
-              <p style={{ margin: "4px 0 0", fontSize: 11, color: "#8B7B9B", lineHeight: 1.5 }}>{pillar.description}</p>
+              <p style={{ margin: "4px 0 0", fontSize: 11, color: "#8B7B9B" }}>{pillar.description}</p>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {pillar.competencies.map((comp, ci) => {
@@ -233,7 +233,7 @@ function StakeholderView({ token }) {
                       <div style={{ width: 22, height: 22, borderRadius: 5, background: pillar.color + "22", border: `1px solid ${pillar.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: pillar.color, flexShrink: 0 }}>{ci+1}</div>
                       <div>
                         <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#1a0a2e" }}>{comp.name}</p>
-                        <p style={{ margin: "2px 0 0", fontSize: 12, fontWeight: 500, color: pillar.color, lineHeight: 1.5 }}>{comp.description}</p>
+                        <p style={{ margin: "2px 0 0", fontSize: 11, color: "#8B7B9B" }}>{comp.description}</p>
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
@@ -242,9 +242,9 @@ function StakeholderView({ token }) {
                         const ri = RATING_LABELS[val];
                         return (
                           <button key={val} onClick={() => setRating(comp.id, val)}
-                            style={{ flex: 1, padding: "8px 4px", borderRadius: 8, border: selected ? `2px solid ${pillar.color}` : `1px solid ${pillar.color}44`, background: selected ? pillar.color + "33" : pillar.color + "08", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                            <span style={{ fontSize: 15, fontWeight: 800, color: pillar.id === "capacity" ? "#C9843A" : pillar.color }}>{val}</span>
-                            <span style={{ fontSize: 8, color: pillar.id === "capacity" ? "#8B5A1E" : pillar.color + "aa", fontWeight: 600 }}>{ri.label}</span>
+                            style={{ flex: 1, padding: "8px 4px", borderRadius: 8, border: selected ? `2px solid ${ri.color}` : "1.5px solid rgba(45,27,78,0.09)", background: selected ? ri.color + "22" : "rgba(45,27,78,0.04)", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                            <span style={{ fontSize: 15, fontWeight: 800, color: selected ? ri.color : "#9B8BAB" }}>{val}</span>
+                            <span style={{ fontSize: 8, color: selected ? ri.color : "#B0A0BF", fontWeight: 600 }}>{ri.label}</span>
                           </button>
                         );
                       })}
@@ -312,20 +312,19 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
   const [inviteEmails, setInviteEmails] = useState({ peers: [""], direct_reports: [""], others: [""], line_manager: "" }); // tracks previously invited
   const [emailLoading, setEmailLoading] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [generatedLink, setGeneratedLink] = useState("");
+  const [copied, setCopied] = useState(false);
   const [showInviteSentPopup, setShowInviteSentPopup] = useState(false);
   const [showDupePopup, setShowDupePopup] = useState(false);
   const [dupeMsg, setDupeMsg] = useState("");
+  const [statusData, setStatusData] = useState({});
   const [newInviteEmails, setNewInviteEmails] = useState({ peers: [""], direct_reports: [""], others: [""], line_manager: "" }); // fresh input only
   const [inviteSending, setInviteSending] = useState(false);
   const [inviteSent, setInviteSent] = useState({}); // { raterId: true }
   const [inviteTokens, setInviteTokens] = useState(() => {
     try { const s = localStorage.getItem('cv_invite_tokens'); return s ? JSON.parse(s) : {}; } catch { return {}; }
   }); // { raterId: token }
-  const [stakeholderData, setStakeholderData] = useState({});
-  const [statusData, setStatusData] = useState({});
-  const [generatedLink, setGeneratedLink] = useState("");
-  const [copied, setCopied] = useState(false);
-
+  const [stakeholderData, setStakeholderData] = useState({}); // { raterId: { ratings, comments, strengths, development } }
   const [loadingStakeholders, setLoadingStakeholders] = useState(false);
 
   const loadStakeholderResponses = async () => {
@@ -346,6 +345,7 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
         tokenData.forEach(d => { if (!existingIds.has(d.id)) data.push(d); });
       }
       if (data && data.length > 0) {
+        // Group by rater role
         const grouped = {};
         data.forEach((inv) => {
           const role = inv.rater_role;
@@ -353,38 +353,27 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
           grouped[role].push(inv);
         });
 
-        // For STATUS: track all completed (any count)
-        // For REPORT: only include if meets minimum
+        // Minimum rules: Line Manager = 1, all others = 3+
         const newData = {};
-        const statusData = {};
-
         Object.entries(grouped).forEach(([role, invites]) => {
           const isManager = role === "Line Manager";
           const minRequired = isManager ? 1 : 3;
-          const roleKey = role.toLowerCase().replace(/\s+/g, '_');
-
-          const avgRatings = {};
-          const allComments = {};
-          const strengths = invites.map(i => i.strengths).filter(Boolean).join(" | ");
-          const development = invites.map(i => i.development).filter(Boolean).join(" | ");
-          COMPETENCIES.forEach(c => {
-            const scores = invites.map(i => i.ratings?.[c.id] || 0).filter(s => s > 0);
-            if (scores.length > 0) avgRatings[c.id] = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length * 10) / 10;
-            const comms = invites.map(i => i.comments?.[c.id]).filter(Boolean);
-            if (comms.length > 0) allComments[c.id] = comms.join(" | ");
-          });
-
-          // Always track for status display
-          statusData[roleKey] = { role, ratings: avgRatings, comments: allComments, strengths, development, count: invites.length, meetsMin: invites.length >= minRequired };
-
-          // Only include in report data if meets minimum
           if (invites.length >= minRequired) {
-            newData[roleKey] = { ...statusData[roleKey] };
+            const avgRatings = {};
+            const allComments = {};
+            const strengths = invites.map(i => i.strengths).filter(Boolean).join(" | ");
+            const development = invites.map(i => i.development).filter(Boolean).join(" | ");
+            COMPETENCIES.forEach(c => {
+              const scores = invites.map(i => i.ratings?.[c.id] || 0).filter(s => s > 0);
+              if (scores.length > 0) avgRatings[c.id] = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length * 10) / 10;
+              const comms = invites.map(i => i.comments?.[c.id]).filter(Boolean);
+              if (comms.length > 0) allComments[c.id] = comms.join(" | ");
+            });
+            const roleKey = role.toLowerCase().replace(/\s+/g, '_');
+            newData[roleKey] = { role, ratings: avgRatings, comments: allComments, strengths, development, count: invites.length };
           }
         });
-
-        setStakeholderData(newData); // used for report
-        setStatusData(statusData);   // used for status display
+        setStakeholderData(newData);
       }
     } catch (e) {
       console.error("Failed to load stakeholder responses:", e);
@@ -476,6 +465,39 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
 
   const generateReport = async () => {
     setReportLoading(true);
+    // Load latest stakeholder responses fresh from Supabase
+    let freshStakeholderData = { ...stakeholderData };
+    try {
+      const allData = await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(userInfo.email)}&completed=eq.true&select=*`);
+      const tokenData = await Promise.all(Object.values(inviteTokens).map(t => sbFetch(`/leadership_invitations?token=eq.${t}&completed=eq.true&select=*`).catch(() => [])));
+      const combined = [...(allData || []), ...tokenData.flat()].filter(Boolean);
+      const deduped = Object.values(Object.fromEntries(combined.map(r => [r.id, r])));
+      if (deduped.length > 0) {
+        const grouped = {};
+        deduped.forEach(inv => { const role = inv.rater_role; if (!grouped[role]) grouped[role] = []; grouped[role].push(inv); });
+        Object.entries(grouped).forEach(([role, invites]) => {
+          const isManager = role === "Line Manager";
+          if (invites.length >= (isManager ? 1 : 3)) {
+            const avgRatings = {};
+            COMPETENCIES.forEach(c => {
+              const scores = invites.map(i => i.ratings?.[c.id] || 0).filter(s => s > 0);
+              if (scores.length > 0) avgRatings[c.id] = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length * 10) / 10;
+            });
+            const roleKey = role.toLowerCase().replace(/\s+/g, '_');
+            freshStakeholderData[roleKey] = { role, ratings: avgRatings, comments: {}, strengths: "", development: "", count: invites.length };
+          }
+        });
+        setStakeholderData(freshStakeholderData);
+      }
+    } catch(e) { console.error("Failed to load stakeholder data for report:", e); }
+    // Pre-calculate top3/bottom3 from line manager scores
+    const lineManagerDataPre = freshStakeholderData["line_manager"] || stakeholderData["line_manager"];
+    const behaviourScoresPre = COMPETENCIES.map((c) => ({
+      name: c.name, score: lineManagerDataPre?.ratings?.[c.id] || 0
+    })).filter(b => b.score > 0).sort((a, b) => b.score - a.score);
+    const top3 = behaviourScoresPre.slice(0, 3).map(b => b.name);
+    const bottom3 = behaviourScoresPre.slice(-3).reverse().map(b => b.name);
+
     try {
       const selfRatings = ratings["self"] || {};
 
@@ -488,7 +510,7 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
           return { name: raterInfo?.label || r, ratings: ratings[r] || {}, comments: comments[r] || {}, strengths: strengths[r] || "", development: development[r] || "" };
         }).filter(r => Object.keys(r.ratings).length > 0),
         // Stakeholders who completed via email link
-        ...Object.values(stakeholderData),
+        ...Object.values(freshStakeholderData),
       ];
 
       const otherRaters = allRaterData.filter(r => r.name !== "Self");
@@ -527,14 +549,13 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
       // Calculate top 3 and bottom 3 using ALL rater scores (self + stakeholders)
       const behaviourScores = COMPETENCIES.map((c) => {
         const selfScore = selfRatings[c.id] || 0;
-        const otherScores = otherRaters.map(r => r.ratings[c.id] || 0).filter(s => s > 0);
-        const avgOthers = otherScores.length > 0 ? otherScores.reduce((a, b) => a + b, 0) / otherScores.length : selfScore;
-        const combinedAvg = otherScores.length > 0 ? (selfScore + avgOthers) / 2 : selfScore;
-        return { name: c.name, selfScore, avgOthers: otherScores.length > 0 ? avgOthers : null, combinedAvg };
-      }).sort((a, b) => b.combinedAvg - a.combinedAvg);
+        // Use ONLY line manager scores for ranking
+        const lmScore = freshStakeholderData["line_manager"]?.ratings?.[c.id] || 0;
+        return { name: c.name, selfScore, combinedAvg: lmScore };
+      }).filter(b => b.combinedAvg > 0).sort((a, b) => b.combinedAvg - a.combinedAvg);
 
       const top3 = behaviourScores.slice(0, 3).map(b => b.name);
-      const bottom3 = behaviourScores.slice(-3).map(b => b.name);
+      const bottom3 = [...behaviourScores].reverse().slice(0, 3).map(b => b.name);
 
       const stakeholderCount = otherRaters.length;
       const prompt = `You are an executive leadership coach analysing a 360-degree leadership assessment using the Parity Coaching Leadership Competency Framework.
@@ -549,8 +570,8 @@ ${pillarLines}
 Individual Behaviour Ratings with Stakeholder Breakdown and Comments:
 ${competencyLines}
 
-Top 3 highest-rated behaviours (combined Self + Stakeholder avg): ${top3.join(", ")}
-Bottom 3 lowest-rated behaviours (combined Self + Stakeholder avg): ${bottom3.join(", ")}
+Top 3 highest-rated behaviours by Line Manager: ${top3.join(", ")}
+Bottom 3 lowest-rated behaviours by Line Manager: ${bottom3.join(", ")}
 
 ${strengthsFeedback ? `Qualitative Strengths Feedback:\n${strengthsFeedback}` : ""}
 ${developmentFeedback ? `Qualitative Development Feedback:\n${developmentFeedback}` : ""}
@@ -559,7 +580,7 @@ IMPORTANT: Base your coaching goals primarily on the STAKEHOLDER feedback and co
 
 Generate a detailed leadership report. Respond ONLY in this exact JSON format with no other text:
 {
-  "headline": "A 1-sentence leadership brand statement",
+  "headline": "A 1-sentence leadership statement",
   "top3": ["highest rated behaviour 1", "highest rated behaviour 2", "highest rated behaviour 3"],
   "bottom3": ["lowest rated behaviour 1", "lowest rated behaviour 2", "lowest rated behaviour 3"],
   "coaching_goals": [
@@ -588,7 +609,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer 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",
+          "Authorization": `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
         },
         body: JSON.stringify({
           model: "gpt-4o",
@@ -609,8 +630,11 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
         try {
           const seniorityLabel = SENIORITY_LEVELS.find(s => s.id === seniority)?.label || seniority;
           const userEmail = currentUser?.email || "Anonymous";
-          const top3text = (parsed.top3 || []).join(", ");
-          const bottom3text = (parsed.bottom3 || []).join(", ");
+          // Override AI top3/bottom3 with our calculated line manager scores
+          parsed.top3 = top3;
+          parsed.bottom3 = bottom3;
+          const top3text = top3.join(", ");
+          const bottom3text = bottom3.join(", ");
           const goalsText = (parsed.coaching_goals || []).map((g, i) => `${i+1}. ${g.goal} (based on: ${g.based_on})`).join("\n");
           const subject = encodeURIComponent(`Leadership Assessment Results - ${userEmail}`);
           const body = encodeURIComponent(
@@ -672,8 +696,8 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
       console.error("Report generation failed:", err);
       setReport({
         headline: "A results-driven leader who balances strategic vision with people-centred execution.",
-        top3: ["Sound Decision Making", "Track Record of Delivery", "Peer Collaboration"],
-        bottom3: ["Talent Development", "Conflict Resolution", "Strategic Problem Solving"],
+        top3: top3,
+        bottom3: bottom3,
         coaching_goals: [
           { goal: "Build a structured talent development practice", based_on: "Talent Development", actions: ["Schedule monthly 1:1 coaching conversations with each team member", "Create individual development plans for your top 3 team members", "Identify one stretch assignment per quarter for high-potential team members"] },
           { goal: "Develop a conflict resolution framework", based_on: "Conflict Resolution", actions: ["Practice the SBI (Situation-Behaviour-Impact) model in difficult conversations", "Seek mediation training or coaching", "Address conflicts within 48 hours rather than letting them escalate"] },
@@ -734,6 +758,8 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     if (hasSelf) { setDupeMsg("You cannot invite yourself."); setShowDupePopup(true); setTimeout(() => setShowDupePopup(false), 3500); }
     else if (hasDupes) { setDupeMsg("Some emails were already invited and skipped."); setShowDupePopup(true); setTimeout(() => setShowDupePopup(false), 3500); }
 
+    if (toInvite.length === 0) { setInviteSending(false); return; }
+
     // Reset new inputs after sending
     setTimeout(() => setNewInviteEmails({ peers: [""], direct_reports: [""], others: [""], line_manager: "" }), 500);
 
@@ -786,9 +812,6 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
       return updated;
     });
     if (toInvite.length > 0) { setShowInviteSentPopup(true); setTimeout(() => setShowInviteSentPopup(false), 3000); }
-    if (hasSelf && hasDupes) { setDupeMsg("Some emails skipped: cannot invite yourself or re-invite same email."); setShowDupePopup(true); setTimeout(() => setShowDupePopup(false), 4000); }
-    else if (hasSelf) { setDupeMsg("You cannot invite yourself — that email was skipped."); setShowDupePopup(true); setTimeout(() => setShowDupePopup(false), 3500); }
-    else if (hasDupes) { setDupeMsg("Some emails were already invited and skipped."); setShowDupePopup(true); setTimeout(() => setShowDupePopup(false), 3500); }
     setInviteSending(false);
   };
 
@@ -814,13 +837,13 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
       return "No evidence";
     };
 
-    const pillarColors = { delivery: "#5B2D8E", capacity: "#C9843A", people: "#5B2D8E" };
+    const pillarColors = { delivery: "#5B2D8E", capacity: "#E0A84A", people: "#C9843A" };
 
     const html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Leadership Brand Assessment Report</title>
+<title>Leadership Competency Assessment Report</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Raleway', 'Lato', 'Arial', sans-serif; color: #2D1B4E; background: white; }
@@ -885,16 +908,12 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
 <div class="page">
   <div class="header">
     <img src="${window.location.origin}/parity-logo.png" alt="Parity Coaching" onerror="this.style.display='none'" />
-    <h1>Leadership Brand Assessment Report</h1>
+    <h1>Leadership Competency Assessment Report</h1>
     <div class="user">${userInfo.firstName ? userInfo.firstName + " " + userInfo.lastName : (currentUser?.email || "Assessment Participant")}</div>
     <p>${userInfo.role || ""} · ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
   </div>
 
-  ${report?.headline ? `
-  <div class="section">
-    <div class="section-title">Your Leadership Brand</div>
-    <div class="headline-box"><p>"${report.headline}"</p></div>
-  </div>` : ""}
+
 
   <!-- Pillar Summary -->
   <div class="section">
@@ -922,8 +941,8 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     <table>
       <tr>
         <th style="width:35%">Behaviour</th>
-        ${allRaters.length > 1 ? "<th>Others Avg</th>" : ""}
         <th>Self</th>
+        ${allRaters.filter(r => r.key !== "self").map(r => `<th>${r.role || r.label || r.key}</th>`).join("")}
         ${allRaters.length > 1 ? "<th>Difference</th>" : ""}
       </tr>
       ${PILLARS.map(p => `
@@ -940,8 +959,8 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           const diffColor = diff !== "N/A" ? (parseFloat(diff) > 0.5 ? "#C9843A" : parseFloat(diff) < -0.5 ? "#5B2D8E" : "#6B5B7B") : "#6B5B7B";
           return `<tr>
             <td>${c.name}<br><span style="font-size:10px;color:#64748b">${c.description}</span></td>
-            ${allRaters.length > 1 ? `<td><strong>${avgOthers}</strong></td>` : ""}
             <td><span class="score-badge ${scoreClass(selfScore)}">${selfScore || "-"}</span></td>
+            ${allRaters.filter(r => r.key !== "self").map(r => `<td><span class="score-badge ${scoreClass(r.ratings?.[c.id])}">${r.ratings?.[c.id] || "-"}</span></td>`).join("")}
             ${allRaters.length > 1 ? `<td style="color:${diffColor};font-weight:700">${diff !== "N/A" ? (parseFloat(diff) > 0 ? "+" : "") + diff : "-"}</td>` : ""}
           </tr>`;
         }).join("")}
@@ -1042,7 +1061,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
         <div style={styles.container}>
           <button onClick={() => setShowInviteScreen(false)} style={styles.backBtn}>← Back</button>
           <div style={{ marginTop: 16 }} />
-          <div style={styles.moduleTag}>Leadership Brand Assessment</div>
+          <div style={styles.moduleTag}>Leadership Competency Assessment</div>
           <h1 style={{ ...styles.title, fontSize: 22, marginBottom: 8 }}>Invite Your Stakeholders</h1>
           <p style={styles.subtitle}>Enter the email address for each rater. They'll receive a personalised link to complete their section privately.</p>
 
@@ -1071,10 +1090,12 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
             })}
           </div>
 
-          <button onClick={sendInvitations} disabled={inviteSending}
-            style={{ ...styles.btnPrimary, width: "100%", marginBottom: 12, opacity: inviteSending ? 0.7 : 1 }}>
-            {inviteSending ? "Sending invitations..." : "Send Invitations"}
-          </button>
+          {!allSent && (
+            <button onClick={sendInvitations} disabled={inviteSending}
+              style={{ ...styles.btnPrimary, width: "100%", marginBottom: 12, opacity: inviteSending ? 0.7 : 1 }}>
+              {inviteSending ? "Sending invitations..." : `Send ${nonSelfRaters.length} Invitation${nonSelfRaters.length !== 1 ? "s" : ""} →`}
+            </button>
+          )}
 
           <button onClick={() => { setShowInviteScreen(false); setCurrentRater("self"); setScreen(3); }}
             style={{ ...styles.btnPrimary, width: "100%", background: allSent ? "#C9843A" : "rgba(45,27,78,0.07)", color: allSent ? "#fff" : "#6B5B7B", border: allSent ? "none" : "1px solid rgba(45,27,78,0.12)" }}>
@@ -1280,7 +1301,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     <div style={styles.root}>
       <div style={styles.container}>
         <button onClick={() => setScreen(1)} style={styles.backBtn}>← Back</button>
-        <div style={styles.moduleTag}>Leadership Brand Assessment</div>
+        <div style={styles.moduleTag}>Leadership Competency Assessment</div>
         <h1 style={styles.title}>Who is completing this assessment?</h1>
         <p style={styles.subtitle}>Select all that apply. You can complete each perspective separately. <strong style={{ color: "#C9843A" }}>Self</strong> is always included.</p>
 
@@ -1330,7 +1351,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           </div>
           <button onClick={() => setScreen(1)} style={styles.backBtn}>← Back</button>
           <div style={{ marginTop: 16 }} />
-          <div style={styles.moduleTag}>Leadership Brand Assessment</div>
+          <div style={styles.moduleTag}>Leadership Competency Assessment</div>
 
           {/* Self-only indicator */}
           <div style={{ display: "flex", gap: 6, marginBottom: 24 }}>
@@ -1376,7 +1397,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                         <div style={{ width: 24, height: 24, borderRadius: 6, background: pillar.color + "22", border: `1px solid ${pillar.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: pillar.color, flexShrink: 0 }}>{ci + 1}</div>
                         <div style={{ flex: 1, textAlign: "left" }}>
                           <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#1a0a2e" }}>{comp.name}</p>
-                          <p style={{ margin: "3px 0 0", fontSize: 12, fontWeight: 500, color: pillar.color, lineHeight: 1.5 }}>{comp.description}</p>
+                          <p style={{ margin: "3px 0 0", fontSize: 11, color: pillar.color + "aa", lineHeight: 1.4 }}>{comp.description}</p>
                         </div>
                       </div>
                       <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
@@ -1385,7 +1406,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                           const ratingInfo = RATING_LABELS[val];
                           return (
                             <button key={val} onClick={() => setRating(comp.id, val)}
-                              style={{ flex: 1, padding: "8px 2px", borderRadius: 8, minWidth: 0, border: selected ? `2px solid ${pillar.color}` : `1px solid ${pillar.color}44`, background: selected ? pillar.color + "33" : pillar.color + "08", cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s", display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+                              style={{ flex: 1, padding: "8px 2px", borderRadius: 8, minWidth: 0, border: selected ? `2px solid ${pillar.color}` : `1px solid ${pillar.color}44`, background: selected ? pillar.color + "22" : pillar.color + "08", cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s", display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
                               <span style={{ fontSize: 16, fontWeight: 800, color: pillar.color }}>{val}</span>
                               <span style={{ fontSize: 9, color: pillar.color + "aa", fontWeight: 600 }}>{ratingInfo.label}</span>
                             </button>
@@ -1463,29 +1484,9 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
 
   // ── Screen 3.5: Invite & Generate ───────────────────────────────────────────
   if (screen === 3.5) {
-    const selfDone = Object.keys(ratings["self"] || {}).length >= COMPETENCIES.length - 0;
-    const hasManager = Object.values(stakeholderData).some(s => s.role === "Line Manager");
+    const selfDone = Object.keys(ratings["self"] || {}).length >= COMPETENCIES.length;
+    const hasManager = Object.values(statusData).some(s => s.role === "Line Manager") || Object.values(stakeholderData).some(s => s.role === "Line Manager");
     const canGenerate = selfDone && hasManager;
-
-    // Count completed by rater type
-    const completedByType = {};
-    Object.values(stakeholderData).forEach(s => {
-      const key = s.role?.toLowerCase().replace(/ /g, "_") || "others";
-      completedByType[key] = (completedByType[key] || 0) + 1;
-    });
-
-    // Multi-email helpers
-    const multiRaters = ["peers", "direct_reports", "others"];
-    const addEmail = (raterId) => {
-      setInviteEmails(prev => ({ ...prev, [raterId]: [...(Array.isArray(prev[raterId]) ? prev[raterId] : [prev[raterId] || ""]), ""] }));
-    };
-    const updateEmail = (raterId, idx, val) => {
-      setNewInviteEmails(prev => {
-        const arr = Array.isArray(prev[raterId]) ? [...prev[raterId]] : [""];
-        arr[idx] = val;
-        return { ...prev, [raterId]: arr };
-      });
-    };
 
     return (
       <div style={styles.root}>
@@ -1494,148 +1495,102 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
             <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 40, objectFit: "contain" }} />
           </div>
           <button onClick={() => setScreen(3)} style={{ ...styles.backBtn, marginBottom: 16 }}>← Back</button>
-          <div style={styles.moduleTag}>Leadership Assessment</div>
+          <div style={styles.moduleTag}>Leadership Competency Assessment</div>
 
-          {/* Success popup */}
+          {/* Success/error popups */}
           {showInviteSentPopup && (
             <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 9999, padding: "14px 24px", background: "#2D1B4E", borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.2)", display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ color: "#C9843A", fontSize: 18 }}>✓</span>
-              <span style={{ color: "#fff", fontSize: 14, fontWeight: 600 }}>Invitations sent successfully!</span>
+              <span style={{ color: "#fff", fontSize: 14, fontWeight: 600 }}>Link generated successfully!</span>
             </div>
           )}
-
-          {/* Error popup */}
           {showDupePopup && (
             <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 9999, padding: "14px 24px", background: "#E85D75", borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.2)", display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ color: "#fff", fontSize: 14, fontWeight: 600 }}>{dupeMsg}</span>
             </div>
           )}
 
-          {/* Self complete badge */}
+          {/* Self complete */}
           <div style={{ padding: "14px 18px", background: "rgba(201,132,58,0.1)", border: "1px solid #C9843A", borderRadius: 12, marginBottom: 24, textAlign: "center" }}>
             <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#C9843A" }}>Self Assessment Complete</p>
-            <p style={{ margin: "4px 0 0", fontSize: 12, color: "#C9843A" }}></p>
           </div>
 
+          {/* Line Manager invite */}
+          <div style={{ padding: "20px", background: "linear-gradient(135deg, rgba(45,27,78,0.05), rgba(201,132,58,0.05))", border: "1px solid rgba(201,132,58,0.3)", borderRadius: 14, marginBottom: 20 }}>
+            <p style={{ margin: "0 0 4px", fontSize: 13, fontWeight: 700, color: "#2D1B4E", textTransform: "uppercase", letterSpacing: "0.5px" }}>Invite Stakeholders</p>
+            <p style={{ margin: "0 0 16px", fontSize: 12, color: "#8B7B9B" }}>Generate a private assessment link to share with your Line Manager</p>
 
-          {/* Invite section */}
-          <p style={{ color: "#C9843A", fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Invite Stakeholders</p>
-          
-
-          {/* Line Manager - single email with swap option */}
-          <div style={{ padding: "14px 16px", background: "rgba(201,132,58,0.06)", border: "1px solid #C9843A", borderRadius: 12, marginBottom: 12 }}>
-            <p style={{ margin: "0 0 8px", fontSize: 14, fontWeight: 700, color: "#C9843A" }}>Line Manager</p>
             {inviteSent["line_manager"] ? (
               <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", background: "#fff", borderRadius: 8, marginBottom: 8 }}>
-                  <span style={{ fontSize: 12, color: "#4A2D6E" }}>{typeof inviteEmails.line_manager === "string" ? inviteEmails.line_manager : "1 manager invited"}</span>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: stakeholderData["line_manager"] ? "#C9843A" : "#8B7B9B" }}>
-                    {stakeholderData["line_manager"] ? "✓ Done" : "Awaiting"}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "#fff", borderRadius: 8, marginBottom: 10, border: "1px solid rgba(201,132,58,0.2)" }}>
+                  <span style={{ fontSize: 13, color: "#4A2D6E", fontWeight: 600 }}>Line Manager</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: statusData["line_manager"] ? "#C9843A" : "#8B7B9B" }}>
+                    {statusData["line_manager"] ? "✓ Completed" : "Awaiting response"}
                   </span>
                 </div>
+                {generatedLink && (
+                  <div style={{ padding: "12px 14px", background: "#fff", border: "1.5px solid #C9843A", borderRadius: 10, marginBottom: 12 }}>
+                    <p style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 700, color: "#C9843A" }}>Share this link with your Line Manager:</p>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                      <input readOnly value={generatedLink}
+                        style={{ flex: 1, padding: "8px 10px", background: "#f9f6f2", border: "1px solid rgba(45,27,78,0.15)", borderRadius: 6, fontSize: 11, color: "#2D1B4E", fontFamily: "inherit", outline: "none" }} />
+                      <button onClick={() => { navigator.clipboard.writeText(generatedLink); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+                        style={{ padding: "8px 14px", background: "#2D1B4E", border: "none", borderRadius: 6, color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+                        {copied ? "Copied!" : "Copy"}
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <button onClick={async () => {
-                  // Invalidate old line manager invitation in Supabase
                   try {
-                    const oldEmail = typeof inviteEmails.line_manager === "string" ? inviteEmails.line_manager : "";
-                    if (oldEmail) {
-                      await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(userInfo.email)}&rater_role=eq.Line%20Manager`, {
-                        method: "PATCH",
-                        headers: { "Prefer": "return=minimal" },
-                        body: JSON.stringify({ completed: true, ratings: {}, comments: {} }), // nullify ratings
-                      });
-                    }
+                    await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(userInfo.email)}&rater_role=eq.Line%20Manager`, {
+                      method: "PATCH", headers: { "Prefer": "return=minimal" },
+                      body: JSON.stringify({ ratings: {}, comments: {} }),
+                    });
                   } catch(e) {}
-                  // Reset line manager state
                   setInviteSent(prev => { const n = {...prev}; delete n["line_manager"]; return n; });
                   setInviteTokens(prev => { const n = {...prev}; Object.keys(n).filter(k => k.startsWith("line_manager")).forEach(k => delete n[k]); return n; });
                   setInviteEmails(prev => ({ ...prev, line_manager: "" }));
-                  setNewInviteEmails(prev => ({ ...prev, line_manager: "" }));
+                  setGeneratedLink("");
+                  setStatusData(prev => { const n = {...prev}; delete n["line_manager"]; return n; });
                   setStakeholderData(prev => { const n = {...prev}; delete n["line_manager"]; return n; });
                 }}
-                  style={{ fontSize: 12, color: "#E85D75", background: "none", border: "1px solid #E85D75", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}>
-                  Remove & invite different manager
+                  style={{ fontSize: 12, color: "#E85D75", background: "none", border: "1px solid #E85D75", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: "inherit" }}>
+                  Replace Line Manager
                 </button>
               </div>
             ) : (
-              <div />
+              <button onClick={async () => {
+                setInviteSending(true);
+                try {
+                  const result = await sbFetch("/leadership_invitations", {
+                    method: "POST",
+                    body: JSON.stringify({
+                      owner_email: userInfo.email || "",
+                      owner_name: `${userInfo.firstName} ${userInfo.lastName}`.trim(),
+                      owner_role: userInfo.role,
+                      rater_role: "Line Manager",
+                      rater_email: "pending",
+                    }),
+                  });
+                  const token = result?.[0]?.token;
+                  if (token) {
+                    const link = `${window.location.origin}?rate=${token}`;
+                    setGeneratedLink(link);
+                    setInviteEmails(prev => ({ ...prev, line_manager: "invited" }));
+                    setInviteSent(prev => ({ ...prev, line_manager: 1 }));
+                    setInviteTokens(prev => ({ ...prev, [`line_manager_${token}`]: token }));
+                    setShowInviteSentPopup(true);
+                    setTimeout(() => setShowInviteSentPopup(false), 3000);
+                  }
+                } catch(e) { console.error(e); }
+                setInviteSending(false);
+              }} disabled={inviteSending}
+                style={{ ...styles.btnPrimary, width: "100%", opacity: inviteSending ? 0.7 : 1 }}>
+                {inviteSending ? "Generating..." : "Generate Invitation Link"}
+              </button>
             )}
           </div>
-
-          {/* Send button */}
-          <button onClick={async () => {
-            // Generate link for line manager without sending email
-            if (inviteSent["line_manager"]) { setDupeMsg("Line Manager already invited."); setShowDupePopup(true); setTimeout(() => setShowDupePopup(false), 3000); return; }
-            setInviteSending(true);
-            try {
-              const result = await sbFetch("/leadership_invitations", {
-                method: "POST",
-                body: JSON.stringify({
-                  owner_email: userInfo.email || "",
-                  owner_name: `${userInfo.firstName} ${userInfo.lastName}`.trim(),
-                  owner_role: userInfo.role,
-                  rater_role: "Line Manager",
-                  rater_email: "pending",
-                }),
-              });
-              const token = result?.[0]?.token;
-              if (token) {
-                const link = `${window.location.origin}?rate=${token}`;
-                setGeneratedLink(link);
-                setInviteEmails(prev => ({ ...prev, line_manager: "invited" }));
-                setInviteSent(prev => ({ ...prev, line_manager: 1 }));
-                const newTokens = { ...inviteTokens, [`line_manager_${token}`]: token };
-                setInviteTokens(newTokens);
-              }
-            } catch(e) { console.error(e); }
-            setInviteSending(false);
-            setNewInviteEmails(prev => ({ ...prev, line_manager: "" }));
-          }} disabled={inviteSending}
-            style={{ ...styles.btnSecondary, width: "100%", marginBottom: 12, opacity: inviteSending ? 0.7 : 1 }}>
-            {inviteSending ? "Generating..." : "Generate Invitation Link"}
-          </button>
-
-          {generatedLink && (
-            <div style={{ padding: "14px 16px", background: "#fff", border: "1.5px solid #C9843A", borderRadius: 10, marginBottom: 16 }}>
-              <p style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 700, color: "#C9843A" }}>Share this link with your Line Manager:</p>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <input readOnly value={generatedLink}
-                  style={{ flex: 1, padding: "8px 10px", background: "#f9f6f2", border: "1px solid rgba(45,27,78,0.15)", borderRadius: 6, fontSize: 11, color: "#2D1B4E", fontFamily: "inherit", outline: "none" }} />
-                <button onClick={() => { navigator.clipboard.writeText(generatedLink); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-                  style={{ padding: "8px 14px", background: "#2D1B4E", border: "none", borderRadius: 6, color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
-                  {copied ? "Copied!" : "Copy"}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Previously invited - status tracker */}
-          {Object.keys(inviteSent).length > 0 && (
-            <div style={{ padding: "14px 16px", background: "rgba(201,132,58,0.06)", border: "1px solid #C9843A", borderRadius: 12, marginBottom: 16 }}>
-              <p style={{ margin: "0 0 10px", fontSize: 13, fontWeight: 700, color: "#C9843A" }}>Invitation Status</p>
-              {["line_manager", "peers", "direct_reports", "others"].map(roleKey => {
-                const count = inviteSent[roleKey] || 0;
-                if (count === 0) return null;
-                const label = roleKey === "line_manager" ? "Line Manager" : roleKey === "direct_reports" ? "Direct Reports" : roleKey.charAt(0).toUpperCase() + roleKey.slice(1);
-                const completed = statusData[roleKey] && statusData[roleKey].count > 0;
-                const emails = roleKey === "line_manager"
-                  ? [typeof inviteEmails.line_manager === "string" ? inviteEmails.line_manager : ""]
-                  : (Array.isArray(inviteEmails[roleKey]) ? inviteEmails[roleKey] : []).filter(Boolean);
-                return (
-                  <div key={roleKey} style={{ marginBottom: 8 }}>
-                    <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 600, color: "#2D1B4E" }}>{label}</p>
-                    {emails.map((email, i) => (
-                      <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 8px", background: "#fff", borderRadius: 6, marginBottom: 3 }}>
-                        <span style={{ fontSize: 12, color: "#4A2D6E" }}>{email}</span>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: completed ? "#C9843A" : "#8B7B9B" }}>
-                          {completed ? "✓ Completed" : "Awaiting"}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
-          )}
 
           {/* Check responses */}
           <button onClick={loadStakeholderResponses} disabled={loadingStakeholders}
@@ -1656,29 +1611,23 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
 
           {!canGenerate && (
             <p style={{ fontSize: 12, color: "#8B5A1E", marginBottom: 8, textAlign: "center" }}>
-              Waiting for Line Manager response before report can be generated
+              Waiting for Line Manager to complete their assessment
             </p>
           )}
 
           <button onClick={generateReport} disabled={!canGenerate || reportLoading}
             style={{ ...styles.btnPrimary, width: "100%", background: "linear-gradient(135deg, #5B2D8E, #2D1B4E)", opacity: canGenerate && !reportLoading ? 1 : 0.5 }}>
-            {reportLoading ? "Generating your report..." : (() => {
-              const parts = ["Self"];
-              if (stakeholderData["line_manager"]) parts.push("Line Manager");
-              if (stakeholderData["peers"]) parts.push("Peers");
-              if (stakeholderData["direct_reports"]) parts.push("Direct Reports");
-              if (stakeholderData["others"]) parts.push("Others");
-              return `Generate Report (${parts.join(" + ")}) →`;
-            })()}
+            {reportLoading ? "Generating your report..." : `Generate Report (Self + Line Manager) →`}
           </button>
         </div>
       </div>
     );
   }
 
-    // ── Screen 4: Report ─────────────────────────────────────────────────────────  // ── Screen 4: Report ─────────────────────────────────────────────────────────
+        // ── Screen 4: Report ─────────────────────────────────────────────────────────  // ── Screen 4: Report ─────────────────────────────────────────────────────────
   if (screen === 4 && report) {
     const selfRatings = ratings["self"] || {};
+    console.log("stakeholderData in report:", JSON.stringify(stakeholderData));
     const otherRaters = selectedRaters.filter((r) => r !== "self");
 
     const getAvgOthers = (competencyId) => {
@@ -1694,25 +1643,24 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           </div>
           <button onClick={() => setScreen(3.5)} style={styles.backBtn}>← Back to Status</button>
           <div style={{ marginTop: 16 }} />
-          <div style={styles.moduleTag}>Leadership Brand Assessment</div>
+          <div style={styles.moduleTag}>Leadership Competency Assessment</div>
 
-          {/* Headline */}
-          <div style={{ padding: "24px", background: "linear-gradient(135deg, rgba(201,132,58,0.15), rgba(38,70,83,0.25))", border: "1px solid rgba(201,132,58,0.3)", borderRadius: 16, marginBottom: 24 }}>
-            <p style={{ color: "#C9843A", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>Your Leadership Brand</p>
-            <p style={{ color: "#1a0a2e", fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: 0, fontWeight: 600 }}>"{report.headline}"</p>
-          </div>
+
 
           {/* Pillar summary scores */}
           <div style={{ display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
             {PILLARS.map((pillar) => {
               const selfAvg = (pillar.competencies.reduce((sum, c) => sum + (selfRatings[c.id] || 0), 0) / pillar.competencies.length).toFixed(1);
-              const otherAvg = otherRaters.length > 0 ? (pillar.competencies.reduce((sum, c) => { const scores = otherRaters.map(r => ratings[r]?.[c.id] || 0).filter(s => s > 0); return sum + (scores.length > 0 ? scores.reduce((a,b)=>a+b,0)/scores.length : 0); }, 0) / pillar.competencies.length).toFixed(1) : null;
+              const stakeholderVals = Object.values(stakeholderData).map(s =>
+                pillar.competencies.reduce((sum, c) => sum + (s.ratings?.[c.id] || 0), 0) / pillar.competencies.length
+              ).filter(v => v > 0);
+              const stakeholderAvg = stakeholderVals.length > 0 ? (stakeholderVals.reduce((a,b)=>a+b,0)/stakeholderVals.length).toFixed(1) : null;
               return (
                 <div key={pillar.id} style={{ flex: 1, minWidth: 120, padding: "14px", background: pillar.color + "12", border: `1px solid ${pillar.color}30`, borderRadius: 12, textAlign: "center" }}>
-                  <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 700, color: pillar.color }}>{pillar.name}</p>
-                  <p style={{ margin: 0, fontSize: 28, fontWeight: 800, color: "#1a0a2e" }}>{selfAvg}</p>
-                  <p style={{ margin: "2px 0 0", fontSize: 10, color: "#8B7B9B" }}>Self / 5.0</p>
-                  {otherAvg && <p style={{ margin: "4px 0 0", fontSize: 11, color: "#6B5B7B" }}>Others: {otherAvg}</p>}
+                  <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: pillar.color }}>{pillar.name}</p>
+                  <p style={{ margin: 0, fontSize: 28, fontWeight: 800, color: "#1a0a2e" }}>{stakeholderAvg || selfAvg}</p>
+                  <p style={{ margin: "2px 0 0", fontSize: 12, color: "#8B7B9B" }}>{stakeholderAvg ? "Line Manager / 5.0" : "Self / 5.0"}</p>
+                  {stakeholderAvg && <p style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 600, color: "#2D1B4E" }}>Self: {selfAvg}</p>}
                 </div>
               );
             })}
@@ -1722,7 +1670,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           <div style={{ marginBottom: 24 }}>
             {PILLARS.map((pillar) => (
               <div key={pillar.id} style={{ marginBottom: 24 }}>
-                <p style={{ color: pillar.color, fontSize: 13, fontWeight: 700, marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>{pillar.name}</p>
+                <p style={{ color: pillar.color, fontSize: 15, fontWeight: 700, marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>{pillar.name}</p>
             {pillar.competencies.map((comp, i) => {
               const selfScore = selfRatings[comp.id] || 0;
               const avgOthers = getAvgOthers(comp.id);
@@ -1730,7 +1678,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
               return (
                 <div key={comp.id} style={{ marginBottom: 14, padding: "12px 14px", background: pillar.color + "0d", borderRadius: 10, border: "1px solid " + pillar.color + "25" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: "#1a0a2e" }}>{comp.name}</span>
+                    <span style={{ fontSize: 16, fontWeight: 800, color: "#2D1B4E", letterSpacing: "0.2px" }}>{comp.name}</span>
                     {gap !== null && (
                       <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: Math.abs(gap) <= 0.5 ? "rgba(201,132,58,0.15)" : Math.abs(gap) <= 1 ? "rgba(244,162,97,0.15)" : "rgba(91,45,142,0.12)", color: Math.abs(gap) <= 0.5 ? "#C9843A" : Math.abs(gap) <= 1 ? "#E0A84A" : "#5B2D8E" }}>
                         {gap > 0 ? "+" : ""}{gap} gap
@@ -1738,13 +1686,16 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                     )}
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                    {[["Self", selfScore, 0.6], avgOthers !== null ? ["Others avg", avgOthers, 1] : null].filter(Boolean).map(([label, val, opacity]) => (
+                    {[
+                      ["Self", selfScore, 0.6],
+                      ...Object.values(stakeholderData).map(s => [s.role || "Stakeholder", s.ratings?.[comp.id] || null, 1])
+                    ].filter(([,val]) => val !== null && val > 0).map(([label, val, opacity]) => (
                       <div key={label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ width: 70, fontSize: 10, color: "#8B7B9B" }}>{label}</span>
-                        <div style={{ flex: 1, height: 8, background: "rgba(45,27,78,0.07)", borderRadius: 4, overflow: "hidden" }}>
-                          <div style={{ width: `${(val / 5) * 100}%`, height: "100%", background: PALETTE[i % PALETTE.length], borderRadius: 4, opacity, transition: "width 0.4s" }} />
+                        <span style={{ width: 100, fontSize: 12, fontWeight: 500, color: "#6B5B7B" }}>{label}</span>
+                        <div style={{ flex: 1, height: 12, background: "rgba(45,27,78,0.07)", borderRadius: 4, overflow: "hidden" }}>
+                          <div style={{ width: `${(val / 5) * 100}%`, height: "100%", background: PALETTE[i % PALETTE.length], borderRadius: 4, transition: "width 0.4s" }} />
                         </div>
-                        <span style={{ width: 24, fontSize: 10, color: "#6B5B7B", textAlign: "right" }}>{typeof val === "number" ? val.toFixed(1) : val}</span>
+                        <span style={{ width: 32, fontSize: 13, fontWeight: 700, color: "#6B5B7B", textAlign: "right" }}>{typeof val === "number" ? val.toFixed(1) : val}</span>
                       </div>
                     ))}
                   </div>
@@ -1758,11 +1709,11 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           {/* Top 3 / Bottom 3 */}
           <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap" }}>
             <div style={{ flex: 1, minWidth: 200, padding: "18px 20px", background: "rgba(201,132,58,0.08)", border: "1px solid rgba(201,132,58,0.2)", borderRadius: 12 }}>
-              <p style={{ color: "#C9843A", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>Top 3 Behaviours</p>
+              <p style={{ color: "#C9843A", fontSize: 14, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>Top 3 Behaviours</p>
               {(report.top3 || []).map((s, i) => (
                 <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "center" }}>
                   <span style={{ width: 20, height: 20, borderRadius: "50%", background: "#C9843A", color: "#fff", fontSize: 11, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i+1}</span>
-                  <p style={{ margin: 0, fontSize: 13, color: "#1a0a2e" }}>{s}</p>
+                  <p style={{ margin: 0, fontSize: 14, color: "#1a0a2e" }}>{s}</p>
                 </div>
               ))}
             </div>
@@ -1771,7 +1722,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
               {(report.bottom3 || []).map((s, i) => (
                 <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "center" }}>
                   <span style={{ width: 20, height: 20, borderRadius: "50%", background: "#5B2D8E", color: "#fff", fontSize: 11, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i+1}</span>
-                  <p style={{ margin: 0, fontSize: 13, color: "#1a0a2e" }}>{s}</p>
+                  <p style={{ margin: 0, fontSize: 14, color: "#1a0a2e" }}>{s}</p>
                 </div>
               ))}
             </div>
@@ -1808,7 +1759,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
             {(report.strengths || []).map((s, i) => (
               <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6 }}>
                 <span style={{ color: "#C9843A", fontSize: 14, flexShrink: 0 }}>→</span>
-                <p style={{ margin: 0, fontSize: 13, color: "#1a0a2e" }}>{s}</p>
+                <p style={{ margin: 0, fontSize: 14, color: "#1a0a2e" }}>{s}</p>
               </div>
             ))}
           </div>
