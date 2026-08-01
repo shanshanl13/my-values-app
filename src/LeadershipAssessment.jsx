@@ -85,7 +85,7 @@ const PILLARS = [
     name: "Capacity",
     fullName: "Capacity — Thinking & Strategic Acumen",
     description: "The ability to think critically, solve complex problems, and provide clear strategic direction. Moving beyond day-to-day tasks to understand the bigger picture and make sound decisions that balance immediate needs with long-term vision.",
-    color: "#E0A84A",
+    color: "#C9843A",
     competencies: [
       { id: "c1", name: "Strategic Mindset", description: "Possesses a strategic mindset, with solid understanding of the company's vision and strategy." },
       { id: "c2", name: "Innovation & Challenge", description: "Thinks outside the box and challenges the status quo." },
@@ -129,6 +129,8 @@ function StakeholderView({ token }) {
   const [comments, setComments] = useState({});
   const [strengths, setStrengths] = useState("");
   const [development, setDevelopment] = useState("");
+  const [raterFirstName, setRaterFirstName] = useState("");
+  const [raterLastName, setRaterLastName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
@@ -140,6 +142,11 @@ function StakeholderView({ token }) {
         if (data && data.length > 0) {
           setInvitation(data[0]);
           if (data[0].completed) setDone(true);
+          if (data[0].rater_name) {
+            const [fn, ...ln] = (data[0].rater_name || "").split(" ");
+            setRaterFirstName(fn || "");
+            setRaterLastName(ln.join(" ") || "");
+          }
         } else {
           setError("Invalid or expired link.");
         }
@@ -161,7 +168,15 @@ function StakeholderView({ token }) {
     try {
       await sbFetch(`/leadership_invitations?token=eq.${token}`, {
         method: "PATCH",
-        body: JSON.stringify({ ratings, comments, strengths, development, completed: true, completed_at: new Date().toISOString() }),
+        body: JSON.stringify({
+          ratings,
+          comments,
+          strengths,
+          development,
+          rater_name: `${raterFirstName} ${raterLastName}`.trim(),
+          completed: true,
+          completed_at: new Date().toISOString()
+        }),
       });
       setDone(true);
     } catch (e) {
@@ -204,8 +219,24 @@ function StakeholderView({ token }) {
           {invitation?.rater_role} Feedback
         </h1>
         <p style={styles.subtitle}>
-          You've been asked to provide feedback on <strong style={{ color: "#1a0a2e" }}>{invitation?.owner_email?.split("@")[0]}</strong>'s leadership. Rate each behaviour 1–5 and add comments where relevant.
+          You've been asked to provide feedback on <strong style={{ color: "#1a0a2e" }}>{invitation?.owner_name || invitation?.owner_email?.split("@")[0]}</strong>'s leadership. Rate each behaviour 1–5 and add comments where relevant.
         </p>
+
+        {/* Name fields */}
+        <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 12, fontWeight: 600, color: "#2D1B4E", margin: "0 0 4px" }}>Your First Name *</p>
+            <input type="text" value={raterFirstName} onChange={(e) => setRaterFirstName(e.target.value)}
+              placeholder="First name"
+              style={{ width: "100%", padding: "8px 12px", background: "#fff", border: "1px solid rgba(45,27,78,0.2)", borderRadius: 8, color: "#2D1B4E", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 12, fontWeight: 600, color: "#2D1B4E", margin: "0 0 4px" }}>Your Last Name *</p>
+            <input type="text" value={raterLastName} onChange={(e) => setRaterLastName(e.target.value)}
+              placeholder="Last name"
+              style={{ width: "100%", padding: "8px 12px", background: "#fff", border: "1px solid rgba(45,27,78,0.2)", borderRadius: 8, color: "#2D1B4E", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+          </div>
+        </div>
 
         {/* Legend */}
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 24 }}>
@@ -233,7 +264,7 @@ function StakeholderView({ token }) {
                       <div style={{ width: 22, height: 22, borderRadius: 5, background: pillar.color + "22", border: `1px solid ${pillar.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: pillar.color, flexShrink: 0 }}>{ci+1}</div>
                       <div>
                         <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#1a0a2e" }}>{comp.name}</p>
-                        <p style={{ margin: "2px 0 0", fontSize: 11, color: "#8B7B9B" }}>{comp.description}</p>
+                        <p style={{ margin: "2px 0 0", fontSize: 11, color: "#4A3728" }}>{comp.description}</p>
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
@@ -242,9 +273,9 @@ function StakeholderView({ token }) {
                         const ri = RATING_LABELS[val];
                         return (
                           <button key={val} onClick={() => setRating(comp.id, val)}
-                            style={{ flex: 1, padding: "8px 4px", borderRadius: 8, border: selected ? `2px solid ${ri.color}` : "1.5px solid rgba(45,27,78,0.09)", background: selected ? ri.color + "22" : "rgba(45,27,78,0.04)", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                            <span style={{ fontSize: 15, fontWeight: 800, color: selected ? ri.color : "#9B8BAB" }}>{val}</span>
-                            <span style={{ fontSize: 8, color: selected ? ri.color : "#B0A0BF", fontWeight: 600 }}>{ri.label}</span>
+                            style={{ flex: 1, padding: "8px 4px", borderRadius: 8, border: selected ? `2px solid ${pillar.color}` : `1px solid ${pillar.color}44`, background: selected ? pillar.color + "20" : pillar.color + "08", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                            <span style={{ fontSize: 15, fontWeight: 800, color: pillar.color }}>{val}</span>
+                            <span style={{ fontSize: 8, color: pillar.color + "aa", fontWeight: 600 }}>{ri.label}</span>
                           </button>
                         );
                       })}
@@ -369,10 +400,18 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
               const comms = invites.map(i => i.comments?.[c.id]).filter(Boolean);
               if (comms.length > 0) allComments[c.id] = comms.join(" | ");
             });
+            const raterNames = [...new Set(invites.map(i => i.rater_name).filter(Boolean))].join(", ");
             const roleKey = role.toLowerCase().replace(/\s+/g, '_');
-            newData[roleKey] = { role, ratings: avgRatings, comments: allComments, strengths, development, count: invites.length };
+            newData[roleKey] = { role, ratings: avgRatings, comments: allComments, strengths, development, count: invites.length, raterName: raterNames };
           }
         });
+        const newStatusData = {};
+        Object.entries(grouped).forEach(([role, invites]) => {
+          const roleKey = role.toLowerCase().replace(/\s+/g, '_');
+          const raterNames = [...new Set(invites.map(i => i.rater_name).filter(Boolean))].join(", ");
+          newStatusData[roleKey] = { role, count: invites.length, raterName: raterNames };
+        });
+        setStatusData(newStatusData);
         setStakeholderData(newData);
       }
     } catch (e) {
@@ -475,29 +514,29 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
       if (deduped.length > 0) {
         const grouped = {};
         deduped.forEach(inv => { const role = inv.rater_role; if (!grouped[role]) grouped[role] = []; grouped[role].push(inv); });
+        const newStatusData = {};
         Object.entries(grouped).forEach(([role, invites]) => {
           const isManager = role === "Line Manager";
-          if (invites.length >= (isManager ? 1 : 3)) {
-            const avgRatings = {};
-            COMPETENCIES.forEach(c => {
-              const scores = invites.map(i => i.ratings?.[c.id] || 0).filter(s => s > 0);
-              if (scores.length > 0) avgRatings[c.id] = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length * 10) / 10;
-            });
-            const roleKey = role.toLowerCase().replace(/\s+/g, '_');
-            freshStakeholderData[roleKey] = { role, ratings: avgRatings, comments: {}, strengths: "", development: "", count: invites.length };
-          }
+          const avgRatings = {};
+          const avgComments = {};
+          const strengthsList = invites.map(i => i.strengths).filter(Boolean).join(" | ");
+          const developmentList = invites.map(i => i.development).filter(Boolean).join(" | ");
+          COMPETENCIES.forEach(c => {
+            const scores = invites.map(i => i.ratings?.[c.id] || 0).filter(s => s > 0);
+            if (scores.length > 0) avgRatings[c.id] = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length * 10) / 10;
+            const comms = invites.map(i => i.comments?.[c.id]).filter(Boolean);
+            if (comms.length > 0) avgComments[c.id] = comms.join(" | ");
+          });
+          const raterNames = [...new Set(invites.map(i => i.rater_name).filter(Boolean))].join(", ");
+          const roleKey = role.toLowerCase().replace(/\s+/g, '_');
+          const entry = { role, ratings: avgRatings, comments: avgComments, strengths: strengthsList, development: developmentList, count: invites.length, raterName: raterNames, meetsMin: invites.length >= (isManager ? 1 : 3) };
+          newStatusData[roleKey] = entry;
+          if (entry.meetsMin) freshStakeholderData[roleKey] = entry;
         });
+        setStatusData(newStatusData);
         setStakeholderData(freshStakeholderData);
       }
     } catch(e) { console.error("Failed to load stakeholder data for report:", e); }
-    // Pre-calculate top3/bottom3 from line manager scores
-    const lineManagerDataPre = freshStakeholderData["line_manager"] || stakeholderData["line_manager"];
-    const behaviourScoresPre = COMPETENCIES.map((c) => ({
-      name: c.name, score: lineManagerDataPre?.ratings?.[c.id] || 0
-    })).filter(b => b.score > 0).sort((a, b) => b.score - a.score);
-    const top3 = behaviourScoresPre.slice(0, 3).map(b => b.name);
-    const bottom3 = behaviourScoresPre.slice(-3).reverse().map(b => b.name);
-
     try {
       const selfRatings = ratings["self"] || {};
 
@@ -549,13 +588,14 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
       // Calculate top 3 and bottom 3 using ALL rater scores (self + stakeholders)
       const behaviourScores = COMPETENCIES.map((c) => {
         const selfScore = selfRatings[c.id] || 0;
-        // Use ONLY line manager scores for ranking
-        const lmScore = freshStakeholderData["line_manager"]?.ratings?.[c.id] || 0;
-        return { name: c.name, selfScore, combinedAvg: lmScore };
-      }).filter(b => b.combinedAvg > 0).sort((a, b) => b.combinedAvg - a.combinedAvg);
+        const otherScores = otherRaters.map(r => r.ratings[c.id] || 0).filter(s => s > 0);
+        const avgOthers = otherScores.length > 0 ? otherScores.reduce((a, b) => a + b, 0) / otherScores.length : selfScore;
+        const combinedAvg = otherScores.length > 0 ? (selfScore + avgOthers) / 2 : selfScore;
+        return { name: c.name, selfScore, avgOthers: otherScores.length > 0 ? avgOthers : null, combinedAvg };
+      }).sort((a, b) => b.combinedAvg - a.combinedAvg);
 
       const top3 = behaviourScores.slice(0, 3).map(b => b.name);
-      const bottom3 = [...behaviourScores].reverse().slice(0, 3).map(b => b.name);
+      const bottom3 = behaviourScores.slice(-3).map(b => b.name);
 
       const stakeholderCount = otherRaters.length;
       const prompt = `You are an executive leadership coach analysing a 360-degree leadership assessment using the Parity Coaching Leadership Competency Framework.
@@ -609,7 +649,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
+          "Authorization": "Bearer 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",
         },
         body: JSON.stringify({
           model: "gpt-4o",
@@ -696,8 +736,8 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
       console.error("Report generation failed:", err);
       setReport({
         headline: "A results-driven leader who balances strategic vision with people-centred execution.",
-        top3: top3,
-        bottom3: bottom3,
+        top3: [],
+        bottom3: [],
         coaching_goals: [
           { goal: "Build a structured talent development practice", based_on: "Talent Development", actions: ["Schedule monthly 1:1 coaching conversations with each team member", "Create individual development plans for your top 3 team members", "Identify one stretch assignment per quarter for high-potential team members"] },
           { goal: "Develop a conflict resolution framework", based_on: "Conflict Resolution", actions: ["Practice the SBI (Situation-Behaviour-Impact) model in difficult conversations", "Seek mediation training or coaching", "Address conflicts within 48 hours rather than letting them escalate"] },
@@ -818,7 +858,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
   const generatePDFReport = () => {
     const selfRatings = ratings["self"] || {};
     const allRaters = [
-      { key: "self", label: "Self", ratings: selfRatings, comments: comments["self"] || {}, strengths: strengths["self"] || "", development: development["self"] || "" },
+      { key: "self", label: "Self", ratings: selfRatings, comments: comments["self"] || {}, strengths: strengths["self"] || "", development: development["self"] || "", name: `${userInfo.firstName} ${userInfo.lastName}`.trim() },
       ...Object.values(stakeholderData),
     ];
 
@@ -910,6 +950,8 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     <img src="${window.location.origin}/parity-logo.png" alt="Parity Coaching" onerror="this.style.display='none'" />
     <h1>Leadership Competency Assessment Report</h1>
     <div class="user">${userInfo.firstName ? userInfo.firstName + " " + userInfo.lastName : (currentUser?.email || "Assessment Participant")}</div>
+    ${stakeholderData["line_manager"]?.raterName ? `<p style="font-size:13px;margin-top:4px;opacity:0.85">Line Manager: <strong>${stakeholderData["line_manager"].raterName}</strong></p>` : ""}
+    
     <p>${userInfo.role || ""} · ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
   </div>
 
@@ -968,34 +1010,9 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     </table>
   </div>
 
-  <!-- Top 3 / Bottom 3 -->
-  <div class="section">
-    <div class="section-title">Key Findings</div>
-    <div class="top-bottom">
-      <div class="top-box" style="background:rgba(201,132,58,0.06); border: 1px solid rgba(201,132,58,0.3);">
-        <h3 style="color:#C9843A">Top 3 Behaviours</h3>
-        ${(report?.top3 || []).map((b, i) => `<div class="item"><div class="num" style="background:#C9843A">${i+1}</div><span style="font-size:12px">${b}</span></div>`).join("")}
-      </div>
-      <div class="top-box" style="background:rgba(91,45,142,0.06); border: 1px solid rgba(91,45,142,0.3);">
-        <h3 style="color:#5B2D8E">Bottom 3 Behaviours</h3>
-        ${(report?.bottom3 || []).map((b, i) => `<div class="item"><div class="num" style="background:#5B2D8E">${i+1}</div><span style="font-size:12px">${b}</span></div>`).join("")}
-      </div>
-    </div>
-  </div>
 
-  <!-- Coaching Goals -->
-  ${report?.coaching_goals?.length ? `
-  <div class="section">
-    <div class="section-title">AI-Generated Coaching Goals</div>
-    <p style="font-size:12px;color:#64748b;margin-bottom:16px">Based on bottom 3 behaviours and stakeholder feedback</p>
-    ${report.coaching_goals.map((g, i) => `
-      <div class="coaching-goal">
-        <h4>${i+1}. ${g.goal}</h4>
-        <div class="based-on">Based on: ${g.based_on}</div>
-        <ul>${(g.actions || []).map(a => `<li>${a}</li>`).join("")}</ul>
-      </div>
-    `).join("")}
-  </div>` : ""}
+
+
 
   <!-- Comments Grid -->
   ${(() => {
@@ -1028,12 +1045,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     </div>`;
   })()}
 
-  <!-- Values Alignment -->
-  ${report?.values_alignment ? `
-  <div class="section">
-    <div class="section-title">Values Alignment</div>
-    <p style="font-size:13px;line-height:1.6;color:#334155">${report.values_alignment}</p>
-  </div>` : ""}
+
 
   <div class="footer">
     <p><strong>Parity Coaching</strong> · sayhello@paritycoaching.org · www.paritycoaching.org</p>
@@ -1226,7 +1238,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           <div style={{ textAlign: "center", marginBottom: 20, paddingBottom: 16, borderBottom: "2px solid #C9843A" }}>
             <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 44, objectFit: "contain" }} />
           </div>
-          <div style={styles.moduleTag}>Leadership Assessment</div>
+          <div style={styles.moduleTag}>Leadership Competency Assessment</div>
           <h1 style={{ ...styles.title, marginTop: 12 }}>Start Assessment</h1>
           <p style={styles.subtitle}>Enter your email to begin or continue your assessment.</p>
 
@@ -1349,8 +1361,9 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           <div style={{ textAlign: "center", marginBottom: 16, paddingBottom: 12, borderBottom: "2px solid #C9843A" }}>
             <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 40, objectFit: "contain" }} />
           </div>
-          <button onClick={() => setScreen(1)} style={styles.backBtn}>← Back</button>
-          <div style={{ marginTop: 16 }} />
+          <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+            <button onClick={() => setScreen(1)} style={styles.backBtn}>← Back</button>
+          </div>
           <div style={styles.moduleTag}>Leadership Competency Assessment</div>
 
           {/* Self-only indicator */}
@@ -1397,7 +1410,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                         <div style={{ width: 24, height: 24, borderRadius: 6, background: pillar.color + "22", border: `1px solid ${pillar.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: pillar.color, flexShrink: 0 }}>{ci + 1}</div>
                         <div style={{ flex: 1, textAlign: "left" }}>
                           <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#1a0a2e" }}>{comp.name}</p>
-                          <p style={{ margin: "3px 0 0", fontSize: 11, color: pillar.color + "aa", lineHeight: 1.4 }}>{comp.description}</p>
+                          <p style={{ margin: "3px 0 0", fontSize: 11, color: "#4A3728", lineHeight: 1.4 }}>{comp.description}</p>
                         </div>
                       </div>
                       <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
@@ -1485,7 +1498,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
   // ── Screen 3.5: Invite & Generate ───────────────────────────────────────────
   if (screen === 3.5) {
     const selfDone = Object.keys(ratings["self"] || {}).length >= COMPETENCIES.length;
-    const hasManager = Object.values(statusData).some(s => s.role === "Line Manager") || Object.values(stakeholderData).some(s => s.role === "Line Manager");
+    const hasManager = statusData["line_manager"]?.count > 0;
     const canGenerate = selfDone && hasManager;
 
     return (
@@ -1494,7 +1507,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           <div style={{ textAlign: "center", marginBottom: 20, paddingBottom: 16, borderBottom: "2px solid #C9843A" }}>
             <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 40, objectFit: "contain" }} />
           </div>
-          <button onClick={() => setScreen(3)} style={{ ...styles.backBtn, marginBottom: 16 }}>← Back</button>
+          <button onClick={() => setScreen(3)} style={{ ...styles.backBtn, marginBottom: 24, display: "block" }}>← Back</button>
           <div style={styles.moduleTag}>Leadership Competency Assessment</div>
 
           {/* Success/error popups */}
@@ -1551,9 +1564,10 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                   setInviteSent(prev => { const n = {...prev}; delete n["line_manager"]; return n; });
                   setInviteTokens(prev => { const n = {...prev}; Object.keys(n).filter(k => k.startsWith("line_manager")).forEach(k => delete n[k]); return n; });
                   setInviteEmails(prev => ({ ...prev, line_manager: "" }));
+                  setNewInviteEmails(prev => ({ ...prev, line_manager: "" }));
                   setGeneratedLink("");
-                  setStatusData(prev => { const n = {...prev}; delete n["line_manager"]; return n; });
-                  setStakeholderData(prev => { const n = {...prev}; delete n["line_manager"]; return n; });
+                  setStatusData({});
+                  setStakeholderData({});
                 }}
                   style={{ fontSize: 12, color: "#E85D75", background: "none", border: "1px solid #E85D75", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: "inherit" }}>
                   Replace Line Manager
@@ -1624,10 +1638,9 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     );
   }
 
-        // ── Screen 4: Report ─────────────────────────────────────────────────────────  // ── Screen 4: Report ─────────────────────────────────────────────────────────
+  // ── Screen 4: Report ─────────────────────────────────────────────────────────
   if (screen === 4 && report) {
     const selfRatings = ratings["self"] || {};
-    console.log("stakeholderData in report:", JSON.stringify(stakeholderData));
     const otherRaters = selectedRaters.filter((r) => r !== "self");
 
     const getAvgOthers = (competencyId) => {
@@ -1641,7 +1654,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           <div style={{ textAlign: "center", marginBottom: 16, paddingBottom: 12, borderBottom: "2px solid #C9843A" }}>
             <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 40, objectFit: "contain" }} />
           </div>
-          <button onClick={() => setScreen(3.5)} style={styles.backBtn}>← Back to Status</button>
+          <button onClick={() => setScreen(3.5)} style={{ ...styles.backBtn, display: "block", marginBottom: 20 }}>← Back</button>
           <div style={{ marginTop: 16 }} />
           <div style={styles.moduleTag}>Leadership Competency Assessment</div>
 
@@ -1651,16 +1664,13 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           <div style={{ display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
             {PILLARS.map((pillar) => {
               const selfAvg = (pillar.competencies.reduce((sum, c) => sum + (selfRatings[c.id] || 0), 0) / pillar.competencies.length).toFixed(1);
-              const stakeholderVals = Object.values(stakeholderData).map(s =>
-                pillar.competencies.reduce((sum, c) => sum + (s.ratings?.[c.id] || 0), 0) / pillar.competencies.length
-              ).filter(v => v > 0);
-              const stakeholderAvg = stakeholderVals.length > 0 ? (stakeholderVals.reduce((a,b)=>a+b,0)/stakeholderVals.length).toFixed(1) : null;
+              const otherAvg = otherRaters.length > 0 ? (pillar.competencies.reduce((sum, c) => { const scores = otherRaters.map(r => ratings[r]?.[c.id] || 0).filter(s => s > 0); return sum + (scores.length > 0 ? scores.reduce((a,b)=>a+b,0)/scores.length : 0); }, 0) / pillar.competencies.length).toFixed(1) : null;
               return (
                 <div key={pillar.id} style={{ flex: 1, minWidth: 120, padding: "14px", background: pillar.color + "12", border: `1px solid ${pillar.color}30`, borderRadius: 12, textAlign: "center" }}>
                   <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: pillar.color }}>{pillar.name}</p>
-                  <p style={{ margin: 0, fontSize: 28, fontWeight: 800, color: "#1a0a2e" }}>{stakeholderAvg || selfAvg}</p>
-                  <p style={{ margin: "2px 0 0", fontSize: 12, color: "#8B7B9B" }}>{stakeholderAvg ? "Line Manager / 5.0" : "Self / 5.0"}</p>
-                  {stakeholderAvg && <p style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 600, color: "#2D1B4E" }}>Self: {selfAvg}</p>}
+                  <p style={{ margin: 0, fontSize: 28, fontWeight: 800, color: "#1a0a2e" }}>{selfAvg}</p>
+                  <p style={{ margin: "2px 0 0", fontSize: 12, color: "#8B7B9B" }}>Self / 5.0</p>
+                  {otherAvg && <p style={{ margin: "4px 0 0", fontSize: 12, color: "#6B5B7B" }}>Others: {otherAvg}</p>}
                 </div>
               );
             })}
@@ -1678,7 +1688,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
               return (
                 <div key={comp.id} style={{ marginBottom: 14, padding: "12px 14px", background: pillar.color + "0d", borderRadius: 10, border: "1px solid " + pillar.color + "25" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                    <span style={{ fontSize: 16, fontWeight: 800, color: "#2D1B4E", letterSpacing: "0.2px" }}>{comp.name}</span>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: "#1a0a2e" }}>{comp.name}</span>
                     {gap !== null && (
                       <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: Math.abs(gap) <= 0.5 ? "rgba(201,132,58,0.15)" : Math.abs(gap) <= 1 ? "rgba(244,162,97,0.15)" : "rgba(91,45,142,0.12)", color: Math.abs(gap) <= 0.5 ? "#C9843A" : Math.abs(gap) <= 1 ? "#E0A84A" : "#5B2D8E" }}>
                         {gap > 0 ? "+" : ""}{gap} gap
@@ -1688,14 +1698,14 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                   <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                     {[
                       ["Self", selfScore, 0.6],
-                      ...Object.values(stakeholderData).map(s => [s.role || "Stakeholder", s.ratings?.[comp.id] || null, 1])
+                      ...Object.values(stakeholderData).map(s => { const lbl = s.raterName ? `${s.role}\n(${s.raterName})` : (s.role || "Stakeholder"); return [lbl, s.ratings?.[comp.id] || null, 1]; })
                     ].filter(([,val]) => val !== null && val > 0).map(([label, val, opacity]) => (
                       <div key={label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ width: 100, fontSize: 12, fontWeight: 500, color: "#6B5B7B" }}>{label}</span>
-                        <div style={{ flex: 1, height: 12, background: "rgba(45,27,78,0.07)", borderRadius: 4, overflow: "hidden" }}>
-                          <div style={{ width: `${(val / 5) * 100}%`, height: "100%", background: PALETTE[i % PALETTE.length], borderRadius: 4, transition: "width 0.4s" }} />
+                        <div style={{ width: 110, flexShrink: 0 }}>{label.split("\n").map((ln, li) => <span key={li} style={{ fontSize: li===0?12:9, fontWeight: li===0?700:400, color: li===0?"#2D1B4E":"#5B2D8E", display:"block", lineHeight:1.2 }}>{ln}</span>)}</div>
+                        <div style={{ flex: 1, height: 8, background: "rgba(45,27,78,0.07)", borderRadius: 4, overflow: "hidden" }}>
+                          <div style={{ width: `${(val / 5) * 100}%`, height: "100%", background: PALETTE[i % PALETTE.length], borderRadius: 4, opacity, transition: "width 0.4s" }} />
                         </div>
-                        <span style={{ width: 32, fontSize: 13, fontWeight: 700, color: "#6B5B7B", textAlign: "right" }}>{typeof val === "number" ? val.toFixed(1) : val}</span>
+                        <span style={{ width: 30, fontSize: 12, color: "#6B5B7B", textAlign: "right" }}>{typeof val === "number" ? val.toFixed(1) : val}</span>
                       </div>
                     ))}
                   </div>
@@ -1706,79 +1716,40 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
             ))}
           </div>
 
-          {/* Top 3 / Bottom 3 */}
-          <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap" }}>
-            <div style={{ flex: 1, minWidth: 200, padding: "18px 20px", background: "rgba(201,132,58,0.08)", border: "1px solid rgba(201,132,58,0.2)", borderRadius: 12 }}>
-              <p style={{ color: "#C9843A", fontSize: 14, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>Top 3 Behaviours</p>
-              {(report.top3 || []).map((s, i) => (
-                <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "center" }}>
-                  <span style={{ width: 20, height: 20, borderRadius: "50%", background: "#C9843A", color: "#fff", fontSize: 11, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i+1}</span>
-                  <p style={{ margin: 0, fontSize: 14, color: "#1a0a2e" }}>{s}</p>
-                </div>
-              ))}
-            </div>
-            <div style={{ flex: 1, minWidth: 200, padding: "18px 20px", background: "rgba(91,45,142,0.08)", border: "1px solid rgba(91,45,142,0.15)", borderRadius: 12 }}>
-              <p style={{ color: "#5B2D8E", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>Bottom 3 Behaviours</p>
-              {(report.bottom3 || []).map((s, i) => (
-                <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "center" }}>
-                  <span style={{ width: 20, height: 20, borderRadius: "50%", background: "#5B2D8E", color: "#fff", fontSize: 11, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i+1}</span>
-                  <p style={{ margin: 0, fontSize: 14, color: "#1a0a2e" }}>{s}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* AI Coaching Goals from Bottom 3 */}
-          <div style={{ marginBottom: 24 }}>
-            <p style={{ color: "#1a0a2e", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>AI-Generated Coaching Goals</p>
-            <p style={{ color: "#8B7B9B", fontSize: 12, margin: "0 0 14px" }}>Based on your bottom 3 behaviours, here are 3 suggested coaching goals with actions.</p>
-            {(report.coaching_goals || []).map((goal, i) => (
-              <div key={i} style={{ padding: "18px 20px", background: "rgba(244,162,97,0.06)", border: "1px solid rgba(244,162,97,0.2)", borderRadius: 12, marginBottom: 12 }}>
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 10 }}>
-                  <span style={{ width: 24, height: 24, borderRadius: 6, background: "#E0A84A", color: "#fff", fontSize: 12, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i+1}</span>
-                  <div>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#1a0a2e" }}>{goal.goal}</p>
-                    <p style={{ margin: "3px 0 0", fontSize: 11, color: "#8B7B9B" }}>Based on: {goal.based_on}</p>
+          {/* Qualitative Feedback from Line Manager */}
+          {(() => {
+            const lm = stakeholderData["line_manager"];
+            if (!lm) return null;
+            const hasComments = COMPETENCIES.some(c => lm.comments?.[c.id]);
+            const hasStrengths = lm.strengths?.trim();
+            const hasDevelopment = lm.development?.trim();
+            if (!hasComments && !hasStrengths && !hasDevelopment) return null;
+            return (
+              <div style={{ marginBottom: 24 }}>
+                <p style={{ color: "#2D1B4E", fontSize: 14, fontWeight: 700, marginBottom: 12, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                  Line Manager Feedback
+                </p>
+                {hasStrengths && (
+                  <div style={{ padding: "12px 16px", background: "rgba(201,132,58,0.06)", border: "1px solid rgba(201,132,58,0.2)", borderRadius: 10, marginBottom: 10 }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: "#C9843A", margin: "0 0 4px" }}>Greatest Strengths</p>
+                    <p style={{ fontSize: 13, color: "#2D1B4E", margin: 0, lineHeight: 1.6 }}>{lm.strengths}</p>
                   </div>
-                </div>
-                <div style={{ paddingLeft: 34 }}>
-                  {(goal.actions || []).map((action, ai) => (
-                    <div key={ai} style={{ display: "flex", gap: 8, marginBottom: 4 }}>
-                      <span style={{ color: "#E0A84A", fontSize: 12, flexShrink: 0 }}>•</span>
-                      <p style={{ margin: 0, fontSize: 12, color: "#6B5B7B" }}>{action}</p>
-                    </div>
-                  ))}
-                </div>
+                )}
+                {hasDevelopment && (
+                  <div style={{ padding: "12px 16px", background: "rgba(91,45,142,0.05)", border: "1px solid rgba(91,45,142,0.15)", borderRadius: 10, marginBottom: 10 }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: "#5B2D8E", margin: "0 0 4px" }}>Areas for Development</p>
+                    <p style={{ fontSize: 13, color: "#2D1B4E", margin: 0, lineHeight: 1.6 }}>{lm.development}</p>
+                  </div>
+                )}
+                {hasComments && COMPETENCIES.filter(c => lm.comments?.[c.id]).map(c => (
+                  <div key={c.id} style={{ padding: "10px 14px", background: "rgba(45,27,78,0.03)", border: "1px solid rgba(45,27,78,0.08)", borderRadius: 8, marginBottom: 8 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: "#8B7B9B", margin: "0 0 3px", textTransform: "uppercase", letterSpacing: 0.5 }}>{c.name}</p>
+                    <p style={{ fontSize: 13, color: "#2D1B4E", margin: 0, lineHeight: 1.5 }}>{lm.comments[c.id]}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-
-          {/* Key Strengths */}
-          <div style={{ padding: "18px 20px", background: "rgba(201,132,58,0.08)", border: "1px solid rgba(201,132,58,0.2)", borderRadius: 12, marginBottom: 16 }}>
-            <p style={{ color: "#C9843A", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>Key Strengths</p>
-            {(report.strengths || []).map((s, i) => (
-              <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6 }}>
-                <span style={{ color: "#C9843A", fontSize: 14, flexShrink: 0 }}>→</span>
-                <p style={{ margin: 0, fontSize: 14, color: "#1a0a2e" }}>{s}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Values alignment */}
-          {coreValues.length > 0 && (
-            <div style={{ padding: "18px 20px", background: "rgba(74,45,110,0.08)", border: "1px solid rgba(74,45,110,0.2)", borderRadius: 12, marginBottom: 16 }}>
-              <p style={{ color: "#4A2D6E", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>Values Alignment</p>
-              <p style={{ margin: 0, fontSize: 13, color: "#1a0a2e", lineHeight: 1.6 }}>{report.values_alignment}</p>
-            </div>
-          )}
-
-          {/* Comments summary */}
-          {report.comments_summary && (
-            <div style={{ padding: "18px 20px", background: "rgba(45,27,78,0.04)", border: "1px solid rgba(45,27,78,0.09)", borderRadius: 12, marginBottom: 16 }}>
-              <p style={{ color: "#1a0a2e", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>Qualitative Feedback Summary</p>
-              <p style={{ margin: 0, fontSize: 13, color: "#6B5B7B", lineHeight: 1.6 }}>{report.comments_summary}</p>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Book a session */}
           <div style={{ padding: "20px 24px", background: "linear-gradient(135deg, rgba(201,132,58,0.12), rgba(38,70,83,0.2))", border: "1px solid rgba(201,132,58,0.25)", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 32 }}>
@@ -1792,21 +1763,6 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
             </a>
           </div>
 
-          {/* Load Stakeholder Responses */}
-          {Object.keys(inviteTokens).length > 0 && (
-            <div style={{ padding: "16px 20px", background: "rgba(45,27,78,0.04)", border: "1px solid rgba(45,27,78,0.09)", borderRadius: 12, marginBottom: 16 }}>
-              <p style={{ color: "#1a0a2e", fontSize: 13, fontWeight: 700, margin: "0 0 8px" }}>Stakeholder Responses</p>
-              <p style={{ color: "#8B7B9B", fontSize: 12, margin: "0 0 12px" }}>
-                {Object.keys(stakeholderData).length > 0
-                  ? `${Object.keys(stakeholderData).length} stakeholder response(s) loaded.`
-                  : "Check if your stakeholders have completed their assessments."}
-              </p>
-              <button onClick={loadStakeholderResponses} disabled={loadingStakeholders}
-                style={{ ...styles.btnSecondary, fontSize: 13, opacity: loadingStakeholders ? 0.7 : 1 }}>
-                {loadingStakeholders ? "Checking..." : "Load Stakeholder Responses"}
-              </button>
-            </div>
-          )}
 
           {/* Generate PDF Report */}
           <button onClick={generatePDFReport}
@@ -1814,9 +1770,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
             Generate PDF Report
           </button>
 
-          <button onClick={onBack} style={{ ...styles.btnSecondary, width: "100%" }}>
-            ← Back to Core Values Exercise
-          </button>
+
         </div>
       </div>
     );
@@ -1828,7 +1782,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
 const styles = {
   root: { minHeight: "100vh", background: "#F9F6F2", fontFamily: "'Raleway', 'Lato', system-ui, sans-serif", color: "#1a0a2e", padding: "20px 0" },
   container: { maxWidth: 600, margin: "0 auto", padding: "0 20px" },
-  backBtn: { background: "none", border: "none", color: "#C9843A", cursor: "pointer", fontSize: 13, fontFamily: "inherit", marginBottom: 16, padding: 0 },
+  backBtn: { background: "none", border: "none", color: "#C9843A", cursor: "pointer", fontSize: 14, fontWeight: 600, fontFamily: "inherit", marginBottom: 16, padding: 0, letterSpacing: "0.5px", opacity: 0.85 },
   moduleTag: { display: "inline-block", padding: "4px 12px", background: "rgba(45,27,78,0.1)", border: "1px solid rgba(45,27,78,0.25)", borderRadius: 20, color: "#2D1B4E", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginBottom: 16 },
   title: { fontSize: 26, fontWeight: 800, color: "#2D1B4E", margin: "0 0 8px", lineHeight: 1.2 },
   subtitle: { fontSize: 14, color: "#6B5B7B", margin: "0 0 24px", lineHeight: 1.5 },
