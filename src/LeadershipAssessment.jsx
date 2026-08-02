@@ -85,7 +85,7 @@ const PILLARS = [
     name: "Capacity",
     fullName: "Capacity — Thinking & Strategic Acumen",
     description: "The ability to think critically, solve complex problems, and provide clear strategic direction. Moving beyond day-to-day tasks to understand the bigger picture and make sound decisions that balance immediate needs with long-term vision.",
-    color: "#C9843A",
+    color: "#E0A84A",
     competencies: [
       { id: "c1", name: "Strategic Mindset", description: "Possesses a strategic mindset, with solid understanding of the company's vision and strategy." },
       { id: "c2", name: "Innovation & Challenge", description: "Thinks outside the box and challenges the status quo." },
@@ -214,7 +214,7 @@ function StakeholderView({ token }) {
         <div style={{ textAlign: "center", marginBottom: 20, paddingBottom: 16, borderBottom: "2px solid #C9843A" }}>
           <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 44, objectFit: "contain" }} />
         </div>
-        <div style={styles.moduleTag}>Leadership Competency Assessment</div>
+        <div style={styles.moduleTag}>Leadership Brand Assessment</div>
         <h1 style={{ ...styles.title, fontSize: 22, marginBottom: 4 }}>
           {invitation?.rater_role} Feedback
         </h1>
@@ -264,7 +264,7 @@ function StakeholderView({ token }) {
                       <div style={{ width: 22, height: 22, borderRadius: 5, background: pillar.color + "22", border: `1px solid ${pillar.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: pillar.color, flexShrink: 0 }}>{ci+1}</div>
                       <div>
                         <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#1a0a2e" }}>{comp.name}</p>
-                        <p style={{ margin: "2px 0 0", fontSize: 11, color: "#4A3728" }}>{comp.description}</p>
+                        <p style={{ margin: "2px 0 0", fontSize: 11, color: "#8B7B9B" }}>{comp.description}</p>
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
@@ -273,9 +273,9 @@ function StakeholderView({ token }) {
                         const ri = RATING_LABELS[val];
                         return (
                           <button key={val} onClick={() => setRating(comp.id, val)}
-                            style={{ flex: 1, padding: "8px 4px", borderRadius: 8, border: selected ? `2px solid ${pillar.color}` : `1px solid ${pillar.color}44`, background: selected ? pillar.color + "20" : pillar.color + "08", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                            <span style={{ fontSize: 15, fontWeight: 800, color: pillar.color }}>{val}</span>
-                            <span style={{ fontSize: 8, color: pillar.color + "aa", fontWeight: 600 }}>{ri.label}</span>
+                            style={{ flex: 1, padding: "8px 4px", borderRadius: 8, border: selected ? `2px solid ${ri.color}` : "1.5px solid rgba(45,27,78,0.09)", background: selected ? ri.color + "22" : "rgba(45,27,78,0.04)", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                            <span style={{ fontSize: 15, fontWeight: 800, color: selected ? ri.color : "#9B8BAB" }}>{val}</span>
+                            <span style={{ fontSize: 8, color: selected ? ri.color : "#B0A0BF", fontWeight: 600 }}>{ri.label}</span>
                           </button>
                         );
                       })}
@@ -400,7 +400,7 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
               const comms = invites.map(i => i.comments?.[c.id]).filter(Boolean);
               if (comms.length > 0) allComments[c.id] = comms.join(" | ");
             });
-            const raterNames = [...new Set(invites.map(i => i.rater_name).filter(Boolean))].join(", ");
+            const raterNames = invites.map(i => i.rater_name).filter(Boolean).join(", ");
             const roleKey = role.toLowerCase().replace(/\s+/g, '_');
             newData[roleKey] = { role, ratings: avgRatings, comments: allComments, strengths, development, count: invites.length, raterName: raterNames };
           }
@@ -408,7 +408,7 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
         const newStatusData = {};
         Object.entries(grouped).forEach(([role, invites]) => {
           const roleKey = role.toLowerCase().replace(/\s+/g, '_');
-          const raterNames = [...new Set(invites.map(i => i.rater_name).filter(Boolean))].join(", ");
+          const raterNames = invites.map(i => i.rater_name).filter(Boolean).join(", ");
           newStatusData[roleKey] = { role, count: invites.length, raterName: raterNames };
         });
         setStatusData(newStatusData);
@@ -527,7 +527,7 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
             const comms = invites.map(i => i.comments?.[c.id]).filter(Boolean);
             if (comms.length > 0) avgComments[c.id] = comms.join(" | ");
           });
-          const raterNames = [...new Set(invites.map(i => i.rater_name).filter(Boolean))].join(", ");
+          const raterNames = invites.map(i => i.rater_name).filter(Boolean).join(", ");
           const roleKey = role.toLowerCase().replace(/\s+/g, '_');
           const entry = { role, ratings: avgRatings, comments: avgComments, strengths: strengthsList, development: developmentList, count: invites.length, raterName: raterNames, meetsMin: invites.length >= (isManager ? 1 : 3) };
           newStatusData[roleKey] = entry;
@@ -951,7 +951,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     <h1>Leadership Competency Assessment Report</h1>
     <div class="user">${userInfo.firstName ? userInfo.firstName + " " + userInfo.lastName : (currentUser?.email || "Assessment Participant")}</div>
     ${stakeholderData["line_manager"]?.raterName ? `<p style="font-size:13px;margin-top:4px;opacity:0.85">Line Manager: <strong>${stakeholderData["line_manager"].raterName}</strong></p>` : ""}
-    
+    ${stakeholderData["line_manager"]?.raterName ? `<p style="font-size:12px;opacity:0.7">Line Manager: ${stakeholderData["line_manager"].raterName}</p>` : ""}
     <p>${userInfo.role || ""} · ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
   </div>
 
@@ -1073,7 +1073,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
         <div style={styles.container}>
           <button onClick={() => setShowInviteScreen(false)} style={styles.backBtn}>← Back</button>
           <div style={{ marginTop: 16 }} />
-          <div style={styles.moduleTag}>Leadership Competency Assessment</div>
+          <div style={styles.moduleTag}>Leadership Brand Assessment</div>
           <h1 style={{ ...styles.title, fontSize: 22, marginBottom: 8 }}>Invite Your Stakeholders</h1>
           <p style={styles.subtitle}>Enter the email address for each rater. They'll receive a personalised link to complete their section privately.</p>
 
@@ -1238,7 +1238,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           <div style={{ textAlign: "center", marginBottom: 20, paddingBottom: 16, borderBottom: "2px solid #C9843A" }}>
             <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 44, objectFit: "contain" }} />
           </div>
-          <div style={styles.moduleTag}>Leadership Competency Assessment</div>
+          <div style={styles.moduleTag}>Leadership Assessment</div>
           <h1 style={{ ...styles.title, marginTop: 12 }}>Start Assessment</h1>
           <p style={styles.subtitle}>Enter your email to begin or continue your assessment.</p>
 
@@ -1313,7 +1313,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     <div style={styles.root}>
       <div style={styles.container}>
         <button onClick={() => setScreen(1)} style={styles.backBtn}>← Back</button>
-        <div style={styles.moduleTag}>Leadership Competency Assessment</div>
+        <div style={styles.moduleTag}>Leadership Brand Assessment</div>
         <h1 style={styles.title}>Who is completing this assessment?</h1>
         <p style={styles.subtitle}>Select all that apply. You can complete each perspective separately. <strong style={{ color: "#C9843A" }}>Self</strong> is always included.</p>
 
@@ -1361,10 +1361,9 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           <div style={{ textAlign: "center", marginBottom: 16, paddingBottom: 12, borderBottom: "2px solid #C9843A" }}>
             <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 40, objectFit: "contain" }} />
           </div>
-          <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
-            <button onClick={() => setScreen(1)} style={styles.backBtn}>← Back</button>
-          </div>
-          <div style={styles.moduleTag}>Leadership Competency Assessment</div>
+          <button onClick={() => setScreen(1)} style={styles.backBtn}>← Back</button>
+          <div style={{ marginTop: 16 }} />
+          <div style={styles.moduleTag}>Leadership Brand Assessment</div>
 
           {/* Self-only indicator */}
           <div style={{ display: "flex", gap: 6, marginBottom: 24 }}>
@@ -1410,7 +1409,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                         <div style={{ width: 24, height: 24, borderRadius: 6, background: pillar.color + "22", border: `1px solid ${pillar.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: pillar.color, flexShrink: 0 }}>{ci + 1}</div>
                         <div style={{ flex: 1, textAlign: "left" }}>
                           <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#1a0a2e" }}>{comp.name}</p>
-                          <p style={{ margin: "3px 0 0", fontSize: 11, color: "#4A3728", lineHeight: 1.4 }}>{comp.description}</p>
+                          <p style={{ margin: "3px 0 0", fontSize: 11, color: pillar.color + "aa", lineHeight: 1.4 }}>{comp.description}</p>
                         </div>
                       </div>
                       <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
@@ -1654,9 +1653,9 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           <div style={{ textAlign: "center", marginBottom: 16, paddingBottom: 12, borderBottom: "2px solid #C9843A" }}>
             <img src="/parity-logo.png" alt="Parity Coaching" style={{ height: 40, objectFit: "contain" }} />
           </div>
-          <button onClick={() => setScreen(3.5)} style={{ ...styles.backBtn, display: "block", marginBottom: 20 }}>← Back</button>
+          <button onClick={() => setScreen(3.5)} style={styles.backBtn}>← Back to Status</button>
           <div style={{ marginTop: 16 }} />
-          <div style={styles.moduleTag}>Leadership Competency Assessment</div>
+          <div style={styles.moduleTag}>Leadership Brand Assessment</div>
 
 
 
@@ -1709,6 +1708,17 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                       </div>
                     ))}
                   </div>
+                  {/* LM comment for this behaviour */}
+                  {(() => {
+                    const lm = stakeholderData["line_manager"];
+                    const comment = lm?.comments?.[comp.id];
+                    if (!comment) return null;
+                    return (
+                      <p style={{ margin: "8px 0 0", fontSize: 12, color: "#4A3728", lineHeight: 1.5, fontStyle: "italic", paddingLeft: 0 }}>
+                        "{comment}"
+                      </p>
+                    );
+                  })()}
                 </div>
               );
             })}
@@ -1716,40 +1726,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
             ))}
           </div>
 
-          {/* Qualitative Feedback from Line Manager */}
-          {(() => {
-            const lm = stakeholderData["line_manager"];
-            if (!lm) return null;
-            const hasComments = COMPETENCIES.some(c => lm.comments?.[c.id]);
-            const hasStrengths = lm.strengths?.trim();
-            const hasDevelopment = lm.development?.trim();
-            if (!hasComments && !hasStrengths && !hasDevelopment) return null;
-            return (
-              <div style={{ marginBottom: 24 }}>
-                <p style={{ color: "#2D1B4E", fontSize: 14, fontWeight: 700, marginBottom: 12, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                  Line Manager Feedback
-                </p>
-                {hasStrengths && (
-                  <div style={{ padding: "12px 16px", background: "rgba(201,132,58,0.06)", border: "1px solid rgba(201,132,58,0.2)", borderRadius: 10, marginBottom: 10 }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, color: "#C9843A", margin: "0 0 4px" }}>Greatest Strengths</p>
-                    <p style={{ fontSize: 13, color: "#2D1B4E", margin: 0, lineHeight: 1.6 }}>{lm.strengths}</p>
-                  </div>
-                )}
-                {hasDevelopment && (
-                  <div style={{ padding: "12px 16px", background: "rgba(91,45,142,0.05)", border: "1px solid rgba(91,45,142,0.15)", borderRadius: 10, marginBottom: 10 }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, color: "#5B2D8E", margin: "0 0 4px" }}>Areas for Development</p>
-                    <p style={{ fontSize: 13, color: "#2D1B4E", margin: 0, lineHeight: 1.6 }}>{lm.development}</p>
-                  </div>
-                )}
-                {hasComments && COMPETENCIES.filter(c => lm.comments?.[c.id]).map(c => (
-                  <div key={c.id} style={{ padding: "10px 14px", background: "rgba(45,27,78,0.03)", border: "1px solid rgba(45,27,78,0.08)", borderRadius: 8, marginBottom: 8 }}>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: "#8B7B9B", margin: "0 0 3px", textTransform: "uppercase", letterSpacing: 0.5 }}>{c.name}</p>
-                    <p style={{ fontSize: 13, color: "#2D1B4E", margin: 0, lineHeight: 1.5 }}>{lm.comments[c.id]}</p>
-                  </div>
-                ))}
-              </div>
-            );
-          })()}
+
 
           {/* Book a session */}
           <div style={{ padding: "20px 24px", background: "linear-gradient(135deg, rgba(201,132,58,0.12), rgba(38,70,83,0.2))", border: "1px solid rgba(201,132,58,0.25)", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 32 }}>
@@ -1782,7 +1759,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
 const styles = {
   root: { minHeight: "100vh", background: "#F9F6F2", fontFamily: "'Raleway', 'Lato', system-ui, sans-serif", color: "#1a0a2e", padding: "20px 0" },
   container: { maxWidth: 600, margin: "0 auto", padding: "0 20px" },
-  backBtn: { background: "none", border: "none", color: "#C9843A", cursor: "pointer", fontSize: 14, fontWeight: 600, fontFamily: "inherit", marginBottom: 16, padding: 0, letterSpacing: "0.5px", opacity: 0.85 },
+  backBtn: { background: "none", border: "none", color: "#C9843A", cursor: "pointer", fontSize: 13, fontFamily: "inherit", marginBottom: 16, padding: 0 },
   moduleTag: { display: "inline-block", padding: "4px 12px", background: "rgba(45,27,78,0.1)", border: "1px solid rgba(45,27,78,0.25)", borderRadius: 20, color: "#2D1B4E", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginBottom: 16 },
   title: { fontSize: 26, fontWeight: 800, color: "#2D1B4E", margin: "0 0 8px", lineHeight: 1.2 },
   subtitle: { fontSize: 14, color: "#6B5B7B", margin: "0 0 24px", lineHeight: 1.5 },
