@@ -668,7 +668,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
   "comments_summary": "2-3 sentences summarising the qualitative feedback from comments and stated strengths/development areas"
 }`;
 
-      const response = await fetch("/openai/v1/chat/completions", {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
