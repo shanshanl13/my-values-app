@@ -1374,10 +1374,12 @@ Respond ONLY in this exact JSON format with no other text:
   return (
     <div style={{ ...styles.root, position: "relative" }}>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      {showWelcomeModal && <WelcomeModal onNewUser={handleNewUser} onLoadUser={handleLoadUser} onNewUserLeadership={handleNewUserLeadership} onLoadUserLeadership={handleLoadUserLeadership} />}
+      {showWelcomeModal && !new URLSearchParams(window.location.search).get("report") && <WelcomeModal onNewUser={handleNewUser} onLoadUser={handleLoadUser} onNewUserLeadership={handleNewUserLeadership} onLoadUserLeadership={handleLoadUserLeadership} />}
       {showRegModal && <RegistrationModal onComplete={handleRegistrationComplete} onSkip={handleSkipReg} />}
 
-      {showLeadership ? (
+      {new URLSearchParams(window.location.search).get("report") ? (
+        <LeadershipAssessment onBack={() => {}} currentUser={currentUser} coreValues={[]} />
+      ) : showLeadership ? (
         <LeadershipAssessment onBack={() => setShowWelcomeModal(true)} currentUser={currentUser} coreValues={selectedCore} />
       ) : (
       <>

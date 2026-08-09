@@ -122,6 +122,24 @@ const RATING_LABELS = {
 };
 
 // ── Stakeholder View (accessed via unique link) ───────────────────────────────
+function ReportViewer({ reportId }) {
+  const [html, setHtml] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    sbFetch(`/leadership_reports?id=eq.${reportId}&select=report_html`)
+      .then(data => {
+        if (data?.[0]?.report_html) setHtml(data[0].report_html);
+        else setHtml("<p>Report not found.</p>");
+      })
+      .catch(() => setHtml("<p>Failed to load report.</p>"))
+      .finally(() => setLoading(false));
+  }, [reportId]);
+
+  if (loading) return <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", fontFamily:"Raleway,sans-serif", color:"#6B5B7B" }}>Loading report...</div>;
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+}
+
 function StakeholderView({ token }) {
   const [invitation, setInvitation] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -325,6 +343,11 @@ function StakeholderView({ token }) {
 export default function LeadershipAssessment({ onBack, currentUser, coreValues = [] }) {
   // Check if this is a stakeholder link
   const urlToken = new URLSearchParams(window.location.search).get("rate");
+  const urlReportId = new URLSearchParams(window.location.search).get("report");
+  if (urlReportId) {
+    return <ReportViewer reportId={urlReportId} />;
+  }
+
   if (urlToken) {
     return <StakeholderView token={urlToken} />;
   }
@@ -659,11 +682,56 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
       });
 
       const data = await response.json();
-      const text = data.choices[0].message.content || "";
+      const text = data.choices?.[0]?.message?.content || "";
       const clean = text.replace(/```json|```/g, "").trim();
-      const parsed = JSON.parse(clean);
+      const parsed = clean ? JSON.parse(clean) : {};
+      // Ensure top3/bottom3 always populated from LM data
+      if (!parsed.top3?.length || !parsed.bottom3?.length) {
+        const lmData2 = freshStakeholderData["line_manager"];
+        const scores2 = COMPETENCIES.map(c => ({ name: c.name, score: lmData2?.ratings?.[c.id] || 0 })).filter(b => b.score > 0).sort((a,b) => b.score - a.score);
+        parsed.top3 = scores2.slice(0, 3).map(b => b.name);
+        parsed.bottom3 = [...scores2].reverse().slice(0, 3).map(b => b.name);
+      }
       setReport(parsed);
       setScreen(4);
+
+      // Save report to Supabase and email link
+      try {
+        console.log("parsed:", JSON.stringify(parsed).slice(0,200), "freshStakeholderData keys:", Object.keys(freshStakeholderData));
+        const reportHtml = generatePDFReport(parsed, freshStakeholderData, ratings["self"] || {});
+        console.log("reportHtml length:", reportHtml?.length);
+        if (reportHtml) {
+          const reportLinkTemp = "pending";
+          const saved = await sbFetch("/leadership_reports", {
+            method: "POST",
+            body: JSON.stringify({
+              owner_email: userInfo.email,
+              owner_name: `${userInfo.firstName} ${userInfo.lastName}`.trim(),
+              report_html: reportHtml,
+              report_json: parsed,
+              report_link: reportLinkTemp,
+            }),
+          });
+          const reportId = saved?.[0]?.id;
+          if (reportId) {
+            const reportLink = `${window.location.origin}?report=${reportId}`;
+            // Update with actual link
+            await sbFetch(`/leadership_reports?id=eq.${reportId}`, {
+              method: "PATCH",
+              headers: { "Prefer": "return=minimal" },
+              body: JSON.stringify({ report_link: reportLink }),
+            });
+            await loadEmailJS();
+            await window.emailjs.send(EMAILJS_SERVICE_ID, "template_7g57ixk", {
+              from_name: "Parity Coaching Platform",
+              rater_role: `New Report: ${userInfo.firstName} ${userInfo.lastName}`,
+              assessment_link: reportLink,
+              email: "sayhello@paritycoaching.org",
+            });
+            console.log("Report saved and emailed:", reportLink);
+          }
+        }
+      } catch(emailErr) { console.error("Save/email failed:", emailErr); }
 
       // Send results to coach if user consented
       if (consentToShare) {
@@ -750,6 +818,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
       setScreen(4);
     } finally {
       setReportLoading(false);
+
     }
   };
 
@@ -855,11 +924,14 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     setInviteSending(false);
   };
 
-  const generatePDFReport = () => {
-    const selfRatings = ratings["self"] || {};
+  const generatePDFReport = (reportOverride = null, stakeholderOverride = null, selfRatingsOverride = null) => {
+    const useReport = reportOverride || report;
+    const useStakeholder = stakeholderOverride || stakeholderData;
+    const useSelfRatings = selfRatingsOverride || (ratings["self"] || {});
+    const selfRatings = useSelfRatings;
     const allRaters = [
       { key: "self", label: "Self", ratings: selfRatings, comments: comments["self"] || {}, strengths: strengths["self"] || "", development: development["self"] || "", name: `${userInfo.firstName} ${userInfo.lastName}`.trim() },
-      ...Object.values(stakeholderData),
+      ...Object.values(useStakeholder),
     ];
 
     const getRaterAvg = (raterRatings, pillarComps) => {
@@ -951,7 +1023,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     <h1>Leadership Competency Assessment Report</h1>
     <div class="user">${userInfo.firstName ? userInfo.firstName + " " + userInfo.lastName : (currentUser?.email || "Assessment Participant")}</div>
     ${stakeholderData["line_manager"]?.raterName ? `<p style="font-size:13px;margin-top:4px;opacity:0.85">Line Manager: <strong>${stakeholderData["line_manager"].raterName}</strong></p>` : ""}
-    ${stakeholderData["line_manager"]?.raterName ? `<p style="font-size:12px;opacity:0.7">Line Manager: ${stakeholderData["line_manager"].raterName}</p>` : ""}
+    
     <p>${userInfo.role || ""} · ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
   </div>
 
@@ -999,8 +1071,9 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           const scoreClass = (s) => s ? `score-${Math.round(parseFloat(s))}` : "";
           const diff = avgOthers !== "N/A" && selfScore ? (parseFloat(avgOthers) - selfScore).toFixed(1) : "N/A";
           const diffColor = diff !== "N/A" ? (parseFloat(diff) > 0.5 ? "#C9843A" : parseFloat(diff) < -0.5 ? "#5B2D8E" : "#6B5B7B") : "#6B5B7B";
+          const lmComment = allRaters.find(r => r.key !== "self")?.comments?.[c.id] || "";
           return `<tr>
-            <td>${c.name}<br><span style="font-size:10px;color:#64748b">${c.description}</span></td>
+            <td>${c.name}<br><span style="font-size:10px;color:#64748b">${c.description}</span>${lmComment ? `<br><span style="font-size:9px;font-weight:700;color:#C9843A;text-transform:uppercase;letter-spacing:0.5px">Line Manager Comments: </span><span style="font-size:10px;color:#4A3728;font-style:italic">"${lmComment}"</span>` : ""}</td>
             <td><span class="score-badge ${scoreClass(selfScore)}">${selfScore || "-"}</span></td>
             ${allRaters.filter(r => r.key !== "self").map(r => `<td><span class="score-badge ${scoreClass(r.ratings?.[c.id])}">${r.ratings?.[c.id] || "-"}</span></td>`).join("")}
             ${allRaters.length > 1 ? `<td style="color:${diffColor};font-weight:700">${diff !== "N/A" ? (parseFloat(diff) > 0 ? "+" : "") + diff : "-"}</td>` : ""}
@@ -1057,6 +1130,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
 </body>
 </html>`;
 
+    if (reportOverride !== null) return html;
     const win = window.open("", "_blank");
     win.document.write(html);
     win.document.close();
@@ -1613,14 +1687,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
 
           <div style={{ height: 1, background: "rgba(45,27,78,0.1)", margin: "8px 0 16px" }} />
 
-          {/* Consent */}
-          <div style={{ padding: "12px 16px", background: "rgba(201,132,58,0.06)", border: "1px solid #C9843A", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "flex-start", gap: 12 }}>
-            <input type="checkbox" id="consent" checked={consentToShare} onChange={(e) => setConsentToShare(e.target.checked)}
-              style={{ width: 18, height: 18, marginTop: 2, cursor: "pointer", flexShrink: 0, accentColor: "#C9843A" }} />
-            <label htmlFor="consent" style={{ fontSize: 13, color: "#C9843A", lineHeight: 1.5, cursor: "pointer" }}>
-              I consent to send a copy of my results to <strong>sayhello@paritycoaching.org</strong>
-            </label>
-          </div>
+
 
           {!canGenerate && (
             <p style={{ fontSize: 12, color: "#8B5A1E", marginBottom: 8, textAlign: "center" }}>
@@ -1686,8 +1753,11 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
               const gap = avgOthers !== null ? (avgOthers - selfScore).toFixed(1) : null;
               return (
                 <div key={comp.id} style={{ marginBottom: 14, padding: "12px 14px", background: pillar.color + "0d", borderRadius: 10, border: "1px solid " + pillar.color + "25" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                    <span style={{ fontSize: 15, fontWeight: 600, color: "#1a0a2e" }}>{comp.name}</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                    <div style={{ flex: 1, textAlign: "center" }}>
+                        <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#1a0a2e" }}>{comp.name}</p>
+                        <p style={{ margin: "2px 0 0", fontSize: 11, color: "#8B7B9B", lineHeight: 1.4, fontStyle: "italic" }}>{comp.description}</p>
+                      </div>
                     {gap !== null && (
                       <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: Math.abs(gap) <= 0.5 ? "rgba(201,132,58,0.15)" : Math.abs(gap) <= 1 ? "rgba(244,162,97,0.15)" : "rgba(91,45,142,0.12)", color: Math.abs(gap) <= 0.5 ? "#C9843A" : Math.abs(gap) <= 1 ? "#E0A84A" : "#5B2D8E" }}>
                         {gap > 0 ? "+" : ""}{gap} gap
@@ -1714,8 +1784,8 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
                     const comment = lm?.comments?.[comp.id];
                     if (!comment) return null;
                     return (
-                      <p style={{ margin: "8px 0 0", fontSize: 12, color: "#4A3728", lineHeight: 1.5, fontStyle: "italic", paddingLeft: 0 }}>
-                        "{comment}"
+                      <p style={{ margin: "10px 0 0", fontSize: 11, color: "#4A3728", lineHeight: 1.5, fontStyle: "italic", paddingLeft: 0 }}>
+                        <span style={{ fontWeight: 600, fontStyle: "normal", color: "#2D1B4E" }}>Line Manager Comments: </span>"{comment}"
                       </p>
                     );
                   })()}
@@ -1742,7 +1812,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
 
 
           {/* Generate PDF Report */}
-          <button onClick={generatePDFReport}
+          <button onClick={() => { console.log("report state:", JSON.stringify(report).slice(0,200)); generatePDFReport(); }}
             style={{ ...styles.btnPrimary, width: "100%", marginBottom: 12, background: "linear-gradient(135deg, #2D1B4E, #C9843A)" }}>
             Generate PDF Report
           </button>
