@@ -123,22 +123,22 @@ const RATING_LABELS = {
 
 // ── Stakeholder View (accessed via unique link) ───────────────────────────────
 function ReportViewer({ reportId }) {
-  const [html, setHtml] = useState(null);
+  const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    sbFetch(`/leadership_reports?id=eq.${reportId}&select=report_html`)
-      .then(data => {
-        if (data?.[0]?.report_html) setHtml(data[0].report_html);
-        else setHtml("<p>Report not found.</p>");
-      })
-      .catch(() => setHtml("<p>Failed to load report.</p>"))
+    sbFetch(`/leadership_reports?id=eq.${reportId}&select=*`)
+      .then(data => { if (data?.[0]) setReportData(data[0]); })
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [reportId]);
 
-  if (loading) return <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", fontFamily:"Raleway,sans-serif", color:"#6B5B7B" }}>Loading report...</div>;
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  if (loading) return <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", fontFamily:"Raleway,sans-serif", color:"#6B5B7B", background:"white" }}>Loading report...</div>;
+  if (!reportData) return <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", fontFamily:"Raleway,sans-serif", color:"#E85D75" }}>Report not found.</div>;
+
+  return <div style={{ background: "white", minHeight: "100vh" }} dangerouslySetInnerHTML={{ __html: reportData.report_html }} />;
 }
+
 
 function StakeholderView({ token }) {
   const [invitation, setInvitation] = useState(null);
@@ -411,19 +411,21 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
         const newData = {};
         Object.entries(grouped).forEach(([role, invites]) => {
           const isManager = role === "Line Manager";
+          // For line manager, only use the most recent response
+          const filteredInvites = isManager ? [invites.sort((a,b) => new Date(b.completed_at) - new Date(a.completed_at))[0]] : invites;
           const minRequired = isManager ? 1 : 3;
-          if (invites.length >= minRequired) {
+          if (filteredInvites.length >= minRequired) {
             const avgRatings = {};
             const allComments = {};
-            const strengths = invites.map(i => i.strengths).filter(Boolean).join(" | ");
+            const strengths = filteredInvites.map(i => i.strengths).filter(Boolean).join(" | ");
             const development = invites.map(i => i.development).filter(Boolean).join(" | ");
             COMPETENCIES.forEach(c => {
-              const scores = invites.map(i => i.ratings?.[c.id] || 0).filter(s => s > 0);
+              const scores = filteredInvites.map(i => i.ratings?.[c.id] || 0).filter(s => s > 0);
               if (scores.length > 0) avgRatings[c.id] = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length * 10) / 10;
-              const comms = invites.map(i => i.comments?.[c.id]).filter(Boolean);
+              const comms = filteredInvites.map(i => i.comments?.[c.id]).filter(Boolean);
               if (comms.length > 0) allComments[c.id] = comms.join(" | ");
             });
-            const raterNames = invites.map(i => i.rater_name).filter(Boolean).join(", ");
+            const raterNames = filteredInvites.map(i => i.rater_name).filter(Boolean).join(", ");
             const roleKey = role.toLowerCase().replace(/\s+/g, '_');
             newData[roleKey] = { role, ratings: avgRatings, comments: allComments, strengths, development, count: invites.length, raterName: raterNames };
           }
@@ -668,7 +670,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
   "comments_summary": "2-3 sentences summarising the qualitative feedback from comments and stated strengths/development areas"
 }`;
 
-      const response = await fetch("/api/openai", {
+      const response = await fetch(window.location.hostname === "localhost" ? "/openai/v1/chat/completions" : "/api/openai", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -708,7 +710,15 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
               owner_email: userInfo.email,
               owner_name: `${userInfo.firstName} ${userInfo.lastName}`.trim(),
               report_html: reportHtml,
-              report_json: parsed,
+              report_json: {
+                ...parsed,
+                self_ratings: ratings["self"] || {},
+                lm_ratings: freshStakeholderData["line_manager"]?.ratings || {},
+                lm_comments: freshStakeholderData["line_manager"]?.comments || {},
+                lm_strengths: freshStakeholderData["line_manager"]?.strengths || "",
+                lm_development: freshStakeholderData["line_manager"]?.development || "",
+                lm_name: freshStakeholderData["line_manager"]?.raterName || "",
+              },
               report_link: reportLinkTemp,
             }),
           });
@@ -934,6 +944,16 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
       ...Object.values(useStakeholder),
     ];
 
+    // Calculate top/bottom with ties from LM data
+    const lmRater = useStakeholder["line_manager"] || allRaters.find(r => r.key !== "self");
+    const lmRatings = lmRater?.ratings || {};
+    const scoredBehaviours = COMPETENCIES.map(c => ({ name: c.name, score: lmRatings[c.id] || 0 })).filter(b => b.score > 0).sort((a,b) => b.score - a.score);
+    const top3Score = scoredBehaviours[2]?.score;
+    const bottom3Score = scoredBehaviours[scoredBehaviours.length - 3]?.score;
+    const topBehaviours = top3Score ? scoredBehaviours.filter(b => b.score >= top3Score) : scoredBehaviours.slice(0, 3);
+    const bottomBehaviours = bottom3Score ? scoredBehaviours.filter(b => b.score <= bottom3Score) : scoredBehaviours.slice(-3).reverse();
+
+    // Calculate top/bottom with ties from LM data
     const getRaterAvg = (raterRatings, pillarComps) => {
       const scores = pillarComps.map(c => raterRatings[c.id] || 0).filter(s => s > 0);
       return scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : "N/A";
@@ -958,7 +978,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
 <title>Leadership Competency Assessment Report</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Raleway', 'Lato', 'Arial', sans-serif; color: #2D1B4E; background: white; }
+  body { font-size: 16px; font-family: 'Raleway', 'Lato', 'Arial', sans-serif; color: #2D1B4E; background: white; }
   .page { max-width: 800px; margin: 0 auto; padding: 40px; }
   @media print { .page { padding: 20px; } .no-print { display: none; } }
   
@@ -969,7 +989,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
   .header .user { font-size: 18px; font-weight: 600; margin: 16px 0 4px; opacity: 0.9; }
   
   .section { margin-bottom: 32px; }
-  .section-title { font-size: 16px; font-weight: 800; color: #1a1a2e; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+  .section-title { font-size: 18px; font-weight: 800; color: #1a1a2e; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
   
   .headline-box { background: #FDF8F3; border-left: 4px solid #C9843A; padding: 20px; margin-bottom: 24px; border-radius: 0 8px 8px 0; }
   .headline-box p { font-size: 16px; font-style: italic; color: #1a1a2e; line-height: 1.6; font-weight: 600; }
@@ -981,8 +1001,8 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
   .pillar-card .label { font-size: 10px; margin-top: 4px; }
   
   table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 12px; }
-  th { background: #2D1B4E; color: white; padding: 10px 8px; text-align: left; font-size: 11px; }
-  td { padding: 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+  th { background: #2D1B4E; color: white; padding: 12px 10px; text-align: left; font-size: 14px; }
+  td { padding: 10px; border-bottom: 1px solid #e2e8f0; vertical-align: top; font-size: 14px; }
   tr:nth-child(even) td { background: #f8fafc; }
   .pillar-row td { background: #f1f5f9; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
   
@@ -1073,7 +1093,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           const diffColor = diff !== "N/A" ? (parseFloat(diff) > 0.5 ? "#C9843A" : parseFloat(diff) < -0.5 ? "#5B2D8E" : "#6B5B7B") : "#6B5B7B";
           const lmComment = allRaters.find(r => r.key !== "self")?.comments?.[c.id] || "";
           return `<tr>
-            <td>${c.name}<br><span style="font-size:10px;color:#64748b">${c.description}</span>${lmComment ? `<br><span style="font-size:9px;font-weight:700;color:#C9843A;text-transform:uppercase;letter-spacing:0.5px">Line Manager Comments: </span><span style="font-size:10px;color:#4A3728;font-style:italic">"${lmComment}"</span>` : ""}</td>
+            <td>${c.name}<br><span style="font-size:13px;color:#64748b;font-style:italic;line-height:1.6">${c.description}</span>${lmComment ? `<br><span style="font-size:11px;font-weight:700;color:#C9843A;text-transform:uppercase;letter-spacing:0.5px">Line Manager Comments: </span><span style="font-size:12px;color:#4A3728;font-style:italic">"${lmComment}"</span>` : ""}</td>
             <td><span class="score-badge ${scoreClass(selfScore)}">${selfScore || "-"}</span></td>
             ${allRaters.filter(r => r.key !== "self").map(r => `<td><span class="score-badge ${scoreClass(r.ratings?.[c.id])}">${r.ratings?.[c.id] || "-"}</span></td>`).join("")}
             ${allRaters.length > 1 ? `<td style="color:${diffColor};font-weight:700">${diff !== "N/A" ? (parseFloat(diff) > 0 ? "+" : "") + diff : "-"}</td>` : ""}
@@ -1101,6 +1121,20 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     
     if (allComments.length === 0 && allStrengths.length === 0 && allDevelopment.length === 0) return "";
     return `
+    <!-- Top & Bottom Behaviours -->
+    <div class="section">
+      <div style="display:flex;gap:24px;margin-bottom:8px">
+        <div style="flex:1;background:rgba(201,132,58,0.08);border:1px solid rgba(201,132,58,0.3);border-radius:10px;padding:20px">
+          <div class="section-title" style="color:#C9843A;border-bottom-color:rgba(201,132,58,0.3)">Top 3 Behaviours</div>
+          ${topBehaviours.map((b,i) => `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="width:26px;height:26px;border-radius:50%;background:#C9843A;color:white;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">${i+1}</span><span style="flex:1;font-size:13px;font-weight:500;color:#2D1B4E">${b.name}</span><span style="font-size:13px;font-weight:700;color:#C9843A">${b.score}/5</span></div>`).join("")}
+        </div>
+        <div style="flex:1;background:rgba(91,45,142,0.06);border:1px solid rgba(91,45,142,0.3);border-radius:10px;padding:20px">
+          <div class="section-title" style="color:#5B2D8E;border-bottom-color:rgba(91,45,142,0.3)">Bottom 3 Behaviours</div>
+          ${bottomBehaviours.map((b,i) => `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="width:26px;height:26px;border-radius:50%;background:#5B2D8E;color:white;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">${i+1}</span><span style="flex:1;font-size:13px;font-weight:500;color:#2D1B4E">${b.name}</span><span style="font-size:13px;font-weight:700;color:#5B2D8E">${b.score}/5</span></div>`).join("")}
+        </div>
+      </div>
+    </div>
+
     <div class="section">
       <div class="section-title">Qualitative Feedback</div>
       ${allStrengths.length > 0 ? `
