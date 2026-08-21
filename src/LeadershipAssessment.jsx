@@ -149,6 +149,9 @@ function StakeholderView({ token }) {
   const [development, setDevelopment] = useState("");
   const [raterFirstName, setRaterFirstName] = useState("");
   const [raterLastName, setRaterLastName] = useState("");
+  const [raterRole, setRaterRole] = useState("");
+  const [raterToken, setRaterToken] = useState(null);
+  const [introComplete, setIntroComplete] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
@@ -159,7 +162,7 @@ function StakeholderView({ token }) {
         const data = await sbFetch(`/leadership_invitations?token=eq.${token}&select=*`);
         if (data && data.length > 0) {
           setInvitation(data[0]);
-          if (data[0].completed) setDone(true);
+          // Allow reuse - do not block on completed status
           if (data[0].rater_name) {
             const [fn, ...ln] = (data[0].rater_name || "").split(" ");
             setRaterFirstName(fn || "");
@@ -184,7 +187,19 @@ function StakeholderView({ token }) {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      await sbFetch(`/leadership_invitations?token=eq.${token}`, {
+      // If submitting as Line Manager, delete all previous completed LM rows for this owner
+      const finalRole = raterRole || invitation?.rater_role;
+      const submitTokenForDelete = window._raterToken || token;
+      if (finalRole === "Line Manager" && invitation?.owner_email) {
+        try {
+          await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(invitation.owner_email)}&rater_role=eq.Line%20Manager&completed=eq.true&token=neq.${submitTokenForDelete}`, {
+            method: "DELETE",
+          });
+        } catch(e) { console.error("Failed to delete old LM:", e); }
+      }
+
+      const submitToken = window._raterToken || token;
+      await sbFetch(`/leadership_invitations?token=eq.${submitToken}`, {
         method: "PATCH",
         body: JSON.stringify({
           ratings,
@@ -192,6 +207,7 @@ function StakeholderView({ token }) {
           strengths,
           development,
           rater_name: `${raterFirstName} ${raterLastName}`.trim(),
+          rater_role: raterRole || invitation?.rater_role,
           completed: true,
           completed_at: new Date().toISOString()
         }),
@@ -226,6 +242,44 @@ function StakeholderView({ token }) {
     </div>
   );
 
+  if (!introComplete) {
+    const canProceed = raterFirstName.trim() && raterLastName.trim() && raterRole;
+    return (
+      <div style={{ minHeight:"100vh", background:"#F9F6F2", fontFamily:"'Raleway','Lato',system-ui,sans-serif", padding:"40px 20px" }}>
+        <div style={{ maxWidth:480, margin:"0 auto" }}>
+          <div style={{ textAlign:"center", marginBottom:28, paddingBottom:16, borderBottom:"2px solid #C9843A" }}>
+            <img src="/parity-logo.png" alt="Parity Coaching" style={{ height:44, objectFit:"contain" }} />
+          </div>
+          <div style={{ display:"inline-block", padding:"4px 12px", background:"rgba(201,132,58,0.1)", border:"1px solid rgba(201,132,58,0.3)", borderRadius:20, fontSize:11, fontWeight:700, color:"#C9843A", textTransform:"uppercase", letterSpacing:"0.8px", marginBottom:16 }}>Leadership Competency Assessment</div>
+          <h1 style={{ fontSize:22, fontWeight:800, color:"#2D1B4E", margin:"0 0 8px" }}>Before you begin</h1>
+          <p style={{ fontSize:13, color:"#6B5B7B", marginBottom:24, lineHeight:1.6 }}>You have been invited to provide feedback on <strong style={{ color:"#1a0a2e" }}>{invitation?.owner_name || "a colleague"}</strong>'s leadership. Please tell us a bit about yourself first.</p>
+          <div style={{ display:"flex", gap:10, marginBottom:16 }}>
+            <div style={{ flex:1 }}>
+              <p style={{ fontSize:12, fontWeight:600, color:"#2D1B4E", margin:"0 0 4px" }}>First Name *</p>
+              <input type="text" value={raterFirstName} onChange={e => setRaterFirstName(e.target.value)} placeholder="First name" style={{ width:"100%", padding:"10px 14px", background:"rgba(45,27,78,0.07)", border:"1px solid rgba(45,27,78,0.12)", borderRadius:8, color:"#1a0a2e", fontSize:13, fontFamily:"inherit", outline:"none", boxSizing:"border-box" }} />
+            </div>
+            <div style={{ flex:1 }}>
+              <p style={{ fontSize:12, fontWeight:600, color:"#2D1B4E", margin:"0 0 4px" }}>Last Name *</p>
+              <input type="text" value={raterLastName} onChange={e => setRaterLastName(e.target.value)} placeholder="Last name" style={{ width:"100%", padding:"10px 14px", background:"rgba(45,27,78,0.07)", border:"1px solid rgba(45,27,78,0.12)", borderRadius:8, color:"#1a0a2e", fontSize:13, fontFamily:"inherit", outline:"none", boxSizing:"border-box" }} />
+            </div>
+          </div>
+          <p style={{ fontSize:12, fontWeight:600, color:"#2D1B4E", margin:"0 0 6px" }}>Your relationship to {invitation?.owner_name?.split(" ")[0] || "this person"} *</p>
+          <select value={raterRole} onChange={e => setRaterRole(e.target.value)} style={{ width:"100%", padding:"10px 14px", background:"rgba(45,27,78,0.07)", border:"1px solid rgba(45,27,78,0.12)", borderRadius:8, color:raterRole?"#1a0a2e":"#8B7B9B", fontSize:13, fontFamily:"inherit", outline:"none", marginBottom:24 }}>
+            <option value="">Select your relationship...</option>
+            <option value="Line Manager">Line Manager</option>
+            <option value="Senior Stakeholder">Senior Stakeholder</option>
+            <option value="Peer">Peer</option>
+            <option value="Direct Report">Direct Report</option>
+          </select>
+          <button onClick={() => { if (canProceed) setIntroComplete(true); }} disabled={!canProceed}
+            style={{ width:"100%", padding:"14px", background:canProceed?"linear-gradient(135deg, #2D1B4E, #5B2D8E)":"rgba(45,27,78,0.1)", border:"none", borderRadius:10, color:canProceed?"#fff":"#8B7B9B", fontSize:14, fontWeight:700, cursor:canProceed?"pointer":"not-allowed", fontFamily:"inherit" }}>
+            Start Assessment →
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={styles.root}>
       <div style={styles.container}>
@@ -234,27 +288,13 @@ function StakeholderView({ token }) {
         </div>
         <div style={styles.moduleTag}>Leadership Brand Assessment</div>
         <h1 style={{ ...styles.title, fontSize: 22, marginBottom: 4 }}>
-          {invitation?.rater_role} Feedback
+          {raterRole || invitation?.rater_role} Feedback
         </h1>
         <p style={styles.subtitle}>
           You've been asked to provide feedback on <strong style={{ color: "#1a0a2e" }}>{invitation?.owner_name || invitation?.owner_email?.split("@")[0]}</strong>'s leadership. Rate each behaviour 1–5 and add comments where relevant.
         </p>
 
-        {/* Name fields */}
-        <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-          <div style={{ flex: 1 }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: "#2D1B4E", margin: "0 0 4px" }}>Your First Name *</p>
-            <input type="text" value={raterFirstName} onChange={(e) => setRaterFirstName(e.target.value)}
-              placeholder="First name"
-              style={{ width: "100%", padding: "8px 12px", background: "#fff", border: "1px solid rgba(45,27,78,0.2)", borderRadius: 8, color: "#2D1B4E", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: "#2D1B4E", margin: "0 0 4px" }}>Your Last Name *</p>
-            <input type="text" value={raterLastName} onChange={(e) => setRaterLastName(e.target.value)}
-              placeholder="Last name"
-              style={{ width: "100%", padding: "8px 12px", background: "#fff", border: "1px solid rgba(45,27,78,0.2)", borderRadius: 8, color: "#2D1B4E", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
-          </div>
-        </div>
+
 
         {/* Legend */}
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 24 }}>
@@ -291,9 +331,9 @@ function StakeholderView({ token }) {
                         const ri = RATING_LABELS[val];
                         return (
                           <button key={val} onClick={() => setRating(comp.id, val)}
-                            style={{ flex: 1, padding: "8px 4px", borderRadius: 8, border: selected ? `2px solid ${ri.color}` : "1.5px solid rgba(45,27,78,0.09)", background: selected ? ri.color + "22" : "rgba(45,27,78,0.04)", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                            <span style={{ fontSize: 15, fontWeight: 800, color: selected ? ri.color : "#9B8BAB" }}>{val}</span>
-                            <span style={{ fontSize: 8, color: selected ? ri.color : "#B0A0BF", fontWeight: 600 }}>{ri.label}</span>
+                            style={{ flex: 1, padding: "8px 4px", borderRadius: 8, border: selected ? `2px solid ${pillar.color}` : `1px solid ${pillar.color}44`, background: selected ? pillar.color + "20" : pillar.color + "08", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                            <span style={{ fontSize: 15, fontWeight: 800, color: pillar.color }}>{val}</span>
+                            <span style={{ fontSize: 8, color: pillar.color + "aa", fontWeight: 600 }}>{ri.label}</span>
                           </button>
                         );
                       })}
@@ -381,6 +421,11 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
   const [stakeholderData, setStakeholderData] = useState({}); // { raterId: { ratings, comments, strengths, development } }
   const [loadingStakeholders, setLoadingStakeholders] = useState(false);
 
+  const normalizeRoleKey = (role) => {
+    const map = { "peer": "peers", "direct report": "direct_reports", "line manager": "line_manager", "senior stakeholder": "senior_stakeholder" };
+    return map[role.toLowerCase()] || role.toLowerCase().replace(/\s+/g, '_');
+  };
+
   const loadStakeholderResponses = async () => {
     setLoadingStakeholders(true);
     try {
@@ -426,13 +471,13 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
               if (comms.length > 0) allComments[c.id] = comms.join(" | ");
             });
             const raterNames = filteredInvites.map(i => i.rater_name).filter(Boolean).join(", ");
-            const roleKey = role.toLowerCase().replace(/\s+/g, '_');
+            const roleKey = normalizeRoleKey(role);
             newData[roleKey] = { role, ratings: avgRatings, comments: allComments, strengths, development, count: invites.length, raterName: raterNames };
           }
         });
         const newStatusData = {};
         Object.entries(grouped).forEach(([role, invites]) => {
-          const roleKey = role.toLowerCase().replace(/\s+/g, '_');
+          const roleKey = normalizeRoleKey(role);
           const raterNames = invites.map(i => i.rater_name).filter(Boolean).join(", ");
           newStatusData[roleKey] = { role, count: invites.length, raterName: raterNames };
         });
@@ -446,6 +491,15 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
   };
   const [showInviteScreen, setShowInviteScreen] = useState(false);
   const [report, setReport] = useState(null);
+
+  // Load existing invite link from pending token
+  useEffect(() => {
+    if (!userInfo.email || generatedLink) return;
+    sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(userInfo.email)}&rater_role=eq.pending&completed=eq.false&select=token&limit=1`)
+      .then(data => {
+        if (data?.[0]?.token) setGeneratedLink(`${window.location.origin}?rate=${data[0].token}`);
+      }).catch(() => {});
+  }, [userInfo.email, screen]);
 
   // Auto-save self assessment progress to Supabase
   useEffect(() => {
@@ -553,8 +607,10 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
             if (comms.length > 0) avgComments[c.id] = comms.join(" | ");
           });
           const raterNames = invites.map(i => i.rater_name).filter(Boolean).join(", ");
-          const roleKey = role.toLowerCase().replace(/\s+/g, '_');
-          const entry = { role, ratings: avgRatings, comments: avgComments, strengths: strengthsList, development: developmentList, count: invites.length, raterName: raterNames, meetsMin: invites.length >= (isManager ? 1 : 3) };
+          const roleKey = normalizeRoleKey(role);
+          const isSr = role === "Senior Stakeholder";
+          const minReq = (isManager || isSr) ? 1 : 3;
+          const entry = { role, ratings: avgRatings, comments: avgComments, strengths: strengthsList, development: developmentList, count: invites.length, raterName: raterNames, meetsMin: invites.length >= minReq };
           newStatusData[roleKey] = entry;
           if (entry.meetsMin) freshStakeholderData[roleKey] = entry;
         });
@@ -731,14 +787,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
               headers: { "Prefer": "return=minimal" },
               body: JSON.stringify({ report_link: reportLink }),
             });
-            await loadEmailJS();
-            await window.emailjs.send(EMAILJS_SERVICE_ID, "template_7g57ixk", {
-              from_name: "Parity Coaching Platform",
-              rater_role: `New Report: ${userInfo.firstName} ${userInfo.lastName}`,
-              assessment_link: reportLink,
-              email: "sayhello@paritycoaching.org",
-            });
-            console.log("Report saved and emailed:", reportLink);
+            console.log("Report saved (email disabled for testing):", reportLink);
           }
         }
       } catch(emailErr) { console.error("Save/email failed:", emailErr); }
@@ -1126,11 +1175,11 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
       <div style="display:flex;gap:24px;margin-bottom:8px">
         <div style="flex:1;background:rgba(201,132,58,0.08);border:1px solid rgba(201,132,58,0.3);border-radius:10px;padding:20px">
           <div class="section-title" style="color:#C9843A;border-bottom-color:rgba(201,132,58,0.3)">Top 3 Behaviours</div>
-          ${topBehaviours.map((b,i) => `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="width:26px;height:26px;border-radius:50%;background:#C9843A;color:white;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">${i+1}</span><span style="flex:1;font-size:13px;font-weight:500;color:#2D1B4E">${b.name}</span><span style="font-size:13px;font-weight:700;color:#C9843A">${b.score}/5</span></div>`).join("")}
+          ${topBehaviours.map((b,i) => { const comp = COMPETENCIES.find(c => c.name === b.name); const comment = comp ? (lmRater?.comments?.[comp.id] || "") : ""; return `<div style="margin-bottom:10px"><div style="display:flex;align-items:center;gap:12px"><span style="width:26px;height:26px;border-radius:50%;background:#C9843A;color:white;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">${i+1}</span><span style="flex:1;font-size:13px;font-weight:500;color:#2D1B4E">${b.name}</span><span style="font-size:13px;font-weight:700;color:#C9843A">${b.score}/5</span></div>${comment ? `<p style="margin:3px 0 0 38px;font-size:11px;color:#6B5B7B">Line Manager Comment: <span style="font-style:italic;color:#4A3728">"${comment}"</span></p>` : ""}</div>`; }).join("")}
         </div>
         <div style="flex:1;background:rgba(91,45,142,0.06);border:1px solid rgba(91,45,142,0.3);border-radius:10px;padding:20px">
           <div class="section-title" style="color:#5B2D8E;border-bottom-color:rgba(91,45,142,0.3)">Bottom 3 Behaviours</div>
-          ${bottomBehaviours.map((b,i) => `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="width:26px;height:26px;border-radius:50%;background:#5B2D8E;color:white;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">${i+1}</span><span style="flex:1;font-size:13px;font-weight:500;color:#2D1B4E">${b.name}</span><span style="font-size:13px;font-weight:700;color:#5B2D8E">${b.score}/5</span></div>`).join("")}
+          ${bottomBehaviours.map((b,i) => { const comp = COMPETENCIES.find(c => c.name === b.name); const comment = comp ? (lmRater?.comments?.[comp.id] || "") : ""; return `<div style="margin-bottom:10px"><div style="display:flex;align-items:center;gap:12px"><span style="width:26px;height:26px;border-radius:50%;background:#5B2D8E;color:white;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">${i+1}</span><span style="flex:1;font-size:13px;font-weight:500;color:#2D1B4E">${b.name}</span><span style="font-size:13px;font-weight:700;color:#5B2D8E">${b.score}/5</span></div>${comment ? `<p style="margin:3px 0 0 38px;font-size:11px;color:#6B5B7B">Line Manager Comment: <span style="font-style:italic;color:#4A3728">"${comment}"</span></p>` : ""}</div>`; }).join("")}
         </div>
       </div>
     </div>
@@ -1606,7 +1655,11 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
   if (screen === 3.5) {
     const selfDone = Object.keys(ratings["self"] || {}).length >= COMPETENCIES.length;
     const hasManager = statusData["line_manager"]?.count > 0;
-    const canGenerate = selfDone && hasManager;
+    const hasSenior = statusData["senior_stakeholder"]?.count >= 1;
+    const hasPeers = statusData["peers"]?.count >= 3;
+    const hasDirectReports = statusData["direct_reports"]?.count >= 3;
+    const hasAnyStakeholder = hasManager || hasSenior || hasPeers || hasDirectReports;
+    const canGenerate = selfDone && hasAnyStakeholder;
 
     return (
       <div style={styles.root}>
@@ -1638,80 +1691,73 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           {/* Line Manager invite */}
           <div style={{ padding: "20px", background: "linear-gradient(135deg, rgba(45,27,78,0.05), rgba(201,132,58,0.05))", border: "1px solid rgba(201,132,58,0.3)", borderRadius: 14, marginBottom: 20 }}>
             <p style={{ margin: "0 0 4px", fontSize: 13, fontWeight: 700, color: "#2D1B4E", textTransform: "uppercase", letterSpacing: "0.5px" }}>Invite Stakeholders</p>
-            <p style={{ margin: "0 0 16px", fontSize: 12, color: "#8B7B9B" }}>Generate a private assessment link to share with your Line Manager</p>
+            <p style={{ margin: "0 0 4px", fontSize: 12, color: "#8B7B9B" }}>Generate a private assessment link to share with your stakeholders.</p>
+            <p style={{ margin: "0 0 12px", fontSize: 11, color: "#8B7B9B" }}>Minimum responses needed: Line Manager ×1 · Senior Stakeholder ×1 · Peers ×3 · Direct Reports ×3</p>
 
-            {inviteSent["line_manager"] ? (
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "#fff", borderRadius: 8, marginBottom: 10, border: "1px solid rgba(201,132,58,0.2)" }}>
-                  <span style={{ fontSize: 13, color: "#4A2D6E", fontWeight: 600 }}>Line Manager</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: statusData["line_manager"] ? "#C9843A" : "#8B7B9B" }}>
-                    {statusData["line_manager"] ? "✓ Completed" : "Awaiting response"}
+            {/* Status rows for all rater types */}
+            {[
+              { id: "line_manager", label: "Line Manager", minRequired: 1 },
+              { id: "senior_stakeholder", label: "Senior Stakeholder", minRequired: 1 },
+              { id: "peers", label: "Peers", minRequired: 3 },
+              { id: "direct_reports", label: "Direct Reports", minRequired: 3 },
+            ].map(({ id, label, minRequired }) => {
+              const status = statusData[id];
+              const meetsMin = status?.count >= minRequired;
+              return (
+                <div key={id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "#fff", borderRadius: 8, marginBottom: 8, border: "1px solid rgba(45,27,78,0.1)" }}>
+                  <span style={{ fontSize: 13, color: "#4A2D6E", fontWeight: 600 }}>{label}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: meetsMin ? "#C9843A" : status ? "#8B5A1E" : "#8B7B9B" }}>
+                    {status ? (meetsMin ? `${status.count} completed ✓` : `${status.count}/${minRequired} responses`) : "Awaiting response"}
                   </span>
                 </div>
-                {generatedLink && (
-                  <div style={{ padding: "12px 14px", background: "#fff", border: "1.5px solid #C9843A", borderRadius: 10, marginBottom: 12 }}>
-                    <p style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 700, color: "#C9843A" }}>Share this link with your Line Manager:</p>
-                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                      <input readOnly value={generatedLink}
-                        style={{ flex: 1, padding: "8px 10px", background: "#f9f6f2", border: "1px solid rgba(45,27,78,0.15)", borderRadius: 6, fontSize: 11, color: "#2D1B4E", fontFamily: "inherit", outline: "none" }} />
-                      <button onClick={() => { navigator.clipboard.writeText(generatedLink); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-                        style={{ padding: "8px 14px", background: "#2D1B4E", border: "none", borderRadius: 6, color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
-                        {copied ? "Copied!" : "Copy"}
-                      </button>
-                    </div>
-                  </div>
-                )}
-                <button onClick={async () => {
-                  try {
-                    await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(userInfo.email)}&rater_role=eq.Line%20Manager`, {
-                      method: "PATCH", headers: { "Prefer": "return=minimal" },
-                      body: JSON.stringify({ ratings: {}, comments: {} }),
-                    });
-                  } catch(e) {}
-                  setInviteSent(prev => { const n = {...prev}; delete n["line_manager"]; return n; });
-                  setInviteTokens(prev => { const n = {...prev}; Object.keys(n).filter(k => k.startsWith("line_manager")).forEach(k => delete n[k]); return n; });
-                  setInviteEmails(prev => ({ ...prev, line_manager: "" }));
-                  setNewInviteEmails(prev => ({ ...prev, line_manager: "" }));
-                  setGeneratedLink("");
-                  setStatusData({});
-                  setStakeholderData({});
-                }}
-                  style={{ fontSize: 12, color: "#E85D75", background: "none", border: "1px solid #E85D75", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: "inherit" }}>
-                  Replace Line Manager
+              );
+            })}
+
+
+
+
+          </div>
+
+          {/* Generate invitation link */}
+          {generatedLink ? (
+            <div style={{ padding: "12px 14px", background: "#fff", border: "1.5px solid #C9843A", borderRadius: 10, marginBottom: 12 }}>
+              <p style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 700, color: "#C9843A" }}>Share this link with your stakeholders:</p>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <input readOnly value={generatedLink}
+                  style={{ flex: 1, padding: "8px 10px", background: "#f9f6f2", border: "1px solid rgba(45,27,78,0.15)", borderRadius: 6, fontSize: 11, color: "#2D1B4E", fontFamily: "inherit", outline: "none" }} />
+                <button onClick={() => { navigator.clipboard.writeText(generatedLink); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+                  style={{ padding: "8px 14px", background: "#2D1B4E", border: "none", borderRadius: 6, color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+                  {copied ? "Copied!" : "Copy"}
                 </button>
               </div>
-            ) : (
-              <button onClick={async () => {
-                setInviteSending(true);
-                try {
+
+            </div>
+          ) : (
+            <button onClick={async () => {
+              setInviteSending(true);
+              try {
+                // Always reuse existing pending token for this user
+                const existing = await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(userInfo.email)}&rater_role=eq.pending&completed=eq.false&select=token&limit=1`);
+                let token = existing?.[0]?.token;
+                if (!token) {
                   const result = await sbFetch("/leadership_invitations", {
                     method: "POST",
-                    body: JSON.stringify({
-                      owner_email: userInfo.email || "",
-                      owner_name: `${userInfo.firstName} ${userInfo.lastName}`.trim(),
-                      owner_role: userInfo.role,
-                      rater_role: "Line Manager",
-                      rater_email: "pending",
-                    }),
+                    body: JSON.stringify({ owner_email: userInfo.email, owner_name: `${userInfo.firstName} ${userInfo.lastName}`.trim(), owner_role: userInfo.role, rater_role: "pending", rater_email: "pending" }),
                   });
-                  const token = result?.[0]?.token;
-                  if (token) {
-                    const link = `${window.location.origin}?rate=${token}`;
-                    setGeneratedLink(link);
-                    setInviteEmails(prev => ({ ...prev, line_manager: "invited" }));
-                    setInviteSent(prev => ({ ...prev, line_manager: 1 }));
-                    setInviteTokens(prev => ({ ...prev, [`line_manager_${token}`]: token }));
-                    setShowInviteSentPopup(true);
-                    setTimeout(() => setShowInviteSentPopup(false), 3000);
-                  }
-                } catch(e) { console.error(e); }
-                setInviteSending(false);
-              }} disabled={inviteSending}
-                style={{ ...styles.btnPrimary, width: "100%", opacity: inviteSending ? 0.7 : 1 }}>
-                {inviteSending ? "Generating..." : "Generate Invitation Link"}
-              </button>
-            )}
-          </div>
+                  token = result?.[0]?.token;
+                }
+                if (token) {
+                  const link = `${window.location.origin}?rate=${token}`;
+                  setGeneratedLink(link);
+                  setShowInviteSentPopup(true);
+                  setTimeout(() => setShowInviteSentPopup(false), 3000);
+                }
+              } catch(e) {}
+              setInviteSending(false);
+            }} style={{ ...styles.btnSecondary, width: "100%", marginBottom: 12 }}>
+              {inviteSending ? "Generating..." : "Generate Invitation Link"}
+            </button>
+          )}
 
           {/* Check responses */}
           <button onClick={loadStakeholderResponses} disabled={loadingStakeholders}
@@ -1731,7 +1777,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
 
           <button onClick={generateReport} disabled={!canGenerate || reportLoading}
             style={{ ...styles.btnPrimary, width: "100%", background: "linear-gradient(135deg, #5B2D8E, #2D1B4E)", opacity: canGenerate && !reportLoading ? 1 : 0.5 }}>
-            {reportLoading ? "Generating your report..." : `Generate Report (Self + Line Manager) →`}
+            {reportLoading ? "Generating your report..." : "Generate Report →"}
           </button>
         </div>
       </div>
@@ -1764,13 +1810,18 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           <div style={{ display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
             {PILLARS.map((pillar) => {
               const selfAvg = (pillar.competencies.reduce((sum, c) => sum + (selfRatings[c.id] || 0), 0) / pillar.competencies.length).toFixed(1);
-              const otherAvg = otherRaters.length > 0 ? (pillar.competencies.reduce((sum, c) => { const scores = otherRaters.map(r => ratings[r]?.[c.id] || 0).filter(s => s > 0); return sum + (scores.length > 0 ? scores.reduce((a,b)=>a+b,0)/scores.length : 0); }, 0) / pillar.competencies.length).toFixed(1) : null;
+              const allStakeholders = Object.values(stakeholderData);
+              const stakeholderVals = allStakeholders.map(s =>
+                pillar.competencies.reduce((sum, c) => sum + (s.ratings?.[c.id] || 0), 0) / pillar.competencies.length
+              ).filter(v => v > 0);
+              const othersAvg = stakeholderVals.length > 0 ? (stakeholderVals.reduce((a,b)=>a+b,0)/stakeholderVals.length).toFixed(1) : null;
+              const label = allStakeholders.length > 1 ? "Others Avg / 5.0" : allStakeholders.length === 1 ? `${allStakeholders[0].role} / 5.0` : "Self / 5.0";
               return (
                 <div key={pillar.id} style={{ flex: 1, minWidth: 120, padding: "14px", background: pillar.color + "12", border: `1px solid ${pillar.color}30`, borderRadius: 12, textAlign: "center" }}>
                   <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: pillar.color }}>{pillar.name}</p>
-                  <p style={{ margin: 0, fontSize: 28, fontWeight: 800, color: "#1a0a2e" }}>{selfAvg}</p>
-                  <p style={{ margin: "2px 0 0", fontSize: 12, color: "#8B7B9B" }}>Self / 5.0</p>
-                  {otherAvg && <p style={{ margin: "4px 0 0", fontSize: 12, color: "#6B5B7B" }}>Others: {otherAvg}</p>}
+                  <p style={{ margin: 0, fontSize: 28, fontWeight: 800, color: "#1a0a2e" }}>{othersAvg || selfAvg}</p>
+                  <p style={{ margin: "2px 0 0", fontSize: 12, color: "#8B7B9B" }}>{othersAvg ? label : "Self / 5.0"}</p>
+                  {othersAvg && <p style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 600, color: "#2D1B4E" }}>Self: {selfAvg}</p>}
                 </div>
               );
             })}
@@ -1831,6 +1882,48 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           </div>
 
 
+
+          {/* Top 3 / Bottom 3 */}
+          {(() => {
+            const lm = stakeholderData["line_manager"];
+            if (!lm?.ratings) return null;
+            const scored = COMPETENCIES.map(c => ({ name: c.name, id: c.id, score: lm.ratings[c.id] || 0 })).filter(b => b.score > 0).sort((a,b) => b.score - a.score);
+            if (scored.length === 0) return null;
+            const top3Score = scored[2]?.score;
+            const bottom3Score = scored[scored.length - 3]?.score;
+            const tops = top3Score ? scored.filter(b => b.score >= top3Score) : scored.slice(0, 3);
+            const bottoms = bottom3Score ? scored.filter(b => b.score <= bottom3Score) : scored.slice(-3).reverse();
+            return (
+              <div style={{ display:"flex", gap:12, marginBottom:24 }}>
+                <div style={{ flex:1, padding:"14px", background:"rgba(201,132,58,0.08)", border:"1px solid rgba(201,132,58,0.3)", borderRadius:12 }}>
+                  <p style={{ fontSize:11, fontWeight:700, color:"#C9843A", textTransform:"uppercase", letterSpacing:"0.8px", margin:"0 0 10px" }}>Top 3 Behaviours</p>
+                  {tops.map((b,i) => (
+                    <div key={b.name} style={{ marginBottom:8 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                        <span style={{ width:20, height:20, borderRadius:"50%", background:"#C9843A", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:800, flexShrink:0 }}>{i+1}</span>
+                        <span style={{ flex:1, fontSize:12, color:"#2D1B4E" }}>{b.name}</span>
+                        <span style={{ fontSize:12, fontWeight:700, color:"#C9843A" }}>{b.score}/5</span>
+                      </div>
+                      {lm.comments?.[b.id] && <p style={{ margin:"2px 0 0 28px", fontSize:10, color:"#6B5B7B" }}>Line Manager Comment: <span style={{ fontStyle:"italic", color:"#4A3728" }}>"{lm.comments[b.id]}"</span></p>}
+                    </div>
+                  ))}
+                </div>
+                <div style={{ flex:1, padding:"14px", background:"rgba(91,45,142,0.06)", border:"1px solid rgba(91,45,142,0.3)", borderRadius:12 }}>
+                  <p style={{ fontSize:11, fontWeight:700, color:"#5B2D8E", textTransform:"uppercase", letterSpacing:"0.8px", margin:"0 0 10px" }}>Bottom 3 Behaviours</p>
+                  {bottoms.map((b,i) => (
+                    <div key={b.name} style={{ marginBottom:8 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                        <span style={{ width:20, height:20, borderRadius:"50%", background:"#5B2D8E", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:800, flexShrink:0 }}>{i+1}</span>
+                        <span style={{ flex:1, fontSize:12, color:"#2D1B4E" }}>{b.name}</span>
+                        <span style={{ fontSize:12, fontWeight:700, color:"#5B2D8E" }}>{b.score}/5</span>
+                      </div>
+                      {lm.comments?.[b.id] && <p style={{ margin:"2px 0 0 28px", fontSize:10, color:"#6B5B7B" }}>Line Manager Comment: <span style={{ fontStyle:"italic", color:"#4A3728" }}>"{lm.comments[b.id]}"</span></p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Book a session */}
           <div style={{ padding: "20px 24px", background: "linear-gradient(135deg, rgba(201,132,58,0.12), rgba(38,70,83,0.2))", border: "1px solid rgba(201,132,58,0.25)", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 32 }}>
