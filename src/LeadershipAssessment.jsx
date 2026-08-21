@@ -187,19 +187,18 @@ function StakeholderView({ token }) {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      // If submitting as Line Manager, delete all previous completed LM rows for this owner
       const finalRole = raterRole || invitation?.rater_role;
-      const submitTokenForDelete = window._raterToken || token;
-      if (finalRole === "Line Manager" && invitation?.owner_email) {
-        try {
-          await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(invitation.owner_email)}&rater_role=eq.Line%20Manager&completed=eq.true&token=neq.${submitTokenForDelete}`, {
-            method: "DELETE",
-          });
-        } catch(e) { console.error("Failed to delete old LM:", e); }
+      // Always submit to the new rater-specific row, never the shared pending row
+      if (!raterToken) {
+        console.error("No raterToken - submission may fail");
       }
-
-      const submitToken = window._raterToken || token;
-      await sbFetch(`/leadership_invitations?token=eq.${submitToken}`, {
+      const submitToken2 = raterToken;
+      if (!submitToken2) {
+        alert("Something went wrong. Please refresh and try again.");
+        setSubmitting(false);
+        return;
+      }
+      await sbFetch(`/leadership_invitations?token=eq.${submitToken2}`, {
         method: "PATCH",
         body: JSON.stringify({
           ratings,
@@ -271,7 +270,32 @@ function StakeholderView({ token }) {
             <option value="Peer">Peer</option>
             <option value="Direct Report">Direct Report</option>
           </select>
-          <button onClick={() => { if (canProceed) setIntroComplete(true); }} disabled={!canProceed}
+          <button onClick={async () => {
+            if (!canProceed) return;
+            try {
+              const existing = await sbFetch(`/leadership_invitations?token=eq.${token}&select=owner_email,owner_name,owner_role&limit=1`);
+              const orig = existing?.[0];
+              if (orig) {
+                const newRow = await sbFetch("/leadership_invitations", {
+                  method: "POST",
+                  headers: { "Prefer": "return=representation" },
+                  body: JSON.stringify({
+                    owner_email: orig.owner_email,
+                    owner_name: orig.owner_name,
+                    owner_role: orig.owner_role,
+                    rater_role: raterRole,
+                    rater_email: "via_link",
+                    rater_name: `${raterFirstName} ${raterLastName}`.trim(),
+                  }),
+                });
+                if (newRow?.[0]?.token) {
+                  setRaterToken(newRow[0].token);
+                  console.log("Created rater row:", newRow[0].token);
+                }
+              }
+            } catch(e) { console.error("Failed to create rater row:", e); }
+            setIntroComplete(true);
+          }} disabled={!canProceed}
             style={{ width:"100%", padding:"14px", background:canProceed?"linear-gradient(135deg, #2D1B4E, #5B2D8E)":"rgba(45,27,78,0.1)", border:"none", borderRadius:10, color:canProceed?"#fff":"#8B7B9B", fontSize:14, fontWeight:700, cursor:canProceed?"pointer":"not-allowed", fontFamily:"inherit" }}>
             Start Assessment →
           </button>
@@ -431,8 +455,8 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
     try {
       // Query by owner email if logged in, otherwise query by rater emails we invited
       let data = [];
-      if (currentUser?.email) {
-        data = await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(currentUser.email)}&completed=eq.true&select=*`) || [];
+      if (userInfo.email) {
+        data = await sbFetch(`/leadership_invitations?owner_email=eq.${encodeURIComponent(userInfo.email)}&completed=eq.true&select=*`) || [];
       }
       // Also check by individual tokens we have stored (catches anonymous invitations)
       const tokens = Object.values(inviteTokens);
