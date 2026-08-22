@@ -680,100 +680,12 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
           if (scores.length === 0) return null;
           return `${r.name}=${(scores.reduce((a,b) => a+b, 0)/scores.length).toFixed(1)}`;
         }).filter(Boolean).join(", ");
-        return `- ${p.name}: Self=${selfAvg}/5${stakeholderBreakdown ? ` [${stakeholderBreakdown}]` : ""}`;
-      }).join("\n");
-
-      // All strengths and development feedback from all raters
-      const strengthsFeedback = allRaterData.filter(r => r.strengths?.trim()).map(r => `${r.name}: ${r.strengths}`).join("\n");
-      const developmentFeedback = allRaterData.filter(r => r.development?.trim()).map(r => `${r.name}: ${r.development}`).join("\n");
-
-      const valuesContext = coreValues.length > 0
-        ? `Their core values are: ${coreValues.join(", ")}.`
-        : "";
-
-      // Calculate top 3 and bottom 3 using ALL rater scores (self + stakeholders)
-      const behaviourScores = COMPETENCIES.map((c) => {
-        const selfScore = selfRatings[c.id] || 0;
-        const otherScores = otherRaters.map(r => r.ratings[c.id] || 0).filter(s => s > 0);
-        const avgOthers = otherScores.length > 0 ? otherScores.reduce((a, b) => a + b, 0) / otherScores.length : selfScore;
-        const combinedAvg = otherScores.length > 0 ? (selfScore + avgOthers) / 2 : selfScore;
-        return { name: c.name, selfScore, avgOthers: otherScores.length > 0 ? avgOthers : null, combinedAvg };
-      }).sort((a, b) => b.combinedAvg - a.combinedAvg);
-
-      const top3 = behaviourScores.slice(0, 3).map(b => b.name);
-      const bottom3 = behaviourScores.slice(-3).map(b => b.name);
-
-      const stakeholderCount = otherRaters.length;
-      const prompt = `You are an executive leadership coach analysing a 360-degree leadership assessment using the Parity Coaching Leadership Competency Framework.
-
-Seniority level: ${SENIORITY_LEVELS.find(s => s.id === seniority)?.label}
-${valuesContext}
-Number of stakeholders who provided feedback: ${stakeholderCount} (${otherRaters.map(r => r.name).join(", ") || "Self only"})
-
-Pillar Scores (Self vs each stakeholder group):
-${pillarLines}
-
-Individual Behaviour Ratings with Stakeholder Breakdown and Comments:
-${competencyLines}
-
-Top 3 highest-rated behaviours by Line Manager: ${top3.join(", ")}
-Bottom 3 lowest-rated behaviours by Line Manager: ${bottom3.join(", ")}
-
-${strengthsFeedback ? `Qualitative Strengths Feedback:\n${strengthsFeedback}` : ""}
-${developmentFeedback ? `Qualitative Development Feedback:\n${developmentFeedback}` : ""}
-
-IMPORTANT: Base your coaching goals primarily on the STAKEHOLDER feedback and comments, not just self-assessment. Note any significant gaps between self-perception and stakeholder scores.
-
-Generate a detailed leadership report. Adopting ICF MCC accreditation standards, generate EXACTLY 5 coaching goal options for the client to reflect on and choose from.
-
-STYLE GUIDE - strictly follow this example format from Wilson's coaching practice:
-
-EXAMPLE GOAL (do NOT copy this, use it as style reference only):
-Title: "Shifting from Executor to Strategic Contributor"
-Objective: "To elevate the client's ability to move beyond operational execution and actively shape strategic direction. This addresses the Capacity pillar's low scores in strategic mindset (2/5) and the overall Capacity average of 2.8, which is the weakest of the three pillars."
-Client benefits: "Greater confidence and credibility in senior-level discussions; a sense of being valued not just for getting things done but for shaping the agenda itself; reduced frustration from feeling stuck in execution while others set direction."
-Org benefits: "Stronger alignment between the client's work and the company's long-term vision; more robust strategic conversations with diverse input; faster identification of emerging opportunities and risks because the client is thinking ahead rather than just responding."
-
-ANOTHER EXAMPLE:
-Title: "Combining Resilience with Strategic Patience"
-Objective: "To help the client balance their natural strength in action and decisiveness (Delivery average 4.0) with more deliberate strategic reflection, avoiding the trap of doing more instead of thinking differently."
-Client benefits: "Reduced burnout from over-reliance on hustle and persistence; better-quality decisions from allowing space for reflection; a more sustainable approach to challenges that leverages both action and insight."
-Org benefits: "More thoughtful, less reactive leadership; better resource allocation because time and energy are invested in the right priorities; a leadership culture that models the value of reflection alongside execution."
-
-RULES for your 5 goals:
-- Titles must signal an IDENTITY SHIFT, not a skill improvement. Use "from X to Y" or "Combining X with Y" structures.
-- Each objective MUST reference the specific pillar average and behaviour score from this client's actual data.
-- Benefits must be emotional AND professional for the client, and business-impact focused for the org.
-- Cover different pillars and dimensions — do not write 5 goals about the same issue.
-- Base goals on the LOWEST scoring behaviours and WEAKEST pillars from the actual data provided.
-
-Respond ONLY in this exact JSON format with no other text:
-{
-  "headline": "A 1-sentence leadership statement capturing both strengths and growth edge",
-  "top3": ["highest rated behaviour 1", "highest rated behaviour 2", "highest rated behaviour 3"],
-  "bottom3": ["lowest rated behaviour 1", "lowest rated behaviour 2", "lowest rated behaviour 3"],
-  "coaching_goals": [
-    {
-      "title": "Aspirational goal title that signals identity shift",
-      "objective": "1-2 sentences referencing the specific pillar average and behaviour score",
-      "client_benefits": "2-3 emotional and professional benefits for this leader personally",
-      "org_benefits": "2-3 specific business impact benefits for the organisation",
-      "based_on": "specific behaviour or pillar name"
-    }
-  ]
-}`;
-
-      const response = await fetch(window.location.hostname === "localhost" ? "/openai/v1/chat/completions" : "/api/openai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer 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",
-        },
-        body: JSON.stringify({
-          model: "gpt-4o",
-          max_tokens: 2000,
-          messages: [{ role: "user", content: prompt }],
-        }),
+        const behaviourList = p.competencies.map(c => {
+          const stakeholderScores = otherRaters.map(r => r.ratings[c.id] || 0).filter(s => s > 0);
+          const avg = stakeholderScores.length > 0 ? (stakeholderScores.reduce((a,b)=>a+b,0)/stakeholderScores.length).toFixed(1) : "N/A";
+          return `  - ${c.name} [${p.name} pillar]: Self=${selfRatings[c.id]||0}/5, Stakeholder avg=${avg}/5`;
+        }).join("\n");
+        return `${p.name} pillar: Self avg=${selfAvg}/5${stakeholderBreakdown ? `, Stakeholders: ${stakeholderBreakdown}` : ""}\nBehaviours:\n${behaviourList}`;
       });
 
       const data = await response.json();
