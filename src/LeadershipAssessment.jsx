@@ -515,6 +515,7 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
   };
   const [showInviteScreen, setShowInviteScreen] = useState(false);
   const [report, setReport] = useState(null);
+  const [selectedGoals, setSelectedGoals] = useState([]);
 
   // Load existing invite link from pending token
   useEffect(() => {
@@ -723,31 +724,20 @@ ${developmentFeedback ? `Qualitative Development Feedback:\n${developmentFeedbac
 
 IMPORTANT: Base your coaching goals primarily on the STAKEHOLDER feedback and comments, not just self-assessment. Note any significant gaps between self-perception and stakeholder scores. Reference specific stakeholder comments in your suggestions where possible.
 
-Generate a detailed leadership report. Respond ONLY in this exact JSON format with no other text:
+Generate a detailed leadership report. Adopting ICF MCC accreditation standards, generate EXACTLY 5 coaching goal options for the client to reflect on and choose from, each grounded in the actual scores. Respond ONLY in this exact JSON format with no other text:
 {
   "headline": "A 1-sentence leadership statement",
   "top3": ["highest rated behaviour 1", "highest rated behaviour 2", "highest rated behaviour 3"],
   "bottom3": ["lowest rated behaviour 1", "lowest rated behaviour 2", "lowest rated behaviour 3"],
   "coaching_goals": [
     {
-      "goal": "Coaching goal targeting the first bottom behaviour",
-      "based_on": "name of the bottom behaviour",
-      "actions": ["specific action 1", "specific action 2", "specific action 3"]
-    },
-    {
-      "goal": "Coaching goal targeting the second bottom behaviour",
-      "based_on": "name of the bottom behaviour",
-      "actions": ["specific action 1", "specific action 2", "specific action 3"]
-    },
-    {
-      "goal": "Coaching goal targeting the third bottom behaviour",
-      "based_on": "name of the bottom behaviour",
-      "actions": ["specific action 1", "specific action 2", "specific action 3"]
+      "title": "Goal title (e.g. Shifting from Executor to Strategic Contributor)",
+      "objective": "1-2 sentences on what this goal aims to achieve, referencing specific scores or behaviours",
+      "client_benefits": "2-3 key benefits for the client personally",
+      "org_benefits": "2-3 key benefits for the organisation",
+      "based_on": "behaviour or pillar name this is based on"
     }
-  ],
-  "strengths": ["key strength 1", "key strength 2", "key strength 3"],
-  "values_alignment": "2-3 sentences connecting leadership style to core values",
-  "comments_summary": "2-3 sentences summarising the qualitative feedback from comments and stated strengths/development areas"
+  ]
 }`;
 
       const response = await fetch(window.location.hostname === "localhost" ? "/openai/v1/chat/completions" : "/api/openai", {
@@ -767,6 +757,17 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
       const text = data.choices?.[0]?.message?.content || "";
       const clean = text.replace(/```json|```/g, "").trim();
       const parsed = clean ? JSON.parse(clean) : {};
+      // Ensure coaching_goals always populated
+      if (!parsed.coaching_goals?.length) {
+        parsed.coaching_goals = [
+          { title: "Strengthen Talent Development", objective: "Build a more structured approach to developing and growing your team members.", client_benefits: "A stronger personal brand as a leader who invests in others; deeper trust across the organisation.", org_benefits: "Improved retention as colleagues feel valued and mentored; a healthier talent pipeline.", based_on: "Talent Development" },
+          { title: "Build a Conflict Resolution Framework", objective: "Develop a consistent, constructive approach to resolving conflicts within your team and with peers.", client_benefits: "Reduced stress from unresolved tension; stronger working relationships.", org_benefits: "A healthier team culture and faster resolution of blockers.", based_on: "Conflict Resolution" },
+          { title: "Strengthen Strategic Contribution", objective: "Increase your visibility and influence in strategic discussions with senior stakeholders.", client_benefits: "Greater confidence and credibility in senior-level discussions.", org_benefits: "Stronger alignment between your work and the company long-term vision.", based_on: "Strategic Problem Solving" },
+          { title: "Shift from Executor to Strategic Contributor", objective: "Move beyond operational execution to actively shape strategic direction.", client_benefits: "A sense of being valued for shaping the agenda, not just delivering on it.", org_benefits: "More robust strategic conversations with diverse input.", based_on: "Strategic Mindset" },
+          { title: "Challenge the Status Quo Constructively", objective: "Develop the confidence and skill to question existing practices and assumptions.", client_benefits: "Increased influence and visibility as someone who brings fresh perspectives.", org_benefits: "A culture more open to innovation and continuous improvement.", based_on: "Innovation & Challenge" },
+        ];
+      }
+
       // Ensure top3/bottom3 always populated from LM data
       if (!parsed.top3?.length || !parsed.bottom3?.length) {
         const lmData2 = freshStakeholderData["line_manager"];
@@ -775,6 +776,7 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
         parsed.bottom3 = [...scores2].reverse().slice(0, 3).map(b => b.name);
       }
       setReport(parsed);
+      setSelectedGoals([]);
       setScreen(4);
 
       // Save report to Supabase and email link
@@ -890,9 +892,11 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
         top3: [],
         bottom3: [],
         coaching_goals: [
-          { goal: "Build a structured talent development practice", based_on: "Talent Development", actions: ["Schedule monthly 1:1 coaching conversations with each team member", "Create individual development plans for your top 3 team members", "Identify one stretch assignment per quarter for high-potential team members"] },
-          { goal: "Develop a conflict resolution framework", based_on: "Conflict Resolution", actions: ["Practice the SBI (Situation-Behaviour-Impact) model in difficult conversations", "Seek mediation training or coaching", "Address conflicts within 48 hours rather than letting them escalate"] },
-          { goal: "Strengthen strategic contribution with senior stakeholders", based_on: "Strategic Problem Solving", actions: ["Prepare one strategic insight to share at each senior leadership meeting", "Request to join cross-functional strategic working groups", "Read one business strategy book per quarter and share learnings"] },
+          { title: "Strengthen Talent Development", objective: "Build a more structured approach to developing and growing your team members.", client_benefits: "A stronger personal brand as a leader who invests in others; deeper trust across the organisation.", org_benefits: "Improved retention as colleagues feel valued and mentored; a healthier talent pipeline.", based_on: "Talent Development" },
+          { title: "Build a Conflict Resolution Framework", objective: "Develop a consistent, constructive approach to resolving conflicts within your team and with peers.", client_benefits: "Reduced stress from unresolved tension; stronger working relationships.", org_benefits: "A healthier team culture and faster resolution of blockers.", based_on: "Conflict Resolution" },
+          { title: "Strengthen Strategic Contribution", objective: "Increase your visibility and influence in strategic discussions with senior stakeholders.", client_benefits: "Greater confidence and credibility in senior-level discussions.", org_benefits: "Stronger alignment between your work and the company's long-term vision.", based_on: "Strategic Problem Solving" },
+          { title: "Shift from Executor to Strategic Contributor", objective: "Move beyond operational execution to actively shape strategic direction.", client_benefits: "A sense of being valued for shaping the agenda, not just delivering on it.", org_benefits: "More robust strategic conversations with diverse input.", based_on: "Strategic Mindset" },
+          { title: "Challenge the Status Quo Constructively", objective: "Develop the confidence and skill to question existing practices and assumptions.", client_benefits: "Increased influence and visibility as someone who brings fresh perspectives.", org_benefits: "A culture more open to innovation and continuous improvement.", based_on: "Innovation & Challenge" },
         ],
         strengths: ["Strong accountability and delivery", "Collaborative relationship building", "Clear communication"],
         values_alignment: "Your leadership style reflects your core values through consistent delivery and authentic relationships.",
@@ -1209,6 +1213,24 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
     </div>
 
     <div class="section">
+      <!-- Coaching Goals -->
+      ${(() => {
+        const goalsToShow = (selectedGoals && selectedGoals.length > 0)
+          ? selectedGoals.map(i => useReport.coaching_goals?.[i]).filter(Boolean)
+          : (useReport.coaching_goals || []);
+        if (!goalsToShow.length) return "";
+        return `<div class="section">
+          <div class="section-title">Coaching Goals</div>
+          ${goalsToShow.map((g, i) => `
+            <div style="padding:16px;background:#FDF8F3;border:1px solid rgba(201,132,58,0.3);border-radius:10px;margin-bottom:14px;">
+              <h4 style="margin:0 0 8px;font-size:15px;color:#2D1B4E;font-weight:700">Goal ${i+1}: ${g.title || g.goal || ""}</h4>
+              ${g.objective ? `<p style="margin:0 0 8px;font-size:13px;color:#4A3728;line-height:1.6"><strong>Objective:</strong> ${g.objective}</p>` : ""}
+              ${g.client_benefits ? `<p style="margin:0 0 8px;font-size:13px;color:#2D1B4E;line-height:1.6"><strong>Benefits for you:</strong> ${g.client_benefits}</p>` : ""}
+              ${g.org_benefits ? `<p style="margin:0;font-size:13px;color:#2D1B4E;line-height:1.6"><strong>Benefits for the organisation:</strong> ${g.org_benefits}</p>` : ""}
+            </div>`).join("")}
+        </div>`;
+      })()}
+
       <div class="section-title">Qualitative Feedback</div>
       ${allStrengths.length > 0 ? `
         <p style="font-size:13px;font-weight:700;margin-bottom:8px;color:#C9843A">Greatest Strengths</p>
@@ -1962,8 +1984,50 @@ Generate a detailed leadership report. Respond ONLY in this exact JSON format wi
           </div>
 
 
+          {/* Coaching Goals Selection */}
+          {report?.coaching_goals?.length > 0 && (
+            <div style={{ marginBottom: 24 }}>
+              <p style={{ color: "#2D1B4E", fontSize: 14, fontWeight: 700, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: 0.5 }}>Coaching Goals</p>
+              <p style={{ color: "#8B7B9B", fontSize: 12, margin: "0 0 16px", lineHeight: 1.5 }}>Select 2-3 goals that resonate most. These will appear in your PDF report.</p>
+              <div style={{ padding: "12px 16px", background: "rgba(91,45,142,0.05)", border: "1px solid rgba(91,45,142,0.15)", borderRadius: 10, marginBottom: 16 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: "#5B2D8E", margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 0.5 }}>Reflect before choosing</p>
+                {["Which goal, if achieved, would have the most meaningful impact on your work and sense of fulfilment?",
+                  "Which goal makes you feel the most uncomfortable — and could that discomfort point to your most important growth area?",
+                  "If you looked back 12 months from now, which achievement would make you most proud?",
+                  "What would you choose if no one else's expectations were influencing your answer?"].map((q, i) => (
+                  <p key={i} style={{ fontSize: 12, color: "#4A2D6E", margin: "0 0 6px", lineHeight: 1.5 }}>• {q}</p>
+                ))}
+              </div>
+              {report.coaching_goals.map((goal, i) => {
+                const isSelected = (selectedGoals || []).includes(i);
+                return (
+                  <div key={i} onClick={() => {
+                    const current = selectedGoals || [];
+                    if (isSelected) setSelectedGoals(current.filter(g => g !== i));
+                    else if (current.length < 3) setSelectedGoals([...current, i]);
+                  }}
+                    style={{ padding: "14px 16px", marginBottom: 10, borderRadius: 12, border: isSelected ? "2px solid #C9843A" : "1px solid rgba(45,27,78,0.12)", background: isSelected ? "rgba(201,132,58,0.06)" : "#fff", cursor: "pointer" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: isSelected ? "#C9843A" : "#2D1B4E" }}>Goal {i+1}: {goal.title || goal.goal}</p>
+                      </div>
+                      <div style={{ width: 22, height: 22, borderRadius: "50%", border: isSelected ? "none" : "2px solid rgba(45,27,78,0.2)", background: isSelected ? "#C9843A" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        {isSelected && <span style={{ color: "#fff", fontSize: 12, fontWeight: 800 }}>✓</span>}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              {(selectedGoals || []).length > 0 && (
+                <p style={{ fontSize: 12, color: "#C9843A", fontWeight: 600, textAlign: "center", margin: "8px 0 0" }}>
+                  {(selectedGoals || []).length} goal{(selectedGoals || []).length !== 1 ? "s" : ""} selected (max 3)
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Generate PDF Report */}
-          <button onClick={() => { console.log("report state:", JSON.stringify(report).slice(0,200)); generatePDFReport(); }}
+          <button onClick={() => generatePDFReport()}
             style={{ ...styles.btnPrimary, width: "100%", marginBottom: 12, background: "linear-gradient(135deg, #2D1B4E, #C9843A)" }}>
             Generate PDF Report
           </button>
