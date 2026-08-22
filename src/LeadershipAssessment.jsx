@@ -724,18 +724,25 @@ ${developmentFeedback ? `Qualitative Development Feedback:\n${developmentFeedbac
 
 IMPORTANT: Base your coaching goals primarily on the STAKEHOLDER feedback and comments, not just self-assessment. Note any significant gaps between self-perception and stakeholder scores. Reference specific stakeholder comments in your suggestions where possible.
 
-Generate a detailed leadership report. Adopting ICF MCC accreditation standards, generate EXACTLY 5 coaching goal options for the client to reflect on and choose from, each grounded in the actual scores. Respond ONLY in this exact JSON format with no other text:
+Generate a detailed leadership report. Adopting ICF MCC accreditation standards, generate EXACTLY 5 coaching goal options for the client to reflect on and choose from. Each goal must:
+- Be grounded in the actual pillar averages and specific behaviour scores
+- Use aspirational, growth-oriented language (not just "improve X")
+- Reference the specific pillar (Delivery/Capacity/People) it addresses
+- Provide meaningful, distinct benefits for the client AND the organisation
+- Follow this style: Goal titles like "Shifting from Executor to Strategic Contributor", "Building Confidence to Challenge the Status Quo", "Developing Talent and Growing Others"
+
+Respond ONLY in this exact JSON format with no other text:
 {
   "headline": "A 1-sentence leadership statement",
   "top3": ["highest rated behaviour 1", "highest rated behaviour 2", "highest rated behaviour 3"],
   "bottom3": ["lowest rated behaviour 1", "lowest rated behaviour 2", "lowest rated behaviour 3"],
   "coaching_goals": [
     {
-      "title": "Goal title (e.g. Shifting from Executor to Strategic Contributor)",
-      "objective": "1-2 sentences on what this goal aims to achieve, referencing specific scores or behaviours",
-      "client_benefits": "2-3 key benefits for the client personally",
-      "org_benefits": "2-3 key benefits for the organisation",
-      "based_on": "behaviour or pillar name this is based on"
+      "title": "Goal title (aspirational, e.g. Shifting from Executor to Strategic Contributor)",
+      "objective": "1-2 sentences on what this goal aims to achieve, referencing the specific score or pillar (e.g. This addresses the Capacity pillar average of X and the low score on Y behaviour)",
+      "client_benefits": "2-3 specific benefits for this leader personally, written in second person",
+      "org_benefits": "2-3 specific benefits for the organisation, written with business impact language",
+      "based_on": "specific behaviour or pillar name"
     }
   ]
 }`;
