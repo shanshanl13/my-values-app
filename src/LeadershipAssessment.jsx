@@ -688,6 +688,68 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
         return `${p.name} pillar: Self avg=${selfAvg}/5${stakeholderBreakdown ? `, Stakeholders: ${stakeholderBreakdown}` : ""}\nBehaviours:\n${behaviourList}`;
       });
 
+      const behaviourScores2 = COMPETENCIES.map(c => {
+        const otherScores = otherRaters.map(r => r.ratings[c.id] || 0).filter(s => s > 0);
+        const avg = otherScores.length > 0 ? otherScores.reduce((a,b)=>a+b,0)/otherScores.length : 0;
+        const pillar = PILLARS.find(p => p.competencies.some(pc => pc.id === c.id));
+        return { name: c.name, avg, pillar: pillar?.name || "" };
+      }).filter(b => b.avg > 0).sort((a,b) => b.avg - a.avg);
+      const topScore2 = behaviourScores2[2]?.avg;
+      const bottomScore2 = behaviourScores2[behaviourScores2.length-3]?.avg;
+      const topBehaviours2 = topScore2 ? behaviourScores2.filter(b => b.avg >= topScore2) : behaviourScores2.slice(0,3);
+      const bottomBehaviours2 = bottomScore2 ? behaviourScores2.filter(b => b.avg <= bottomScore2) : behaviourScores2.slice(-3).reverse();
+
+      const prompt = `You are an executive leadership coach analysing a 360-degree leadership assessment using the Parity Coaching Leadership Competency Framework.
+
+Leader: ${userInfo.firstName} ${userInfo.lastName} (${userInfo.role})
+Number of stakeholder groups: ${otherRaters.length}
+
+CRITICAL PILLAR-BEHAVIOUR MAPPING (never mix these up):
+- DELIVERY pillar: Track Record of Delivery, Sound Decision Making, Perseverance, Composure & Learning, Change Implementation
+- CAPACITY pillar: Strategic Mindset, Innovation & Challenge, Broader Organisational Impact, Curiosity & Stakeholder Engagement, Strategic Problem Solving
+- PEOPLE pillar: Effective Delegation, Talent Development, Peer Collaboration, Senior Stakeholder Relationships, Conflict Resolution
+
+Pillar scores with behaviour breakdown:
+${pillarLines.join("
+
+")}
+
+Top behaviours (highest stakeholder scores): ${topBehaviours2.map(b => `${b.name} (${b.pillar}, ${b.avg.toFixed(1)}/5)`).join(", ")}
+Bottom behaviours (lowest stakeholder scores): ${bottomBehaviours2.map(b => `${b.name} (${b.pillar}, ${b.avg.toFixed(1)}/5)`).join(", ")}
+
+${strengthsFeedback ? `Qualitative Strengths: ${strengthsFeedback}` : ""}
+${developmentFeedback ? `Qualitative Development Areas: ${developmentFeedback}` : ""}
+
+STYLE GUIDE - follow Wilson's ICF MCC coaching philosophy:
+- Goal titles must signal IDENTITY SHIFT: use "From X to Y" or "Combining X with Y" structures
+- Example good titles: "Shifting from Executor to Strategic Contributor", "Combining Resilience with Strategic Patience", "Moving from Personal Excellence to Systemic Influence"
+- Objectives MUST reference the specific pillar name and behaviour score from the data above
+- Client benefits: emotional AND professional, written in second person, e.g. "Greater confidence and credibility; reduced frustration from feeling stuck in execution"
+- Org benefits: specific business impact, e.g. "More cohesive decision-making; faster identification of emerging risks"
+- Cover DIFFERENT pillars — do not write 5 goals about the same issue
+
+Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
+{
+  "headline": "A 1-sentence leadership statement",
+  "top3": ["top behaviour 1", "top behaviour 2", "top behaviour 3"],
+  "bottom3": ["bottom behaviour 1", "bottom behaviour 2", "bottom behaviour 3"],
+  "coaching_goals": [
+    {
+      "title": "Aspirational identity-shift title",
+      "objective": "1-2 sentences referencing the specific pillar name and behaviour score",
+      "client_benefits": "2-3 emotional and professional benefits in second person",
+      "org_benefits": "2-3 specific business impact benefits",
+      "based_on": "specific behaviour name and pillar"
+    }
+  ]
+}`;
+
+      const response = await fetch(window.location.hostname === "localhost" ? "/openai/v1/chat/completions" : "/api/openai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}` },
+        body: JSON.stringify({ model: "gpt-4o-mini", max_tokens: 2000, messages: [{ role: "user", content: prompt }] })
+      });
+
       const data = await response.json();
       const text = data.choices?.[0]?.message?.content || "";
       const clean = text.replace(/```json|```/g, "").trim();
