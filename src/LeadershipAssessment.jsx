@@ -726,13 +726,26 @@ IMPORTANT: Base your coaching goals primarily on the STAKEHOLDER feedback and co
 
 Generate a detailed leadership report. Adopting ICF MCC accreditation standards, generate EXACTLY 5 coaching goal options for the client to reflect on and choose from.
 
-STYLE GUIDE - follow Wilson's coaching philosophy exactly:
-- Goal titles must be identity-shifting and aspirational, NOT skill-based. Good examples: "Shifting from Executor to Strategic Contributor", "Building Confidence and Capability to Challenge the Status Quo", "Developing Talent and Growing Others", "Moving from Personal Excellence to Systemic Influence", "Combining Resilience with Strategic Patience". Bad examples: "Boosting Perseverance", "Improving Peer Collaboration".
-- Objectives must reference the SPECIFIC pillar average AND the specific behaviour score causing concern. E.g. "This addresses the People pillar average of 3.0 and the low score on Peer Collaboration (1/5)."
-- Client benefits must be written in second person and describe emotional/identity benefits, not just skill gains. E.g. "Greater confidence and credibility in senior discussions; a sense of being valued not just for delivering but for shaping direction."
-- Org benefits must describe business impact with specificity. E.g. "More cohesive team dynamics; faster identification of emerging risks because diverse perspectives are surfaced."
-- Each goal should address a DIFFERENT dimension — avoid 5 goals all targeting the same pillar.
-- Consider the PILLAR STORY: which pillar is weakest? Which is strongest? What does the gap between self and stakeholder scores reveal?
+STYLE GUIDE - strictly follow this example format from Wilson's coaching practice:
+
+EXAMPLE GOAL (do NOT copy this, use it as style reference only):
+Title: "Shifting from Executor to Strategic Contributor"
+Objective: "To elevate the client's ability to move beyond operational execution and actively shape strategic direction. This addresses the Capacity pillar's low scores in strategic mindset (2/5) and the overall Capacity average of 2.8, which is the weakest of the three pillars."
+Client benefits: "Greater confidence and credibility in senior-level discussions; a sense of being valued not just for getting things done but for shaping the agenda itself; reduced frustration from feeling stuck in execution while others set direction."
+Org benefits: "Stronger alignment between the client's work and the company's long-term vision; more robust strategic conversations with diverse input; faster identification of emerging opportunities and risks because the client is thinking ahead rather than just responding."
+
+ANOTHER EXAMPLE:
+Title: "Combining Resilience with Strategic Patience"
+Objective: "To help the client balance their natural strength in action and decisiveness (Delivery average 4.0) with more deliberate strategic reflection, avoiding the trap of doing more instead of thinking differently."
+Client benefits: "Reduced burnout from over-reliance on hustle and persistence; better-quality decisions from allowing space for reflection; a more sustainable approach to challenges that leverages both action and insight."
+Org benefits: "More thoughtful, less reactive leadership; better resource allocation because time and energy are invested in the right priorities; a leadership culture that models the value of reflection alongside execution."
+
+RULES for your 5 goals:
+- Titles must signal an IDENTITY SHIFT, not a skill improvement. Use "from X to Y" or "Combining X with Y" structures.
+- Each objective MUST reference the specific pillar average and behaviour score from this client's actual data.
+- Benefits must be emotional AND professional for the client, and business-impact focused for the org.
+- Cover different pillars and dimensions — do not write 5 goals about the same issue.
+- Base goals on the LOWEST scoring behaviours and WEAKEST pillars from the actual data provided.
 
 Respond ONLY in this exact JSON format with no other text:
 {
