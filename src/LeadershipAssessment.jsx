@@ -722,26 +722,29 @@ Bottom 3 lowest-rated behaviours by Line Manager: ${bottom3.join(", ")}
 ${strengthsFeedback ? `Qualitative Strengths Feedback:\n${strengthsFeedback}` : ""}
 ${developmentFeedback ? `Qualitative Development Feedback:\n${developmentFeedback}` : ""}
 
-IMPORTANT: Base your coaching goals primarily on the STAKEHOLDER feedback and comments, not just self-assessment. Note any significant gaps between self-perception and stakeholder scores. Reference specific stakeholder comments in your suggestions where possible.
+IMPORTANT: Base your coaching goals primarily on the STAKEHOLDER feedback and comments, not just self-assessment. Note any significant gaps between self-perception and stakeholder scores.
 
-Generate a detailed leadership report. Adopting ICF MCC accreditation standards, generate EXACTLY 5 coaching goal options for the client to reflect on and choose from. Each goal must:
-- Be grounded in the actual pillar averages and specific behaviour scores
-- Use aspirational, growth-oriented language (not just "improve X")
-- Reference the specific pillar (Delivery/Capacity/People) it addresses
-- Provide meaningful, distinct benefits for the client AND the organisation
-- Follow this style: Goal titles like "Shifting from Executor to Strategic Contributor", "Building Confidence to Challenge the Status Quo", "Developing Talent and Growing Others"
+Generate a detailed leadership report. Adopting ICF MCC accreditation standards, generate EXACTLY 5 coaching goal options for the client to reflect on and choose from.
+
+STYLE GUIDE - follow Wilson's coaching philosophy exactly:
+- Goal titles must be identity-shifting and aspirational, NOT skill-based. Good examples: "Shifting from Executor to Strategic Contributor", "Building Confidence and Capability to Challenge the Status Quo", "Developing Talent and Growing Others", "Moving from Personal Excellence to Systemic Influence", "Combining Resilience with Strategic Patience". Bad examples: "Boosting Perseverance", "Improving Peer Collaboration".
+- Objectives must reference the SPECIFIC pillar average AND the specific behaviour score causing concern. E.g. "This addresses the People pillar average of 3.0 and the low score on Peer Collaboration (1/5)."
+- Client benefits must be written in second person and describe emotional/identity benefits, not just skill gains. E.g. "Greater confidence and credibility in senior discussions; a sense of being valued not just for delivering but for shaping direction."
+- Org benefits must describe business impact with specificity. E.g. "More cohesive team dynamics; faster identification of emerging risks because diverse perspectives are surfaced."
+- Each goal should address a DIFFERENT dimension — avoid 5 goals all targeting the same pillar.
+- Consider the PILLAR STORY: which pillar is weakest? Which is strongest? What does the gap between self and stakeholder scores reveal?
 
 Respond ONLY in this exact JSON format with no other text:
 {
-  "headline": "A 1-sentence leadership statement",
+  "headline": "A 1-sentence leadership statement capturing both strengths and growth edge",
   "top3": ["highest rated behaviour 1", "highest rated behaviour 2", "highest rated behaviour 3"],
   "bottom3": ["lowest rated behaviour 1", "lowest rated behaviour 2", "lowest rated behaviour 3"],
   "coaching_goals": [
     {
-      "title": "Goal title (aspirational, e.g. Shifting from Executor to Strategic Contributor)",
-      "objective": "1-2 sentences on what this goal aims to achieve, referencing the specific score or pillar (e.g. This addresses the Capacity pillar average of X and the low score on Y behaviour)",
-      "client_benefits": "2-3 specific benefits for this leader personally, written in second person",
-      "org_benefits": "2-3 specific benefits for the organisation, written with business impact language",
+      "title": "Aspirational goal title that signals identity shift",
+      "objective": "1-2 sentences referencing the specific pillar average and behaviour score",
+      "client_benefits": "2-3 emotional and professional benefits for this leader personally",
+      "org_benefits": "2-3 specific business impact benefits for the organisation",
       "based_on": "specific behaviour or pillar name"
     }
   ]
