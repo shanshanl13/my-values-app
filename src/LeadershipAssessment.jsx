@@ -721,13 +721,15 @@ Bottom behaviours (lowest stakeholder scores): ${bottomBehaviours2.map(b => `${b
 ${strengthsFeedback ? `Qualitative Strengths: ${strengthsFeedback}` : ""}
 ${developmentFeedback ? `Qualitative Development Areas: ${developmentFeedback}` : ""}
 
+CRITICAL RULE: ONLY generate goals based on the BOTTOM behaviours and WEAKEST pillar averages listed above. NEVER generate a goal targeting a top-scoring behaviour or strength. If a behaviour scores 4 or 5, do NOT use it as a basis for a coaching goal.
+
 STYLE GUIDE - follow Wilson's ICF MCC coaching philosophy:
 - Goal titles must signal IDENTITY SHIFT: use "From X to Y" or "Combining X with Y" structures
 - Example good titles: "Shifting from Executor to Strategic Contributor", "Combining Resilience with Strategic Patience", "Moving from Personal Excellence to Systemic Influence"
-- Objectives MUST reference the specific pillar name and behaviour score from the data above
-- Client benefits: emotional AND professional, written in second person, e.g. "Greater confidence and credibility; reduced frustration from feeling stuck in execution"
-- Org benefits: specific business impact, e.g. "More cohesive decision-making; faster identification of emerging risks"
-- Cover DIFFERENT pillars — do not write 5 goals about the same issue
+- Objectives MUST reference the specific pillar name AND the actual low score (e.g. "Peer Collaboration scores 1/5 in the People pillar")
+- Client benefits: emotional AND professional, written in second person
+- Org benefits: specific business impact
+- Cover DIFFERENT bottom behaviours — address each weak area separately
 
 Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
 {
