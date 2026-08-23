@@ -761,13 +761,24 @@ Objective: To help the client balance their natural strength in action, persever
 Client benefits: Reduced burnout from over-reliance on hustle and persistence; better-quality decisions from allowing space for reflection; a more sustainable approach to challenges that leverages both action and insight.
 Org benefits: More thoughtful, less reactive leadership; better resource allocation because time and energy are invested in the right priorities; a leadership culture that models the value of reflection alongside execution, encouraging others to do the same.
 
-NOW generate 5 goals for THIS client using their actual scores. STRICT RULES:
-- Each objective MUST reference BOTH the specific behaviour score AND the pillar average
-- Client benefits MUST include emotional/identity shift language ("a sense of...", "reduced frustration from...", "greater personal satisfaction from...")
-- Org benefits MUST include cause-effect specificity ("because the client is...", "so that...")
-- Goal 5 should contrast the client's STRONGEST pillar vs their WEAKEST pillar
+NOW generate 5 goals for THIS client using their actual scores. STRICT SENTENCE TEMPLATES — follow these exactly:
+
+OBJECTIVE template: "To [action verb phrase] the client's [capability/behaviour]. This addresses the [Pillar name] pillar average of [X]/5 and the specific low score on [Behaviour name] ([score]/5), which is [one of the lowest / the lowest] in the assessment."
+
+CLIENT BENEFITS template: Must include ALL THREE of these elements:
+1. A professional/credibility benefit: "Greater [X] and [Y] in [context]"
+2. An identity/emotional shift: "a sense of being valued not just for [old identity] but for [new identity]" OR "reduced [frustration/burnout/tension] from [specific cause]"
+3. A relational benefit: "deeper, more [trusting/meaningful] relationships [with whom]"
+
+ORG BENEFITS template: Must include ALL THREE of these elements:
+1. A strategic alignment benefit: "[Specific outcome] because the client is [new behaviour] rather than just [old behaviour]"
+2. A team/cultural benefit: "[Specific cultural shift] as colleagues [specific effect]"
+3. A business impact benefit: "[Measurable or observable business outcome]"
+
+GOAL 5 SPECIAL RULE: Must contrast the client's STRONGEST pillar (highest average) with their WEAKEST pillar (lowest average). Title must use "Combining [strength] with [development area]" pattern. Objective must say: "To help the client balance their natural strength in [strongest pillar behaviours] ([strongest pillar name] average [X]/5) with more deliberate [weakest pillar skill], avoiding the trap of [risk of over-relying on strength]."
+
 - ONLY target behaviours scoring 3/5 or below — NEVER use a behaviour scoring 4 or 5
-- Cover different pillars — do not write 5 goals about the same pillar
+- Cover different pillars across the 5 goals
 - Always generate EXACTLY 5 goals
 
 Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
