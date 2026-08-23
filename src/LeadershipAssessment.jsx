@@ -773,9 +773,12 @@ ORG BENEFITS: Must include cause-effect language: "because the client is [doing 
 
 GOAL 5: Must contrast strongest pillar (highest average) vs weakest pillar (lowest average). Use "Combining [strength] with [new capability]" title pattern.
 
-- ONLY target behaviours scoring 3/5 or below
-- Cover different pillars
+- ONLY target behaviours scoring 3/5 or below — check the ranked behaviour list above and NEVER use any behaviour scoring 4 or 5
+- Goal 5 MUST use "Combining [strongest pillar quality] with [weakest pillar quality]" — the first part must reference what the client is ALREADY GOOD AT (highest pillar), the second part what they need to develop (lowest pillar)
+- Goals 1-4 must each target a DIFFERENT behaviour from the lowest-scoring ones
+- Cover different pillars across goals 1-4
 - Exactly 5 goals
+- Double-check: before finalising each goal, verify the behaviour it targets scores 3 or below in the ranked list
 
 Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
 {
