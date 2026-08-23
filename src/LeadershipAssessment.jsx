@@ -731,9 +731,10 @@ STYLE GUIDE - follow Wilson's ICF MCC coaching philosophy:
 - Org benefits: specific business impact
 - Cover DIFFERENT bottom behaviours — address each weak area separately
 - If there are fewer than 5 distinct bottom behaviours, look at ALL behaviours scoring 3/5 or below across ALL pillars and generate additional goals from those. Do NOT invent process goals or meta-goals about feedback or assessment.
-- Additional goals must still reference specific behaviour names and their actual scores from the data
+- For additional goals beyond the bottom 3, scan ALL 15 behaviours from the data above and find the ones with stakeholder average scores of 3 or below. Use those specific behaviours — cite their exact scores.
+- Priority order for additional goals: first use behaviours scoring 1-2/5, then 3/5, then 4/5 if needed. NEVER use a behaviour scoring 5/5 as a basis for a development goal.
 - Always generate EXACTLY 5 goals — never fewer
-- Every goal must be about a real leadership behaviour from the Parity Coaching framework, not a process or mindset goal
+- Every goal must name a specific Parity Coaching framework behaviour and its actual score
 
 Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
 {
