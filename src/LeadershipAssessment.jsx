@@ -710,9 +710,7 @@ CRITICAL PILLAR-BEHAVIOUR MAPPING (never mix these up):
 - PEOPLE pillar: Effective Delegation, Talent Development, Peer Collaboration, Senior Stakeholder Relationships, Conflict Resolution
 
 Pillar scores with behaviour breakdown:
-${pillarLines.join("
-
-")}
+${pillarLines.join("\n\n")}
 
 Top behaviours (highest stakeholder scores): ${topBehaviours2.map(b => `${b.name} (${b.pillar}, ${b.avg.toFixed(1)}/5)`).join(", ")}
 Bottom behaviours (lowest stakeholder scores): ${bottomBehaviours2.map(b => `${b.name} (${b.pillar}, ${b.avg.toFixed(1)}/5)`).join(", ")}
