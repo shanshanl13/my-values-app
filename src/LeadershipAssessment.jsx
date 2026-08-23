@@ -2042,10 +2042,10 @@ Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
                     if (isSelected) setSelectedGoals(current.filter(g => g !== i));
                     else if (current.length < 3) setSelectedGoals([...current, i]);
                   }}
-                    style={{ padding: "14px 16px", marginBottom: 10, borderRadius: 12, border: isSelected ? "2px solid #C9843A" : "1px solid rgba(45,27,78,0.12)", background: isSelected ? "rgba(201,132,58,0.06)" : "#fff", cursor: "pointer" }}>
+                    style={{ padding: "14px 16px", marginBottom: 10, borderRadius: 12, border: isSelected ? "2px solid #5B2D8E" : "1px solid rgba(91,45,142,0.2)", background: isSelected ? "rgba(91,45,142,0.06)" : "rgba(91,45,142,0.03)", cursor: "pointer" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
                       <div style={{ flex: 1 }}>
-                        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: isSelected ? "#C9843A" : "#2D1B4E" }}>Goal {i+1}: {goal.title || goal.goal}</p>
+                        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: isSelected ? "#5B2D8E" : "#2D1B4E" }}>Goal {i+1}: {goal.title || goal.goal}</p>
                       </div>
                       <div style={{ width: 22, height: 22, borderRadius: "50%", border: isSelected ? "none" : "2px solid rgba(45,27,78,0.2)", background: isSelected ? "#C9843A" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         {isSelected && <span style={{ color: "#fff", fontSize: 12, fontWeight: 800 }}>✓</span>}
