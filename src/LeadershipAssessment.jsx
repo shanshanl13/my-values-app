@@ -761,25 +761,21 @@ Objective: To help the client balance their natural strength in action, persever
 Client benefits: Reduced burnout from over-reliance on hustle and persistence; better-quality decisions from allowing space for reflection; a more sustainable approach to challenges that leverages both action and insight.
 Org benefits: More thoughtful, less reactive leadership; better resource allocation because time and energy are invested in the right priorities; a leadership culture that models the value of reflection alongside execution, encouraging others to do the same.
 
-NOW generate 5 goals for THIS client using their actual scores. STRICT SENTENCE TEMPLATES — follow these exactly:
+NOW generate 5 goals for THIS client using their actual scores. RULES:
 
-OBJECTIVE template: "To [action verb phrase] the client's [capability/behaviour]. This addresses the [Pillar name] pillar average of [X]/5 and the specific low score on [Behaviour name] ([score]/5), which is [one of the lowest / the lowest] in the assessment."
+TITLES: Use Wilson's exact patterns — "Shifting from X to Y", "Moving from X to Y", "Building X", "Combining X with Y". Be specific to this client's data, not generic. Bad: "Enhancing Collaboration". Good: "Shifting from Isolation to Collaborative Engagement".
 
-CLIENT BENEFITS template: Must include ALL THREE of these elements:
-1. A professional/credibility benefit: "Greater [X] and [Y] in [context]"
-2. An identity/emotional shift: "a sense of being valued not just for [old identity] but for [new identity]" OR "reduced [frustration/burnout/tension] from [specific cause]"
-3. A relational benefit: "deeper, more [trusting/meaningful] relationships [with whom]"
+OBJECTIVES: Follow this exact structure: "To [develop/expand/elevate] the client's [specific capability]. This addresses the [Pillar] pillar average of [X]/5 and the specific low score on [Behaviour] ([score]/5), which is [one of the lowest/the lowest] in the assessment."
 
-ORG BENEFITS template: Must include ALL THREE of these elements:
-1. A strategic alignment benefit: "[Specific outcome] because the client is [new behaviour] rather than just [old behaviour]"
-2. A team/cultural benefit: "[Specific cultural shift] as colleagues [specific effect]"
-3. A business impact benefit: "[Measurable or observable business outcome]"
+CLIENT BENEFITS: Must include: (1) a credibility/professional benefit, (2) an identity/emotional shift using "a sense of..." or "reduced frustration/burnout from...", (3) a relational benefit.
 
-GOAL 5 SPECIAL RULE: Must contrast the client's STRONGEST pillar (highest average) with their WEAKEST pillar (lowest average). Title must use "Combining [strength] with [development area]" pattern. Objective must say: "To help the client balance their natural strength in [strongest pillar behaviours] ([strongest pillar name] average [X]/5) with more deliberate [weakest pillar skill], avoiding the trap of [risk of over-relying on strength]."
+ORG BENEFITS: Must include cause-effect language: "because the client is [doing new thing] rather than just [old thing]". Be specific, not generic.
 
-- ONLY target behaviours scoring 3/5 or below — NEVER use a behaviour scoring 4 or 5
-- Cover different pillars across the 5 goals
-- Always generate EXACTLY 5 goals
+GOAL 5: Must contrast strongest pillar (highest average) vs weakest pillar (lowest average). Use "Combining [strength] with [new capability]" title pattern.
+
+- ONLY target behaviours scoring 3/5 or below
+- Cover different pillars
+- Exactly 5 goals
 
 Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
 {
