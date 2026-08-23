@@ -862,7 +862,14 @@ Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
               headers: { "Prefer": "return=minimal" },
               body: JSON.stringify({ report_link: reportLink }),
             });
-            console.log("Report saved (email disabled for testing):", reportLink);
+            await loadEmailJS();
+            await window.emailjs.send(EMAILJS_SERVICE_ID, "template_7g57ixk", {
+              from_name: "Parity Coaching Platform",
+              rater_role: `New Report: ${userInfo.firstName} ${userInfo.lastName}`,
+              assessment_link: reportLink,
+              email: "sayhello@paritycoaching.org",
+            });
+            console.log("Report saved and emailed:", reportLink);
           }
         }
       } catch(emailErr) { console.error("Save/email failed:", emailErr); }
