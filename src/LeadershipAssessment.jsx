@@ -774,7 +774,7 @@ ORG BENEFITS: Must include cause-effect language: "because the client is [doing 
 GOAL 5: Must contrast strongest pillar (highest average) vs weakest pillar (lowest average). Use "Combining [strength] with [new capability]" title pattern.
 
 - ONLY target behaviours scoring 3/5 or below — check the ranked behaviour list above and NEVER use any behaviour scoring 4 or 5
-- Goal 5 MUST use "Combining [strongest pillar quality] with [weakest pillar quality]" — the first part must reference what the client is ALREADY GOOD AT (highest pillar), the second part what they need to develop (lowest pillar)
+- Goal 5 MUST follow Wilson's exact "Combining" pattern: contrast the PILLAR AVERAGES, not individual behaviours. Objective MUST say: "To help the client balance their natural strength in [specific traits from highest-scoring pillar] ([highest pillar name] average [X]/5) with more deliberate [quality needed from lowest pillar], avoiding the trap of [specific risk from over-relying on strength]. This addresses the gap between the client's strongest pillar ([highest pillar] [X]/5) and their weakest pillar ([lowest pillar] [Y]/5)." Goal 5 must NOT repeat any behaviour already used in Goals 1-4.
 - Goals 1-4 must each target a DIFFERENT behaviour from the lowest-scoring ones
 - Cover different pillars across goals 1-4
 - Exactly 5 goals
