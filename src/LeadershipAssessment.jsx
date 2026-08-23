@@ -730,8 +730,10 @@ STYLE GUIDE - follow Wilson's ICF MCC coaching philosophy:
 - Client benefits: emotional AND professional, written in second person
 - Org benefits: specific business impact
 - Cover DIFFERENT bottom behaviours — address each weak area separately
-- If there are fewer than 5 distinct bottom behaviours, generate additional goals based on the WEAKEST pillar averages (the pillar with the lowest average score), exploring different dimensions of that pillar
+- If there are fewer than 5 distinct bottom behaviours, look at ALL behaviours scoring 3/5 or below across ALL pillars and generate additional goals from those. Do NOT invent process goals or meta-goals about feedback or assessment.
+- Additional goals must still reference specific behaviour names and their actual scores from the data
 - Always generate EXACTLY 5 goals — never fewer
+- Every goal must be about a real leadership behaviour from the Parity Coaching framework, not a process or mindset goal
 
 Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
 {
