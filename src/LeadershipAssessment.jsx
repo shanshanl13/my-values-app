@@ -718,6 +718,17 @@ ${pillarLines.join("\n\n")}
 Top behaviours (highest stakeholder scores): ${topBehaviours2.map(b => `${b.name} (${b.pillar}, ${b.avg.toFixed(1)}/5)`).join(", ")}
 Bottom behaviours (lowest stakeholder scores): ${bottomBehaviours2.map(b => `${b.name} (${b.pillar}, ${b.avg.toFixed(1)}/5)`).join(", ")}
 
+${(() => {
+        const sortedBehaviours = COMPETENCIES.map(c => {
+          const pillar = PILLARS.find(p => p.competencies.some(pc => pc.id === c.id));
+          const stakeholderScores = otherRaters.map(r => r.ratings[c.id] || 0).filter(s => s > 0);
+          const avg = stakeholderScores.length > 0 ? (stakeholderScores.reduce((a,b)=>a+b,0)/stakeholderScores.length).toFixed(1) : "N/A";
+          return `${avg}/5 - ${c.name} (${pillar?.name} pillar)`;
+        }).sort((a,b) => parseFloat(a) - parseFloat(b));
+        return `ALL 15 BEHAVIOURS RANKED BY STAKEHOLDER SCORE (lowest first — use the LOWEST for coaching goals):
+${sortedBehaviours.join("\n")}`;
+      })()}
+
 ${strengthsFeedback ? `Qualitative Strengths: ${strengthsFeedback}` : ""}
 ${developmentFeedback ? `Qualitative Development Areas: ${developmentFeedback}` : ""}
 
