@@ -763,7 +763,7 @@ Org benefits: More thoughtful, less reactive leadership; better resource allocat
 
 NOW generate 5 goals for THIS client using their actual scores. RULES:
 
-TITLES: Use Wilson's exact patterns — "Shifting from X to Y", "Moving from X to Y", "Building X", "Combining X with Y". Be specific to this client's data, not generic. Bad: "Enhancing Collaboration". Good: "Shifting from Isolation to Collaborative Engagement".
+TITLES: Use Wilson's exact patterns — ONLY "Shifting from X to Y", "Moving from X to Y", or "Combining X with Y". NEVER use "Building X", "Developing X", "Enhancing X", "Cultivating X". Every title must have a FROM and a TO or a COMBINING structure. Bad: "Building Strategic Decision-Making Capability". Good: "Shifting from Reactive Decisions to Strategic Clarity". Bad: "Developing Resilience". Good: "Moving from Avoidance to Resilient Leadership".
 
 OBJECTIVES: Follow this exact structure: "To [develop/expand/elevate] the client's [specific capability]. This addresses the [Pillar] pillar average of [X]/5 and the specific low score on [Behaviour] ([score]/5), which is [one of the lowest/the lowest] in the assessment."
 
