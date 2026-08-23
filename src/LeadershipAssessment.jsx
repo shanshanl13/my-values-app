@@ -734,18 +734,41 @@ ${developmentFeedback ? `Qualitative Development Areas: ${developmentFeedback}` 
 
 CRITICAL RULE: ONLY generate goals based on the BOTTOM behaviours and WEAKEST pillar averages listed above. NEVER generate a goal targeting a top-scoring behaviour or strength. If a behaviour scores 4 or 5, do NOT use it as a basis for a coaching goal.
 
-STYLE GUIDE - follow Wilson's ICF MCC coaching philosophy:
-- Goal titles must signal IDENTITY SHIFT: use "From X to Y" or "Combining X with Y" structures
-- Example good titles: "Shifting from Executor to Strategic Contributor", "Combining Resilience with Strategic Patience", "Moving from Personal Excellence to Systemic Influence"
-- Objectives MUST reference the specific pillar name AND the actual low score (e.g. "Peer Collaboration scores 1/5 in the People pillar")
-- Client benefits: emotional AND professional, written in second person
-- Org benefits: specific business impact
-- Cover DIFFERENT bottom behaviours — address each weak area separately
-- If there are fewer than 5 distinct bottom behaviours, look at ALL behaviours scoring 3/5 or below across ALL pillars and generate additional goals from those. Do NOT invent process goals or meta-goals about feedback or assessment.
-- For additional goals beyond the bottom 3, scan ALL 15 behaviours from the data above and find the ones with stakeholder average scores of 3 or below. Use those specific behaviours — cite their exact scores.
-- Priority order for additional goals: first use behaviours scoring 1-2/5, then 3/5, then 4/5 if needed. NEVER use a behaviour scoring 5/5 as a basis for a development goal.
-- Always generate EXACTLY 5 goals — never fewer
-- Every goal must name a specific Parity Coaching framework behaviour and its actual score
+FOLLOW WILSON'S EXACT COACHING STANDARD (ICF MCC). Match this quality and depth exactly using the client's actual data:
+
+EXAMPLE 1 - "Shifting from Executor to Strategic Contributor"
+Objective: To elevate the client's ability to move beyond operational execution and actively shape strategic direction. This addresses the Capacity pillar's low scores in strategic mindset (2) and the overall 2.8 average, which is the weakest of the three pillars.
+Client benefits: Greater confidence and credibility in senior-level discussions; a sense of being valued not just for "getting things done" but for shaping the agenda itself; reduced frustration from feeling stuck in execution while others set direction.
+Org benefits: Stronger alignment between the client's work and the company's long-term vision; more robust strategic conversations with diverse input; faster identification of emerging opportunities and risks because the client is thinking ahead rather than just responding.
+
+EXAMPLE 2 - "Building Confidence and Capability to Challenge the Status Quo"
+Objective: To develop the client's willingness and skill to constructively question existing practices, processes, and assumptions. This directly targets the Capacity trait "thinks outside the box and challenges the status quo," which scored 2 – one of the lowest in the assessment.
+Client benefits: Increased influence and visibility as someone who brings fresh perspectives; greater personal satisfaction from contributing to meaningful change; reduced internal tension from holding back ideas that could add value.
+Org benefits: A culture that is more open to innovation and continuous improvement; earlier detection of outdated or inefficient practices; better decision-making through diverse viewpoints being surfaced and considered.
+
+EXAMPLE 3 - "Developing Talent and Growing Others (with or without Formal Authority)"
+Objective: To expand the client's ability to develop, mentor, and elevate the capabilities of colleagues around them – even without direct reporting lines. This addresses the People trait "attracts and develops talents," which scored 2 – one of the lowest in the assessment.
+Client benefits: A stronger personal brand as a leader who invests in others; deeper, more trusting relationships across the organisation; greater sense of purpose and legacy from seeing others grow as a result of their support.
+Org benefits: Broader capability-building without relying solely on formal L&D programmes; improved retention as colleagues feel valued and mentored; a healthier talent pipeline that is not dependent on a single manager or structure.
+
+EXAMPLE 4 - "Moving from Personal Excellence to Systemic Influence"
+Objective: To broaden the client's perspective from their immediate role or team to the wider organisational system, ensuring decisions consider ripple effects across functions and geographies. This builds on the Capacity trait "considers broader impacts" (score 3) and the overall need to strengthen systemic thinking.
+Client benefits: Enhanced reputation as a cross-functional collaborator and mature leader; greater ability to anticipate unintended consequences of decisions; more meaningful engagement with senior stakeholders who value big-picture thinking.
+Org benefits: More cohesive, aligned decision-making across silos; reduced friction between departments as decisions are made with mutual impact in mind; stronger organisational resilience because leaders are thinking holistically, not just locally.
+
+EXAMPLE 5 - "Combining Resilience with Strategic Patience"
+Objective: To help the client balance their natural strength in action, perseverance, and decisiveness (Delivery average 4.0) with more deliberate strategic reflection, avoiding the trap of "doing more" instead of "thinking differently." This addresses the gap between the client's strongest pillar and their weakest pillar (Capacity 2.8).
+Client benefits: Reduced burnout from over-reliance on hustle and persistence; better-quality decisions from allowing space for reflection; a more sustainable approach to challenges that leverages both action and insight.
+Org benefits: More thoughtful, less reactive leadership; better resource allocation because time and energy are invested in the right priorities; a leadership culture that models the value of reflection alongside execution, encouraging others to do the same.
+
+NOW generate 5 goals for THIS client using their actual scores. STRICT RULES:
+- Each objective MUST reference BOTH the specific behaviour score AND the pillar average
+- Client benefits MUST include emotional/identity shift language ("a sense of...", "reduced frustration from...", "greater personal satisfaction from...")
+- Org benefits MUST include cause-effect specificity ("because the client is...", "so that...")
+- Goal 5 should contrast the client's STRONGEST pillar vs their WEAKEST pillar
+- ONLY target behaviours scoring 3/5 or below — NEVER use a behaviour scoring 4 or 5
+- Cover different pillars — do not write 5 goals about the same pillar
+- Always generate EXACTLY 5 goals
 
 Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
 {
