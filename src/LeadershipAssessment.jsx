@@ -730,6 +730,8 @@ STYLE GUIDE - follow Wilson's ICF MCC coaching philosophy:
 - Client benefits: emotional AND professional, written in second person
 - Org benefits: specific business impact
 - Cover DIFFERENT bottom behaviours — address each weak area separately
+- If there are fewer than 5 distinct bottom behaviours, generate additional goals based on the WEAKEST pillar averages (the pillar with the lowest average score), exploring different dimensions of that pillar
+- Always generate EXACTLY 5 goals — never fewer
 
 Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
 {
