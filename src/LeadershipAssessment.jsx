@@ -2025,8 +2025,8 @@ Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
             <div style={{ marginBottom: 24 }}>
               <p style={{ color: "#2D1B4E", fontSize: 14, fontWeight: 700, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: 0.5 }}>Coaching Goals</p>
               <p style={{ color: "#8B7B9B", fontSize: 12, margin: "0 0 16px", lineHeight: 1.5 }}>Select 2-3 goals that resonate most. These will appear in your PDF report.</p>
-              <div style={{ padding: "12px 16px", background: "rgba(91,45,142,0.05)", border: "1px solid rgba(91,45,142,0.15)", borderRadius: 10, marginBottom: 16 }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: "#5B2D8E", margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 0.5 }}>Reflect before choosing</p>
+              <div style={{ padding: "12px 16px", background: "rgba(224,168,74,0.05)", border: "1px solid rgba(224,168,74,0.2)", borderRadius: 10, marginBottom: 16 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: "#E0A84A", margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 0.5 }}>Reflect before choosing</p>
                 {["Which goal, if achieved, would have the most meaningful impact on your work and sense of fulfilment?",
                   "Which goal makes you feel the most uncomfortable — and could that discomfort point to your most important growth area?",
                   "If you looked back 12 months from now, which achievement would make you most proud?",
@@ -2042,10 +2042,10 @@ Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
                     if (isSelected) setSelectedGoals(current.filter(g => g !== i));
                     else if (current.length < 3) setSelectedGoals([...current, i]);
                   }}
-                    style={{ padding: "14px 16px", marginBottom: 10, borderRadius: 12, border: isSelected ? "2px solid #5B2D8E" : "1px solid rgba(91,45,142,0.2)", background: isSelected ? "rgba(91,45,142,0.06)" : "rgba(91,45,142,0.03)", cursor: "pointer" }}>
+                    style={{ padding: "14px 16px", marginBottom: 10, borderRadius: 12, border: isSelected ? "2px solid #E0A84A" : "1px solid rgba(224,168,74,0.25)", background: isSelected ? "rgba(224,168,74,0.08)" : "rgba(224,168,74,0.03)", cursor: "pointer" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
                       <div style={{ flex: 1 }}>
-                        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: isSelected ? "#5B2D8E" : "#2D1B4E" }}>Goal {i+1}: {goal.title || goal.goal}</p>
+                        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: isSelected ? "#E0A84A" : "#2D1B4E" }}>Goal {i+1}: {goal.title || goal.goal}</p>
                       </div>
                       <div style={{ width: 22, height: 22, borderRadius: "50%", border: isSelected ? "none" : "2px solid rgba(45,27,78,0.2)", background: isSelected ? "#C9843A" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         {isSelected && <span style={{ color: "#fff", fontSize: 12, fontWeight: 800 }}>✓</span>}
