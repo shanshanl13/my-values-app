@@ -1987,19 +1987,6 @@ Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
             );
           })()}
 
-          {/* Book a session */}
-          <div style={{ padding: "20px 24px", background: "linear-gradient(135deg, rgba(201,132,58,0.12), rgba(38,70,83,0.2))", border: "1px solid rgba(201,132,58,0.25)", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 32 }}>
-            <div>
-              <p style={{ color: "#1a0a2e", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Discuss your results with a coach</p>
-              <p style={{ color: "#6B5B7B", fontSize: 12, margin: 0 }}>Book a 1:1 session to debrief your leadership brand report.</p>
-            </div>
-            <a href="https://www.paritycoaching.org" target="_blank" rel="noopener noreferrer"
-              style={{ padding: "10px 20px", background: "#C9843A", borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none", flexShrink: 0 }}>
-              Book a Session →
-            </a>
-          </div>
-
-
           {/* Coaching Goals Selection */}
           {report?.coaching_goals?.length > 0 && (
             <div style={{ marginBottom: 24 }}>
@@ -2041,6 +2028,18 @@ Generate EXACTLY 5 coaching goal options. Respond ONLY in JSON:
               )}
             </div>
           )}
+
+          {/* Book a session */}
+          <div style={{ padding: "20px 24px", background: "linear-gradient(135deg, rgba(201,132,58,0.12), rgba(38,70,83,0.2))", border: "1px solid rgba(201,132,58,0.25)", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
+            <div>
+              <p style={{ color: "#1a0a2e", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Discuss your results with a coach</p>
+              <p style={{ color: "#6B5B7B", fontSize: 12, margin: 0 }}>Book a 1:1 session to debrief your leadership brand report.</p>
+            </div>
+            <a href="https://www.paritycoaching.org" target="_blank" rel="noopener noreferrer"
+              style={{ padding: "10px 20px", background: "#C9843A", borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none", flexShrink: 0 }}>
+              Book a Session →
+            </a>
+          </div>
 
           {/* Generate PDF Report */}
           <button onClick={() => generatePDFReport()}
