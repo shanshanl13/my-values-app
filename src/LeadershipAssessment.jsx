@@ -688,6 +688,9 @@ export default function LeadershipAssessment({ onBack, currentUser, coreValues =
         return `${p.name} pillar: Self avg=${selfAvg}/5${stakeholderBreakdown ? `, Stakeholders: ${stakeholderBreakdown}` : ""}\nBehaviours:\n${behaviourList}`;
       });
 
+      const strengthsFeedback = allRaterData.filter(r => r.strengths?.trim()).map(r => `${r.name}: ${r.strengths}`).join("\n");
+      const developmentFeedback = allRaterData.filter(r => r.development?.trim()).map(r => `${r.name}: ${r.development}`).join("\n");
+
       const behaviourScores2 = COMPETENCIES.map(c => {
         const otherScores = otherRaters.map(r => r.ratings[c.id] || 0).filter(s => s > 0);
         const avg = otherScores.length > 0 ? otherScores.reduce((a,b)=>a+b,0)/otherScores.length : 0;
